@@ -1,0 +1,91 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>Debug page for Project {{.Project.Title}}</h1>
+        {{ $id := .Project.UID }}
+
+        <p><a href="/">home</a> / <a href="/projects">projects</a> / <a href="/projects/{{$id}}">{{$id}}</a> / <a href="/projects/{{$id}}/attributes">attributes</a>
+
+        <p><a class="pure-button" href="/projects/{{$id}}">🔙 Back to project</a></p>
+    
+        <p>🐛</p>
+
+        <p class="status"><b>Status</b>: <img src="/assets/images/status/{{.Project.Status}}.gif"/> {{.Project.Status}}</p>
+
+        <h3>Set status</h3>
+
+        <form class="pure-form pure-form-stacked" action="/projects/{{$id}}/status" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="put"/>
+            <select name="status">
+                <option value="initialized">initialized</option>
+                <option value="preparingEnclave">preparingEnclave</option>
+                <option value="preparingEnclaveErrored">preparingEnclaveErrored</option>
+                <option value="preparingEnclaveDone">preparingEnclaveDone</option>
+                <option value="updatingAttributes">updatingAttributes</option>
+                <option value="attributesUpdated">attributesUpdated</option>
+                <option value="attributesUpdatedErrored">attributesUpdatedErrored</option>
+                <option value="unlockingEnclave">unlockingEnclave</option>
+                <option value="unlockingEnclaveDone">unlockingEnclaveDone</option>
+                <option value="unlockingEnclaveErrored">unlockingEnclaveErrored</option>
+                <option value="deletingEnclaveDone">deletingEnclaveDone</option>
+                <option value="deletingEnclaveErrored">deletingEnclaveErrored</option>
+            </select>
+            <button type="submit" class="pure-button pure-button-primary">Set status</button>
+        </form>
+
+        <h3>Free actions</h3>
+        <h4>Next step: update the project attributes</h4>
+        <p><a href="/projects/{{$id}}/attributes" class="pure-button">Go to the attributes update page</a></p>
+
+        <h4>Next step: ask to unlock the enclave</h4>
+        <form class="pure-form pure-form-stacked" action="/projects/{{$id}}/unlock" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="put"/>
+            <button type="submit" class="pure-button">Ask to unlock the enclave</button>
+        </form>
+
+        <h4>Next step: Access you enclave</h4>
+        <p><a href="/projects/{{$id}}/enclave" class="pure-button">Go to the access page</a></p>
+
+        <h4>Next step: Retry to boot the enclave</h4>
+        <form class="pure-form pure-form-stacked" action="/projects/{{$id}}" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="put"/>
+            <button type="submit" class="pure-button">Ask to prepare the enclave (retry)</button>
+        </form>
+
+        <h4>Delete the project</h4>
+        <form class="pure-form pure-form-stacked" action="/projects/{{$id}}" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="delete"/>
+            <button type="submit" style="background: rgb(223, 117, 20)" onclick="return confirm('This action will remove this failed project. You confirm?');" class="pure-button pure-button-primary">Remove this failed project</button>
+        </form>
+
+        <h4>Delete the enclave</h4>
+        <form class="pure-form pure-form-stacked" action="/projects/{{ $id }}/enclave" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for DELETE -->
+            <input type="hidden" name="_method" value="delete"/>
+            <button style="background: rgb(223, 117, 20)" onclick="return confirm('This action will destroy the enclave and all its data. Are you sure?');" type="submit" class="pure-button pure-button-primary">Delete the enclave</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    p.status {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    p.status img {
+        padding: 0 7px 0 10px;
+        max-height: 32px;
+    }
+</style>
+
+{{ end }}

@@ -1,0 +1,49 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+.DS_Store
+/secret
+dsmanager/app/docs
+domanager/app/uploads
+catalogc/catadmin/catadmin
+
+domanager/app/bcadmin
+domanager/app/catadmin
+domanager/app/csadmin
+domanager/app/my.db
+
+dsmanager/app/csadmin
+dsmanager/app/catadmin
+dsmanager/app/pcadmin
+dsmanager/app/id_rsa
+dsmanager/app/id_rsa.pub
+dsmanager/app/my.db
+
+enclavem/app/my.db
+enclavem/app/pcadmin
+enclavem/app/csadmin
+enclavem/app/main
+enclavem/secret
+
+projectc/pcadmin/pcadmin
+student_18_explorer/
+dsmanager/app/bcadmin
+enclavem/app/bcadmin
+domanager/app/config.toml
+dsmanager/app/config.toml
+enclavem/app/config.toml
+ledger/bcadmin
+ledger/csadmin

@@ -1,0 +1,28 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-3"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-3">
+    
+      <h1>Authorize</h1>
+
+      <p>Store the byzcoin-id that should be trusted to create new LTS</p>
+
+      <form enctype="multipart/form-data" action="http://localhost:5001/authorize" method="post" class="pure-form pure-form-stacked">
+        <fieldset>
+            <label for="file">private.toml</label>
+            <input class="pure-input-1" id="file" required type="file" name="myFile" /><br>
+
+            <label for="bid">ByzcoinID</label>
+            <input class="pure-input-1" id="bid" required type="text" name="bid"><br>
+
+          <input class="pure-button pure-button-primary" type="submit" value="authorize" />
+        </fieldset>
+      </form>
+    
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-3"><p></p></div>
+</div>
+
+{{ end }}

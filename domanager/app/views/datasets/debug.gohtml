@@ -1,0 +1,61 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>Debug page for dataset "{{ .Dataset.Title}}"</h1>
+
+        <p><a class="pure-button" href="/datasets/{{ .Dataset.CalypsoWriteID }}">🔙 Back to the dataset</a></p>
+
+        <p>🐛</p>
+
+        <h4>Remove this dataset from the list</h4>
+        <form class="pure-form pure-form-stacked" action="/datasets/{{ .Dataset.CalypsoWriteID }}" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for DELETE -->
+            <input type="hidden" name="_method" value="delete"/>
+            <!-- we use it to display the dataset's name in the task -->
+            <input type="hidden" value="{{ .Dataset.Title }}" name="datasetTitle"/>
+            <button type="submit" style="background: rgb(223, 117, 20)" onclick="return confirm('This action will remove this dataset. You confirm?');" class="pure-button pure-button-primary">Remove this dataset</button>
+        </form>
+
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+</div>
+
+<style>
+    #loading {
+        visibility: hidden;
+    }
+    .sub-form {
+        margin-left: 25px;
+        padding-left: 15px;
+        border-left: 3px solid #f2f2f2;
+    }
+    .sub-form.disabled {
+        pointer-events: none;
+        opacity: .3;
+    }
+
+    .aligned-checkbox {
+        display: flex;
+        flex-direction: row;
+        margin: .5em 0;
+        align-items: center;
+    }
+    .aligned-checkbox input {
+        flex-shrink: 0;
+    }
+    .aligned-checkbox span {
+        padding: 0 5px 0 8px;
+    }
+</style>
+
+<script>
+    function displayLoader() {
+        document.getElementById("loading").style.visibility = "visible"
+    };
+</script>
+
+{{ end }}

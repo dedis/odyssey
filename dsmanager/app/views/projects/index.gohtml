@@ -1,0 +1,81 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>List of Projects</h1>
+
+        <p><a href="/">home</a> / <a href="/projects">projects</a>
+
+        <p><a class="pure-button" href="/">🔙 Back to 🏠</a></p>
+
+        <p>🦉</p>
+
+        <div class="nice-scroll" style="overflow-x:scroll">
+            <table class="pure-table pure-table-horizontal projects">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Created at</th>
+                        <th>Status</th>
+                        <th>Title</th>
+                        <th>UID</th>
+                        <th>InstanceID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range $i, $d := .Projects }}
+                        <tr>
+                            <td><a class="pure-button pure-button-primary" href="/projects/{{.UID}}">see</a></td>
+                            <td>{{.CreatedAt.Format "02-01-2006 15:04:05..999"}}</td>
+                            <td><div class="status" id="status-holder-{{$i}}"><img src="/assets/images/status/{{.Status}}.gif"/> {{.Status}}</div></td>
+                            <td>{{.Title}}</td>
+                            <td>{{.UID}}</td>
+                            <td>{{.InstanceID}}</td>
+                        </tr>
+
+                        <script>
+                            (function () {
+                                const evtSource = new EventSource("/projects/"+"{{.UID}}"+"/status/stream", {withCredentials: false });
+                                evtSource.onopen = function() {
+                                    console.log("stream is open")
+                                    evtSource.onerror = function(err) {
+                                        console.error("EventSource failed:", err);
+                                        evtSource.close();
+                                    };
+                                };    
+                                evtSource.onmessage = function(event) {
+                                    const statusHolder = document.getElementById("status-holder-{{$i}}");
+                                    statusHolder.innerHTML = '<img src="/assets/images/status/' + event.data + '.gif"/> ' + event.data
+                                }
+                            })();
+                        </script>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+
+</div>
+
+<style>
+    table.projects {
+        width: 100%;
+    }
+
+    div.status {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    div.status img {
+        padding: 0 7px 0 0;
+        max-height: 32px;
+    }
+</style>
+
+{{ end }}

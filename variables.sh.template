@@ -1,0 +1,15 @@
+#!/bin/sh
+# VCD = VCloud Director
+# VDC = Virtual Data Center
+export VCD_PASS=
+export VCD_HOST=
+export VCD_API_USER=
+export VCD_ORG_NAME=
+
+export VDC_ID=
+export NETWORK_ID=
+export TEMPLATE_ID=
+
+export MINIO_ENDPOINT=
+export MINIO_KEY=
+export MINIO_SECRET=

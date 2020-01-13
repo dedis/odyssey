@@ -1,0 +1,176 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>Datasets: {{ .Dataset.Title}}</h1>
+
+        <p><a class="pure-button" href="/datasets">🔙 Back to the list</a></p>
+
+        <p>🐠</p>
+
+        {{ if .Dataset.IsArchived }}
+            <p class="archived-info"><b>This dataset is in "archived" state, which means you can not edit it anymore</b></p>
+
+            <div class="disabled-overlay">
+        {{ else }}
+            <div>
+        {{ end }}
+
+        <h3>Infos</h3>
+
+        <form onsubmit="displayLoader()" class="pure-form action="/datasets/{{.Dataset.CalypsoWriteID}}" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="put"/>
+            <p><b>Title</b>: <input type="text" value="{{ .Dataset.Title }}" name="title"></p>
+            <p><b>Description</b>: <input type="text" value="{{ .Dataset.Description }}" name="description"></p>
+            <p><b>CloudURL</b>: <input readonly="readonly" type="text" value="{{ .Dataset.CloudURL }}" name="cloudURL"></p>
+            <p><b>SHA2</b>: <input readonly="readonly" type="text" value="{{ .Dataset.SHA2 }}" name="sha2"></p>
+            <p><b>CalypsoWriteID</b>: {{ .Dataset.CalypsoWriteID }}</p>
+            <p><b>IdentityStr</b>: {{ .Dataset.IdentityStr }}</p>
+            <p><b>IsArchived</b>: {{ .Dataset.IsArchived }}</p>
+
+            <button id="submit" type="submit" class="pure-button pure-button-primary">Update dataset</button> <span id="loading"> <img src="/assets/images/loader.gif"> updating dataset, please wait...</span>
+        </form>
+
+        <h3>Attributes / rules</h3>
+        {{ if .Dataset.Metadata }}
+            <form class="pure-form pure-form-stacked" action="/datasets/{{ .Dataset.CalypsoWriteID }}/attributes" method="post">
+                <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+                <input type="hidden" name="_method" value="put"/>
+                <!-- we use it to display the dataset's name in the task -->
+                <input type="hidden" value="{{ .Dataset.Title }}" name="datasetTitle"/>
+                
+                {{ range .Dataset.Metadata.AttributesGroups }}
+                    <fieldset>
+                        <legend>{{ .Title }}</legend>
+                        <p>{{ .Description }}</p>
+
+                        {{ range $attr := .Attributes }}
+                            {{ $attr.Form }}
+                        {{ end }}
+                    </fieldset>
+                {{ end }}
+                <button type="submit" class="pure-button pure-button-primary">Update the attributes</button>
+            </form>
+        {{ else }}
+            <p style="color: darkred">No metadata associated with this dataset found</p>
+        {{ end }}
+
+        <h3>Remove access to this dataset</h3>
+        <p>This action can not be undone and prevents anyone to further use this dataset. It does the following:<br>
+        - Remove the encrypted dataset from the cloud storage<br>
+        - Update the dataset record on the catalog with the "archived" flag<br>
+        - Delete all the attributes set as the dataset's metadata<br>
+        - Remove from the DARC controlling the calypso read action all the access rules based on the metadata</p>
+        <form class="pure-form pure-form-stacked" action="/datasets/{{ .Dataset.CalypsoWriteID }}/archive" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="put"/>
+            <!-- we use it to display the dataset's name in the task -->
+            <input type="hidden" value="{{ .Dataset.Title }}" name="datasetTitle"/>
+            <button type="submit" style="background: rgb(223, 117, 20)" onclick="return confirm('This action will prevent anyone to further request this dataset. You confirm?');" class="pure-button pure-button-primary">Remove access</button>
+        </form>
+
+        </div>
+
+        <h3>DARC controlling this dataset</h3>
+        <div class="nice-scroll" style="overflow-x:scroll">
+            <p><b>DarcID</b>: {{ .DarcID }}
+            <pre><code>
+{{ .DarcStr }}
+            </pre></code>
+        <p class="small-links"><a href="/datasets/{{.Dataset.CalypsoWriteID}}/debug">debug</a>
+        </div>
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+</div>
+
+<style>
+    #loading {
+        visibility: hidden;
+    }
+    .sub-form {
+        margin-left: 25px;
+        padding-left: 15px;
+        border-left: 3px solid #f2f2f2;
+    }
+    .sub-form.disabled {
+        pointer-events: none;
+        opacity: .3;
+    }
+
+    .aligned-checkbox {
+        display: flex;
+        flex-direction: row;
+        margin: .5em 0;
+        align-items: center;
+    }
+    .aligned-checkbox input {
+        flex-shrink: 0;
+    }
+    .aligned-checkbox span {
+        padding: 0 5px 0 8px;
+    }
+    .small-links {
+        text-align: right;
+    }
+    .small-links a {
+        color: #aaa;
+        font-size: 8px;
+        text-decoration: none;
+    }
+    div.disabled-overlay {
+        position: relative;
+    }
+    div.disabled-overlay:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color:rgba(255, 255, 255, 0.79);
+        z-index: 10;
+    }
+    p.archived-info {
+        text-align: center;
+        padding: 10px;
+        border: 3px solid red;
+    }
+</style>
+
+<script>
+    function displayLoader() {
+        document.getElementById("loading").style.visibility = "visible"
+    };
+    // hides or shows the subform that contains the subattributes of an attribute
+    function toggleSubform(el) {
+        subform = el.parentElement.parentElement.querySelector(":scope > .sub-form")
+        if (subform === null) {
+            return
+        }
+        if (el.checked == true) {
+            subform.classList.remove("disabled")
+        } else {
+            subform.classList.add("disabled")
+        }
+        if (el.type === "radio") {
+            // Then we need to uncheck all the other sub-forms that are in the
+            // radio button group
+            document.querySelectorAll("input[name='access'][type='radio']").forEach(el => {
+                subform = el.parentElement.parentElement.querySelector(":scope > .sub-form")
+                if (subform === null) {
+                    return
+                }
+                if (el.checked == true) {
+                    subform.classList.remove("disabled")
+                } else {
+                    subform.classList.add("disabled")
+                }
+            });
+        }
+    };
+</script>
+
+{{ end }}

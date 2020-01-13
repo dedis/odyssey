@@ -1,0 +1,64 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="stylesheet" href="/assets/stylesheets/pure-min.css">
+    <link rel="stylesheet" href="/assets/stylesheets/pure-grid-responsive-min.css">
+    <link rel="stylesheet" href="/assets/stylesheets/flash.css">
+    <link rel="stylesheet" href="/assets/stylesheets/base.css">
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <title>{{ template "title" .}}</title>
+  </head>
+  <body>
+    <div class="pure-g header">
+      <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+      <div class="pure-u-1 pure-u-sm-1-2 header-content">
+        {{ if .Session.IsLogged }}
+          <p>You are logged as <a href="/profile">{{ .Session.GetShortIdentity }}</a>
+        {{ else }}
+          <a href="/signin">Sign in</a>
+        {{ end }}
+      </div>
+      <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    </div>
+    
+    {{ if .Flash }}
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+        <div class="pure-u-1 pure-u-sm-1-2">
+          {{ range .Flash}}
+            <div class="flash flash-{{.Type}}">{{.Msg}}</div>
+          {{end}}
+        </div>
+        <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+      </div>
+    {{ end }}
+
+    {{ template "content" .}}
+
+    <div id="footer">
+    </div>
+
+    <style>
+      div#tasks-main-container {
+        display: none;
+      }
+      table.tasks {
+        width: 100%;
+      }
+      div.header-content {
+        text-align: right;
+        padding: 5px;
+      }
+    </style>
+
+  </body>
+</html>
+{{end}}

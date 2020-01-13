@@ -1,0 +1,62 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>List of EProjects</h1>
+
+        <p><a class="pure-button" href="/">🔙 Back to 🏠</a></p>
+
+        <p>Hello there</p>
+
+        <form class="pure-form pure-form-stacked" action="/eprojects" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+            <input type="hidden" name="_method" value="delete"/>
+            <button style="background: rgb(223, 117, 20)" onclick="return confirm('Are you sure?');" type="submit" class="pure-button pure-button-primary">Delete all instances</button>
+        </form>
+
+        <div style="overflow:scroll">
+        <table class="pure-table pure-table-horizontal projects">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Enclave name</th>
+                    <th>Status</th>
+                    <th>IP Address</th>
+                    <th>InstanceID</th>
+                    <th>Enclave hredf</th>
+                    <th>Public key</th>
+                    <th>Cloud endpoint</th>
+                </tr>
+            </thead>
+            <tbody>
+{{ range $i, $d := .EProjects }}
+                <tr>
+                    <td><a class="pure-button pure-button-primary" href="/eprojects/{{.InstanceID}}">See</a></td>
+                    <td>{{.EnclaveName}}</td>
+                    <td>{{.Status}}</td>
+                    <td>{{.IPAddr}}</td>
+                    <td>{{.InstanceID}}</td>
+                    <td>{{.EnclaveHref}}</td>
+                    <td>{{.PubKey}}</td>
+                    <td>{{.CloudEndpoint}}</td>
+                </tr>
+{{ end }}
+            </tbody>
+        </table>
+        </div>
+
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+
+</div>
+
+<style>
+  table.projects {
+    width: 100%;
+  }
+</style>
+
+{{ end }}

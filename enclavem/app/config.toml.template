@@ -1,0 +1,5 @@
+BCPath = "....cfg"
+DarcID = "darc:..."
+KeyID = "ed25519:..."
+ConfigPath = ""
+NetworkID = ""

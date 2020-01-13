@@ -1,0 +1,6 @@
+CatalogID = ""
+BCPath = "...cfg"
+DarcID = "darc:..."
+KeyID = "ed25519:..."
+ConfigPath = ""
+PubKeyPath = "...pub"

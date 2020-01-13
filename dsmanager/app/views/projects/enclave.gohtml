@@ -1,0 +1,57 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>Enclave of Project {{.Project.Title}}</h1>
+        {{ $id := .Project.UID }}
+
+        <p><a href="/">home</a> / <a href="/projects">projects</a> / <a href="/projects/{{$id}}">{{$id}}</a> / <a href="/projects/{{$id}}/enclave">enclave</a>
+
+        <p><a class="pure-button" href="/projects/{{$id}}">🔙 Back to project</a></p>
+    
+        <p>🦉</p>
+
+        <p>
+            <b>Security restrictions</b><br><br>
+            - Only ssh on port 22 allowed<br>
+            - No other in/out network trafic authorized<br>
+            - No root access<br>
+            - scp has a PII checker
+        </p>
+
+        <h3>💻 Option 1: SSH</h3>
+
+        <p>You can ssh to your enclave with the following command:</p>
+        <p><pre>ssh -i id_rsa scientist@{{.URL}}</pre></p>
+
+        <h3>🐍 Option 2: Run a Jupyter Notebook</h3>
+        <p>To run a jupyter notebook on the enclave you must first run the jupyter notebook via ssh, then initialize a tunel in another terminal.</p>
+        <p>
+            <b>Start the notebook via ssh</b>:<br>
+            <pre>ssh -t -i id_rsa scientist@{{.URL}} 'jupyter notebook'</pre>
+        </p>
+        <p>
+            <b>Initialize a tunnel to the notebook (in another terminal)</b>:<br>
+            <pre>ssh -i id_rsa -N -L localhost:8888:localhost:8888 scientist@{{.URL}}</pre><br>
+        </p>
+        <p>You may then access jupyter by clicking <a href="http://localhost:8888" target="_blank">here</a></p>
+
+        <p>
+            If you want to upload a notebook:<br>
+            <pre>scp -i id_rsa /Users/nkocher/GitHub/odyssey/enclave/demo/Demo.ipynb scientist@{{.URL}}:python_project</pre>
+            or download the result:<br>
+            <pre>scp -i id_rsa scientist@{{.URL}}:python_project/pearson.pdf ./</pre>
+        </p>
+
+        <br><hr><br>
+
+        <form class="pure-form pure-form-stacked" action="/projects/{{ $id }}/enclave" method="post">
+            <!-- html form only supports POST and GET forms, this is a workaround for DELETE -->
+            <input type="hidden" name="_method" value="delete"/>
+            <button style="background: rgb(223, 117, 20)" onclick="return confirm('This action will destroy the enclave and all its data. Are you sure?');" type="submit" class="pure-button pure-button-primary">Delete the enclave</button>
+        </form>
+
+{{ end }}

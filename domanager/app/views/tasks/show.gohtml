@@ -1,0 +1,232 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g main">
+
+    <div class="pure-u-1">
+        <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+        <div class="pure-u-1 pure-u-sm-1-2">
+            <p><a class="pure-button" href="/showtasks">🔙 Back to the list of tasks</a></p>
+            {{ .Request.GoBackLink }}
+        </div>
+        <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    </div>
+    <div class="pure-u-1 main-content">
+        <div class="main-content-wrapper">
+            <p class="description">{{.Request.Description}}</p>
+            <p class="status">{{.StatusImg}}</p>
+            <div id="logs">
+                {{ range $i, $d := .Request.History }}
+                    {{ if eq $d.Type "closeOK" }}
+                        <div onclick="toggle(this)" class="log last ok">
+                    {{ else if eq $d.Type "closeError" }}
+                        <div onclick="toggle(this)" class="log last error">
+                    {{ else }}
+                        <div onclick="toggle(this)" class="log">
+                    {{ end }}
+                            <div class="message">{{.Message}}</div>
+                            <div data-collapsed="true" style="height: 0px; display:none;" class="details">
+                                {{.Details}}
+                            </div>
+                        </div>
+                {{ end }}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    body {
+        background: rgb(254,254,254);
+        background: radial-gradient(circle, rgba(254,254,254,1) 0%, rgba(226,225,224,1) 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .main-content {
+        text-align: center;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .main-content-wrapper {
+        flex: 4;
+    }
+    .main-content:before {
+        content: "";
+        flex: 1;
+    }
+    .main-content:after {
+        content: "";
+        flex: 2;
+    }
+    p.description {
+        font-weight: bold;
+        font-site: 1.3em;
+    }
+    p.status {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    p.status img {
+        padding: 0 7px 0 10px;
+        max-height: 32px;
+    }
+    div#logs {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+    div#logs div.log {
+        background: #fff;
+        border-radius: 2px;
+        padding: 10px 30px;
+        display: inline-block;
+        margin: .3rem;
+        position: relative;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        cursor: pointer;
+    }
+    div#logs div.log:hover {
+        /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.20), 0 10px 10px rgba(0, 0, 0, 0.14) !important;
+    }
+    div#logs div.log.opened {
+        /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.11), 0 10px 10px rgba(0, 0, 0, 0.04)
+    }
+    div#logs div.log:first-child:not(.last) {
+        background: none;
+        font-weight: bold;
+        font-size: .95em;
+    }
+    div#logs div.log div.message:after {
+        content: " ✓";
+        font-size: .8em;
+        color: #8b8783;
+        padding: 0 0 0 5px;
+    }
+    div#logs div.log:first-child:not(.last) div.message:after {
+        content: "..." !important;
+        font-size: 1em !important;
+        color: #000 !important;
+    }
+    div#logs div.log.last {
+        font-weight: bold;
+    }
+    div#logs div.log.last.ok {
+        background: greenyellow;
+    }
+    div#logs div.log.last.ok div.details {
+        color: #000;
+    }
+    div#logs div.log.last.error {
+        background: red;
+    }
+    div#logs div.log.last.error div.details {
+        color: #000;
+    }
+    div#logs div.log div.details {
+        overflow:hidden;
+        transition:height 0.3s ease-out;
+        height: auto;
+        color: rgb(112, 112, 112);
+        word-break: break-word;
+    }
+</style>
+
+<script>
+var url = new URL(window.location.href);
+const evtSource = new EventSource("/tasks/"+"{{.Request.Index}}", {withCredentials: false });
+
+evtSource.onmessage = function(event) {
+
+    const eventList = document.getElementById("logs");
+
+    var newLog = document.createElement("div");
+    newLog.classList.add("log")
+    newLog.onclick = function() {
+        toggle(this);
+    }
+    var message = document.createElement("div")
+    message.classList.add("message")
+
+    var details = document.createElement("div")
+    details.classList.add("details")
+    details.setAttribute('data-collapsed', 'true');
+    details.style.height = "0px";
+    details.style.display = "none";
+    
+    var jsonObj = JSON.parse(event.data)
+
+    if (jsonObj.type == "closeError") {
+        location.reload();
+    } else if (jsonObj.type == "closeOK") {
+        location.reload();
+    }
+
+    message.innerHTML = jsonObj.message
+    newLog.appendChild(message)
+    details.innerHTML = jsonObj.details
+    newLog.appendChild(details)
+
+    eventList.prepend(newLog);
+
+    evtSource.onerror = function(err) {
+        console.error("EventSource failed:", err);
+        evtSource.close();
+    };
+}
+
+function toggle(el) {
+    var details = el.children[1];
+    var isCollapsed = details.getAttribute('data-collapsed') === 'true';
+    if (isCollapsed) {
+        expandSection(details)
+        el.classList.add("opened")
+    } else {
+        collapseSection(details)
+        el.classList.remove("opened")
+    }
+}
+
+function collapseSection(element) {
+  var sectionHeight = element.scrollHeight;
+    var elementTransition = element.style.transition;
+    element.style.display = "none";
+  element.style.transition = '';
+  requestAnimationFrame(function() {
+    element.style.height = sectionHeight + 'px';
+    element.style.transition = elementTransition;
+    requestAnimationFrame(function() {
+      element.style.height = 0 + 'px';
+    });
+  });
+  element.setAttribute('data-collapsed', 'true');
+}
+
+function expandSection(element) {
+    element.style.display = "block";
+  var sectionHeight = element.scrollHeight;
+  element.style.height = sectionHeight + 'px';
+  element.addEventListener('transitionend', function(e) {
+    element.removeEventListener('transitionend', arguments.callee);
+    element.style.height = null;
+  });
+  element.setAttribute('data-collapsed', 'false');
+}
+</script>
+
+{{ end }}

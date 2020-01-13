@@ -1,0 +1,299 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>Project {{.Project.Title}}</h1>
+        {{ $id := .Project.UID }}
+
+        <p><a href="/">home</a> / <a href="/projects">projects</a> / <a href="/projects/{{$id}}">{{$id}}</a>
+
+        <p><a class="pure-button" href="/projects">🔙 Back to projects</a></p>
+
+        <p>🦉</p>
+
+        <p class="project-status"><b>Status</b>: <img src="/assets/images/status/{{.Project.Status}}.gif"/> {{.Project.Status}}</p>
+        <p><b>Description</b>: {{.Project.Description}}</p>
+        <p><b>UID</b>: {{.Project.UID}}</p>
+        <details>
+            <summary><b>InstanceID</b></summary>
+            <div style="overflow:scroll;"><p>{{.Project.InstanceID}}</p></div>
+        </details>
+        <details>
+            <summary><b>Public key</b></summary>
+            <div style="overflow:scroll;"><p>{{.Project.PubKey}}</p></div>
+        </details>
+        <details>
+            <summary><b>Attributes</b></summary>
+            <div style="overflow:scroll;"><pre>{{.ProjectContractData}}</pre></div>
+        </details>
+
+        {{ if or (eq .Project.Status "preparingEnclaveDone") (eq .Project.Status "attributesUpdatedErrored") }}
+            <h3>Next step: update the project attributes</h3>
+            <p><a href="/projects/{{$id}}/attributes" class="pure-button pure-button-primary">Go to the attributes update page</a></p>
+        {{end }}
+
+        {{ if and (eq .Project.Status "unlockingEnclaveErrored") (ne .FailedReasons "") }}
+            <h3>Next step: update the attributes to comply with the rules</h3>
+            <p><b>Reason it couldn't unlock:</b><br><pre>{{ .FailedReasons }}</pre></p>
+            <p><a href="/projects/{{$id}}/attributes" class="pure-button pure-button-primary">Go to the attributes update page</a></p>
+        {{end }}
+
+        {{ if and (eq .Project.Status "unlockingEnclaveErrored") (eq .FailedReasons "") }}
+            <h3>Next step: retry or update the attributes to comply with the rules</h3>
+            <p>This is bad. Apparently it didn't fail because of the project's attributes. One of the reason could be that the IP adress of the enclave is already used. You can check the logs for more infos</p>
+            <form class="pure-form pure-form-stacked" action="/projects/{{$id}}/unlock" method="post">
+                <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+                <input type="hidden" name="_method" value="put"/>
+                <button type="submit" class="pure-button pure-button-primary">Ask to unlock the enclave (retry)</button>
+            </form>            
+            <p><a href="/projects/{{$id}}/attributes" class="pure-button pure-button-primary">Go to the attributes update page</a></p>
+        {{end }}
+
+        {{ if eq .Project.Status "attributesUpdated" }}
+            <h3>Next step: ask to unlock the enclave</h3>
+            <form class="pure-form pure-form-stacked" action="/projects/{{$id}}/unlock" method="post">
+                <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+                <input type="hidden" name="_method" value="put"/>
+                <button type="submit" class="pure-button pure-button-primary">Ask to unlock the enclave</button>
+            </form>
+            <p>you can still update the project's attributes</p>
+            <p><a href="/projects/{{$id}}/attributes" class="pure-button">Go to the attributes update page</a></p>
+        {{end }}
+
+        {{ if or (eq .Project.Status "unlockingEnclaveDone") (eq .Project.Status "deletingEnclaveErrored") }}
+            <h3>Next step: Access / destroy you enclave</h3>
+            <p><a href="/projects/{{$id}}/enclave" class="pure-button pure-button-primary">Go to the access page</a></p>
+            <form class="pure-form pure-form-stacked" action="/projects/{{ $id }}/enclave" method="post">
+                <!-- html form only supports POST and GET forms, this is a workaround for DELETE -->
+                <input type="hidden" name="_method" value="delete"/>
+                <button style="background: rgb(223, 117, 20)" onclick="return confirm('This action will destroy the enclave and all its data. Are you sure?');" type="submit" class="pure-button pure-button-primary">Destroy the enclave</button>
+            </form>        
+        {{end }}
+
+        {{ if and (eq .Project.Status "preparingEnclaveErrored") (ne .Project.InstanceID "") }}
+            <h3>Next step: Retry to boot the enclave</h3>
+            <form class="pure-form pure-form-stacked" action="/projects/{{$id}}" method="post">
+                <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+                <input type="hidden" name="_method" value="put"/>
+                <button type="submit" class="pure-button pure-button-primary">Ask to prepare the enclave (retry)</button>
+            </form>
+        {{ end }}
+
+        {{ if and (eq .Project.Status "preparingEnclaveErrored") (eq .Project.InstanceID "") }}
+            <h3>Next step: remove this project</h3>
+            <p>The booting of the enclave failed before saving the project's attributes. This project can't be used anymore.</p>
+            <form class="pure-form pure-form-stacked" action="/projects/{{$id}}" method="post">
+                <!-- html form only supports POST and GET forms, this is a workaround for PUT -->
+                <input type="hidden" name="_method" value="delete"/>
+                <button type="submit" style="background: rgb(223, 117, 20)" onclick="return confirm('This action will remove this failed project. You confirm?');" class="pure-button pure-button-primary">Remove this failed project</button>
+            </form>
+        {{ end }}
+
+        <h3>Progress of the project</h3>
+
+        <div class="progress nice-scroll">
+            <div id="pointer" class="{{ isGreen 1 .Project.Status }} {{ isOrange 1 .Project.Status }} {{ isRed 1 .Project.Status }}">
+                <p>Prepare the enclave</p>
+            </div>
+            <div id="pointer" class="{{ isGreen 2 .Project.Status }} {{ isOrange 2 .Project.Status }} {{ isRed 2 .Project.Status }}">
+                <p>Update the project attributes</p>
+            </div>
+            <div id="pointer" class="{{ isGreen 3 .Project.Status }} {{ isOrange 3 .Project.Status }} {{ isRed 3 .Project.Status }}">
+                <p>Unlock the enclave</p>
+            </div>
+            <div id="pointer" class="{{ isGreen 4 .Project.Status }} {{ isOrange 4 .Project.Status }} {{ isRed 4 .Project.Status }}">
+                <p>Destroy the enclave</p>
+            </div>
+            <img class="bin" src="/assets/images/bin.png"/>
+        </div>
+
+        <h3>Requests ({{len .SortedRequests }})</h3>
+        <table id="tasks-main-container" class="pure-table pure-table-horizontal tasks">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="task-holder">
+                {{ range $i, $d := .SortedRequests }}
+                    <tr>
+                        <td><a class="pure-button pure-button-primary" href="/projects/{{$id}}/requests/{{$d.Index}}">See</a></td>
+                        <td>({{.Index}}) {{.Description}}</td>
+                        <td><div class="status" id="status-holder-{{$i}}"><img src="/assets/images/status/{{.Status}}.gif"/> {{.Status}}</div></th>
+                    </tr>
+
+                    <script>
+                        (function () {
+                            const evtSource = new EventSource("/projects/{{$id}}/requests/{{$i}}/status/stream", {withCredentials: false });
+                            evtSource.onopen = function() {
+                                console.log("stream is open")
+                                evtSource.onerror = function(err) {
+                                    console.error("EventSource failed:", err);
+                                    evtSource.close();
+                                    location.reload();
+                                };
+                            };
+                            evtSource.onmessage = function(event) {
+                                const statusHolder = document.getElementById("status-holder-{{$i}}");
+                                statusHolder.innerHTML = '<img src="/assets/images/status/' + event.data + '.gif"/> ' + event.data
+                            };
+                        })();
+                    </script>
+                {{ end }}
+            </tbody>
+        </table>   
+
+        <h3>Datasets ({{len .Datasets}})</h3>
+        {{ range .Datasets }}
+            <p><b>{{.Title}}</b></p>
+            <p>Description: {{ .Description }}</p>
+            <p>CloudURL: {{ .CloudURL }}</p>
+            <p>Author: {{ .IdentityStr }}</p>
+            <p>CalypsoWriteID: {{ .CalypsoWriteID }}</p>
+            <p>SHA2: {{ .SHA2 }}</p>
+        {{ end }}
+
+        <p class="small-links"><a href="/projects/{{$id}}/debug">debug</a>
+    </div>
+</div>
+
+<style>
+    p.project-status {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    p.project-status img {
+        padding: 0 7px 0 10px;
+        max-height: 32px;
+    }
+
+    div.status {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    div.status img {
+        padding: 0 7px 0 0;
+        max-height: 32px;
+    }
+
+    .progress {
+        overflow-x: scroll;
+        white-space: nowrap;
+        padding: 10px 0;
+    }
+
+    img.bin {
+        width: 40px;
+        vertical-align: middle;
+        padding: 0 0 0 30px;
+    }
+
+    #pointer {
+      position: relative;
+      display: inline-block;
+      background: #dadada;
+      padding: 0 10px 0 13px;
+      margin-left: 40px;
+    }
+    #pointer:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -30px;
+        border-style: solid;
+        border-width: 25px 0 25px 30px;
+        border-color: #dadada #dadada #dadada transparent;
+    }
+    #pointer:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: -30px;
+        border-style: solid;
+        border-width: 25px 0 25px 30px;
+        border-color: transparent transparent transparent #dadada;
+    }
+
+    #pointer.green {
+        background: #6ac259;
+    }
+    #pointer.green:before {
+        border-color: #6ac259 #6ac259 #6ac259 transparent;
+    }
+    #pointer.green:after {
+        border-color: transparent transparent transparent #6ac259;
+    }
+    
+    #pointer.orange {
+        animation: color-me-in 1s infinite alternate;
+    }
+    #pointer.orange:before {
+        animation: color-me-in-before 1s infinite alternate;
+    }
+    #pointer.orange:after {
+        animation: color-me-in-after 1s infinite alternate;
+    }
+
+    #pointer.red {
+        background: red;
+    }
+    #pointer.red:before {
+        border-color: red red red transparent;
+    }
+    #pointer.red:after {
+        border-color: transparent transparent transparent red;
+    }
+
+    @keyframes color-me-in {
+        /* You could think of as "step 1" */
+        0% {
+            background: transparent;
+        }
+        /* You could think of as "step 2" */
+        100% {
+            background: #6ac259;
+        }
+    }
+    @keyframes color-me-in-before {
+        /* You could think of as "step 1" */
+        0% {
+            border-color: transparent transparent transparent transparent;
+        }
+        /* You could think of as "step 2" */
+        100% {
+            border-color: #6ac259 #6ac259 #6ac259 transparent;
+        }
+    }
+    @keyframes color-me-in-after {
+        /* You could think of as "step 1" */
+        0% {
+            border-color: transparent transparent transparent transparent;
+        }
+        /* You could think of as "step 2" */
+        100% {
+            border-color: transparent transparent transparent #6ac259;
+        }
+    }
+    .small-links {
+        text-align: right;
+    }
+    .small-links a {
+        color: #aaa;
+        font-size: 8px;
+        text-decoration: none;
+    }
+</style>
+
+{{ end }}

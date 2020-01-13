@@ -1,0 +1,16 @@
+.flash-0 {
+    background-color: rgb(212, 212, 255);
+}
+
+.flash-1 {
+    background-color: rgb(255, 241, 158);
+}
+
+.flash-2 {
+    background-color: rgb(255, 158, 158);
+}
+
+.flash {
+    padding: 10px;
+    margin: 0 0 2px 0;
+}

@@ -1,0 +1,41 @@
+{{ define "title" }}{{.Title}}{{ end }}
+{{ define "content" }}
+
+<div class="pure-g">
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+    
+        <h1>Sign in</h1>
+
+        <p>🐠</p>
+
+        <h3>Please upload your credentials</h3>
+
+        <p>You need to upload a <code>bc-XXX.cfg</code> that contains your DARC and Identity.
+        This file can be created with the following command:</p> 
+        
+        <pre>bcadmin -c . link /path/to/public.toml --darc DARC_ID --id DARC_KEY</pre>
+        
+
+
+        <form enctype="multipart/form-data" action="http://localhost:5002/sessions" method="post" class="pure-form pure-form-stacked">
+            <fieldset>
+                <label for="file">bc-XXXX.cfg</label>
+                <input class="pure-input-1" id="file" required type="file" name="myFile" /><br>
+
+            <input class="pure-button pure-button-primary" type="submit" value="Sign in" />
+            </fieldset>
+        </form>
+
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
+</div>
+
+<style>
+    div.sub-block {
+        box-sizing: border-box;
+        padding: 10px;
+    }
+</style>
+
+{{ end }}
