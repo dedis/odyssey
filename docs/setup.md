@@ -41,7 +41,7 @@ exec dependencies of each components:
 |`enclavem/app` |        |         | x     | x     | x     |
 
 
-## Pre-requist
+## Prerequisite
 
 Make sure you use a local version of cothority based on the
 "odyssey-needs" branch (`git checkout odyssey-needs`), as well as the
