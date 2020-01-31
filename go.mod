@@ -10,6 +10,7 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/minio/cli v1.20.0
 	github.com/minio/minio-go/v6 v6.0.34
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/swaggo/http-swagger v0.0.0-20190614090009-c2865af9083e
 	github.com/swaggo/swag v1.6.3

@@ -1,7 +1,19 @@
 # Auditable Sharing and Management of Sensitive Data Across Jurisdictions
 
-This repo holds all the components necessary to run the Odyssey projects. You
-will find 3 components:
+Because sharing sensitive data between multiple distrustfull parties can
+be a challenge, Odyssey makes use of state-of-the-art secret management
+on the blockchain, coupled with an enclave deleviery mechanism, to
+ensure controlled and safe delivery of the data, as well as proper
+destruction with controller life-cycle. At rest, data are stored
+encrypted on a private cloud provider. Data can be requested and
+decrypted based on the attribute of a project that clearly defines the
+context on wich the data will be used. Data are never decrypted outside
+a virtual machine created on fly for that purpose. The lifecycle of the
+VM ensures that unencrypted data are deleted after use, preventing
+accidental or malicious leakage.
+
+This repo holds all the components necessary to run the Odyssey
+projects. You will find 3 components:
 
 - **Data Scientist Manager**, user application that delivers requested datasets to an encalve
 - **Data Owner Manager**, user application that allows one to upload and update datasets

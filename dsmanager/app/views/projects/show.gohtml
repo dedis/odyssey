@@ -37,8 +37,12 @@
 
         {{ if and (eq .Project.Status "unlockingEnclaveErrored") (ne .FailedReasons "") }}
             <h3>Next step: update the attributes to comply with the rules</h3>
-            <p><b>Reason it couldn't unlock:</b><br><pre>{{ .FailedReasons }}</pre></p>
+            <p><b>Go to the attribute update page in order to see why it couldn't unlock</b></p>
             <p><a href="/projects/{{$id}}/attributes" class="pure-button pure-button-primary">Go to the attributes update page</a></p>
+            <details>
+                <summary>see the error text</summary>
+                <pre>{{ .FailedReasons }}</pre>
+            </details>
         {{end }}
 
         {{ if and (eq .Project.Status "unlockingEnclaveErrored") (eq .FailedReasons "") }}

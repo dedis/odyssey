@@ -10,7 +10,7 @@ enclave manager
 
 1. Generate an ssh keypair (in the `/app` folder): `ssh-keygen -t rsa -b 4096 -f ./id_rsa -C "dsmanager-key"`
 
-2. Update the `config.toml`
+2. Update the `config.toml` (rename it first)
 
 3. Export the needed variables:
 

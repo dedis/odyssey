@@ -1,8 +1,8 @@
 - **General purpose**
 - [Introduction](introduction.md)
+- [Setup](setup.md)
 - [Design](design.md)
 - [Attributes](attributes.md)
-- [Setup](setup.md)
 - **Components**
 - [Data Owner Manager](domanager.md)
 - [Data Scientist Manager](dsmanager.md)

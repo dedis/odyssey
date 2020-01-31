@@ -35,7 +35,11 @@
                 <h3>Additional checks</h3>
                 <p>{{ .Metadata.DelegatedEnforcement.Description }}</p>
                 {{ range $dataset := .Datasets }}
-                    {{ $dataset.DelegatedForm $projectMetadata }}
+                    {{ if $dataset.DelegatedForm $projectMetadata }}
+                        {{ $dataset.DelegatedForm $projectMetadata }}
+                    {{ else }}
+                        <p><i>Not additional check for dataset "{{ $dataset.Title }}"</i></p>
+                    {{ end }}
                 {{ end }}
                 <button type="submit" class="pure-button pure-button-primary">Update the attributes</button>
             </form>
