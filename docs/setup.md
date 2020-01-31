@@ -29,7 +29,7 @@ echo "hello" | mc pipe "dedis/newbucket/$(date +%Y-%m-%d-%H%M-%S).txt"
 ## Generate the executables
 
 We heavily make use of direct call to executables as a mean to interface
-with cothority. As such, you will need to generate them an set up each
+with cothority. As such, you will need to generate them and set up each
 components with the appropriate executables. Here is a summary of the
 exec dependencies of each components:
 

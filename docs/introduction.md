@@ -1,15 +1,15 @@
 # Auditable Sharing and Management of Sensitive Data Across Jurisdictions
 
 Because sharing sensitive data between multiple distrustfull parties can
-be a challenge, Odyssey makes use of state-of-the-art secret management
-on the blockchain, coupled with an enclave deleviery mechanism, to
-ensure controlled and safe delivery of the data, as well as proper
-destruction with controller life-cycle. At rest, data are stored
-encrypted on a private cloud provider. Data can be requested and
-decrypted based on the attribute of a project that clearly defines the
-context on wich the data will be used. Data are never decrypted outside
-a virtual machine created on fly for that purpose. The lifecycle of the
-VM ensures that unencrypted data are deleted after use, preventing
+be a challenge, Odyssey make use of state-of-the-art secret management
+service on the blockchain, coupled with an enclave delivery mechanism,
+to ensure controlled and safe delivery of the data, as well as proper
+destruction of the data with a controlled life-cycle. At rest, data is
+stored encrypted on a private cloud provider. Data can be requested and
+decrypted based on the attributes of a project that clearly defines the
+context on wich the data will be used. Data is never decrypted outside a
+virtual machine created on fly for that purpose. The lifecycle of the VM
+ensures that unencrypted data is deleted after use, preventing
 accidental or malicious leakage.
 
 This repo holds all the components necessary to run the Odyssey
