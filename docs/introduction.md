@@ -8,8 +8,8 @@ destruction of the data with a controlled life-cycle. At rest, data is
 stored encrypted on a private cloud provider. Data can be requested and
 decrypted based on the attributes of a project that clearly defines the
 context on wich the data will be used. Data is never decrypted outside a
-virtual machine created on fly for that purpose. The lifecycle of the VM
-ensures that unencrypted data is deleted after use, preventing
+virtual machine (VM) created on fly for that purpose. The lifecycle of
+the VM ensures that unencrypted data is deleted after use, preventing
 accidental or malicious leakage.
 
 This repo holds all the components necessary to run the Odyssey
@@ -22,6 +22,7 @@ projects. You will find 3 components:
 Additionally, some tools were needed to support the system:
 
 - **Projectc**, a smart contract holding the attributes of a project
-- **Catalogc**, a smart contract holding the catalog of available datasets and defines the attributes to control them
+- **Catalogc**, a smart contract holding the catalog of available
+  datasets along with their attributes that control their acess
 - **Cryptutil**, a command line tool to encrypt and decrypt data with AES-CGM
-- **Enclave**, scripts used on the enclave
+- **Enclave**, scripts used on the enclave (ie. VMs)

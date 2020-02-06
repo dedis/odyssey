@@ -1,6 +1,21 @@
+# InstanceID of the catalog contract. You can create a catalog instance with
+# the catadmin CLI.
 CatalogID = ""
-BCPath = "...cfg"
+
+# Path to the BcConfig file.
+BCPath = "/path/to/bc-...cfg"
+
+# Darc of the data scientist. This darc should be allowed to spawn and update an
+# instance of an "odysseyproject".
 DarcID = "darc:..."
+
+# Key associated to the given darc.
 KeyID = "ed25519:..."
+
+# The config path used by the CLIs (ie. -c option). This is where the private
+# key of the data scientist is stored. This private key is used to authenticate the
+# owner on Cothority.
 ConfigPath = ""
-PubKeyPath = "...pub"
+
+# The public key that will be set in the authorized_hosts of the enclave
+PubKeyPath = "/path/to/ssh-rsa...pub"

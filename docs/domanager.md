@@ -23,6 +23,18 @@ The following executables are needed at the root of `domanager/app`:
 Then rename `app/config.toml.template` to `app/config.toml` and fill it
 with the appropriate settings.
 
+## Catalog
+
+As you'll discover in the config file, you need an instance of a catalog
+contract. This can be created with the catadmin CLI. See `catadmin
+contract catalog spawn -h` for help.
+
+## Enclave manager
+
+In order to upload new datasets, the enclave manager must be running on
+`localhost:5000`. See its corresponding documentation in order to run
+it.
+
 ## Run
 
 from `domanager/app` run `go run main.go`.

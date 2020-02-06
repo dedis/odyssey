@@ -12,7 +12,9 @@ vCloud REST API. It receives requests from the datascientist manager.
 
 ## Usage
 
-Still looking for a nice way to generate a documentation for a REST api...
+There is a plan to generate documentation for the REST API but for the
+moment one might have a look in the main.go to see the reachable
+locations.
 
 ## Sample code to use the REST API
 

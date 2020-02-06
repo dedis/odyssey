@@ -14,10 +14,10 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/swaggo/http-swagger v0.0.0-20190614090009-c2865af9083e
 	github.com/swaggo/swag v1.6.3
-	github.com/urfave/cli v1.22.0
+	github.com/urfave/cli v1.22.2
 	go.dedis.ch/cothority/v3 v3.1.3
-	go.dedis.ch/kyber/v3 v3.0.11
-	go.dedis.ch/onet/v3 v3.0.31
+	go.dedis.ch/kyber/v3 v3.0.12
+	go.dedis.ch/onet/v3 v3.1.0
 	go.dedis.ch/protobuf v1.0.11
 	go.etcd.io/bbolt v1.3.3
 	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898

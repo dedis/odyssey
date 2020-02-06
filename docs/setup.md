@@ -30,8 +30,9 @@ echo "hello" | mc pipe "dedis/newbucket/$(date +%Y-%m-%d-%H%M-%S).txt"
 
 We heavily make use of direct call to executables as a mean to interface
 with cothority. As such, you will need to generate them and set up each
-components with the appropriate executables. Here is a summary of the
-exec dependencies of each components:
+components with the appropriate executables. Instructions on how to
+generate them are in the next section "Prerequiste". Here is a summary
+of the exec dependencies of each components:
 
 |               |catadmin|cryptutil|pcadmin|bcadmin|csadmin|
 |---------------|--------|---------|-------|-------|-------|
@@ -46,7 +47,7 @@ exec dependencies of each components:
 Make sure you use a local version of cothority based on the
 "odyssey-needs" branch (`git checkout odyssey-needs`), as well as the
 local version of odyssey. For that, add the following replace directives
-in your `go.mod` file:
+in your `odyssey/go.mod` file:
 
 ```
 replace go.dedis.ch/cothority/v3 => /Users/whatever/GitHub/cothority
@@ -90,6 +91,9 @@ go build
 
 Then you can copy each executable to the right places, according to the
 table above.
+
+There are additional setup steps for each component that you will find
+in their associated documentation (chapter "Components").
 
 ## Generate doc
 

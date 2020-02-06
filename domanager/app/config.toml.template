@@ -1,5 +1,16 @@
+# The config path used by the CLIs (ie. -c option). This is where the private
+# key of the data owner is stored. This private key is used to authenticate the
+# owner on Cothority. As we are requiring the data owner to "sing in" by
+# uploading the BcConfig file, we could assume that the private key is stored
+# next to it. But we don't.
 ConfigPath = ""
+
+# InstanceID of the catalog contract. You can create a catalog instance with
+# the catadmin CLI.
 CatalogID = ""
-BCPath = "bc-....cfg"
+
+# Relative to Calypso, the Long Term Secret ID (use csadmin to get one)
 LtsID = ""
+
+# Relative to Calypso, the Long Term Secret Key (use csadmin to get one)
 LtsKey = ""
