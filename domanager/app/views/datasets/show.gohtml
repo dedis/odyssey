@@ -4,7 +4,7 @@
 <div class="pure-g">
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     <div class="pure-u-1 pure-u-sm-1-2">
-    
+
         <h1>Datasets: {{ .Dataset.Title}}</h1>
 
         <p><a class="pure-button" href="/datasets">🔙 Back to the list</a></p>
@@ -42,7 +42,7 @@
                 <input type="hidden" name="_method" value="put"/>
                 <!-- we use it to display the dataset's name in the task -->
                 <input type="hidden" value="{{ .Dataset.Title }}" name="datasetTitle"/>
-                
+
                 {{ range .Dataset.Metadata.AttributesGroups }}
                     <fieldset>
                         <legend>{{ .Title }}</legend>
@@ -58,6 +58,10 @@
         {{ else }}
             <p style="color: darkred">No metadata associated with this dataset found</p>
         {{ end }}
+
+        <h3>Audit access on this dataset</h3>
+        <p>This action displays all the access requested on this dataset</p>
+        <p><a class="pure-button" href="/datasets/{{ .Dataset.CalypsoWriteID }}/audit">see access</a></p>
 
         <h3>Remove access to this dataset</h3>
         <p>This action can not be undone and prevents anyone to further use this dataset. It does the following:<br>

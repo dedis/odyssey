@@ -1,14 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/dedis/odyssey/projectc"
 	"github.com/urfave/cli"
+	"go.dedis.ch/cothority/v3"
+	"go.dedis.ch/cothority/v3/byzcoin"
 	"go.dedis.ch/cothority/v3/byzcoin/bcadmin/lib"
 	"go.dedis.ch/onet/v3/cfgpath"
 	"go.dedis.ch/onet/v3/log"
+	"go.dedis.ch/protobuf"
+	"golang.org/x/xerrors"
 )
 
 var cliApp = cli.NewApp()
@@ -58,4 +65,186 @@ func main() {
 		log.Fatal(err)
 	}
 	return
+}
+
+// auditDataset prints all the access performed on the dataset
+func auditDataset(c *cli.Context) error {
+	bcArg := c.String("bc")
+	if bcArg == "" {
+		return xerrors.New("--bc flag is required")
+	}
+
+	instid := c.String("instid")
+	if instid == "" {
+		return xerrors.New("please provide a Calypso write instanceID with --instid")
+	}
+
+	cfg, cl, err := lib.LoadConfig(bcArg)
+	if err != nil {
+		return err
+	}
+
+	msg := &byzcoin.PaginateRequest{
+		StartID:  cfg.ByzCoinID,
+		PageSize: 1,
+		NumPages: 100000,
+		Backward: false,
+	}
+	ret := &byzcoin.PaginateResponse{}
+	streamingCon, err := cl.Stream(cfg.Roster.RandomServerIdentity(), msg)
+	if err != nil {
+		return xerrors.Errorf("failed to call PaginateRequest: %v", err)
+	}
+
+	out := new(strings.Builder)
+	occurences := 0
+	nblocks := 0
+
+	for ; nblocks < 100000; nblocks++ {
+		err = streamingCon.ReadMessage(ret)
+		if err != nil {
+			return xerrors.Errorf("failed to read from stream: %v", err)
+		}
+		// This is normal when it reaches the end of the chain
+		if ret.ErrorCode == 4 {
+			break
+		}
+		if ret.ErrorCode != 0 {
+			return xerrors.Errorf("Got a non zero error code: %d, %v", ret.ErrorCode, ret.ErrorText)
+
+		}
+		if len(ret.Blocks) == 0 {
+			return xerrors.Errorf("Expected to have one block, but got: %v", ret.Blocks)
+		}
+		dataBody := &byzcoin.DataBody{}
+		err := protobuf.Decode(ret.Blocks[0].Payload, dataBody)
+		if err != nil {
+			return xerrors.Errorf("failed to decode dataBody: %v", err)
+		}
+		if len(dataBody.TxResults) == 0 {
+			continue
+		}
+		for _, txResult := range dataBody.TxResults {
+			for _, instr := range txResult.ClientTransaction.Instructions {
+				if instr.InstanceID.String() == instid {
+					occurences++
+					out.WriteString("<div class=\"occurence\">")
+					fmt.Fprintf(out, "<p>Accepted? <b>%v</b><br>", txResult.Accepted)
+					fmt.Fprintf(out, "BlockIndex: %d<p>", ret.Blocks[0].Index)
+					fmt.Fprintf(out, "<pre>%v</pre>", instr)
+					if instr.GetType() == byzcoin.SpawnType {
+						projectInstID := instr.Spawn.Args.Search("projectInstID")
+						fmt.Fprintf(out, "<p>Project instance ID: %x</p>", projectInstID)
+						resp, err := cl.GetProofFromLatest(projectInstID)
+						if err != nil {
+							return xerrors.Errorf("failed to get project instance: %v", err)
+						}
+						var projectInst projectc.ProjectData
+						err = resp.Proof.VerifyAndDecode(cothority.Suite, projectc.ContractProjectID, &projectInst)
+						if err != nil {
+							return xerrors.Errorf("failed to decode project instance: %v", err)
+						}
+						out.WriteString("<summary>")
+						out.WriteString("See the project attributes")
+						out.WriteString("<details>")
+						fmt.Fprintf(out, "<pre>%v</pre>", projectInst)
+						out.WriteString("</details>")
+						out.WriteString("</summary>")
+					}
+					out.WriteString("</div>")
+				}
+			}
+		}
+	}
+
+	prolog := fmt.Sprintf("<h4>Checked %d blocks and found %d requests.</h4>", nblocks, occurences)
+	log.Info(prolog + out.String())
+
+	return nil
+}
+
+// auditProject prints all the access performed on the dataset
+func auditProject(c *cli.Context) error {
+	bcArg := c.String("bc")
+	if bcArg == "" {
+		return xerrors.New("--bc flag is required")
+	}
+
+	instid := c.String("instid")
+	if instid == "" {
+		return xerrors.New("please provide a Calypso write instanceID with --instid")
+	}
+
+	cfg, cl, err := lib.LoadConfig(bcArg)
+	if err != nil {
+		return err
+	}
+
+	msg := &byzcoin.PaginateRequest{
+		StartID:  cfg.ByzCoinID,
+		PageSize: 1,
+		NumPages: 100000,
+		Backward: false,
+	}
+	ret := &byzcoin.PaginateResponse{}
+	streamingCon, err := cl.Stream(cfg.Roster.RandomServerIdentity(), msg)
+	if err != nil {
+		return xerrors.Errorf("failed to call PaginateRequest: %v", err)
+	}
+
+	out := new(strings.Builder)
+	occurences := 0
+	nblocks := 0
+
+	for ; nblocks < 100000; nblocks++ {
+		err = streamingCon.ReadMessage(ret)
+		if err != nil {
+			return xerrors.Errorf("failed to read from stream: %v", err)
+		}
+		// This is normal when it reaches the end of the chain
+		if ret.ErrorCode == 4 {
+			break
+		}
+		if ret.ErrorCode != 0 {
+			return xerrors.Errorf("Got a non zero error code: %d, %v", ret.ErrorCode, ret.ErrorText)
+
+		}
+		if len(ret.Blocks) == 0 {
+			return xerrors.Errorf("Expected to have one block, but got: %v", ret.Blocks)
+		}
+		dataBody := &byzcoin.DataBody{}
+		err := protobuf.Decode(ret.Blocks[0].Payload, dataBody)
+		if err != nil {
+			return xerrors.Errorf("failed to decode dataBody: %v", err)
+		}
+		if len(dataBody.TxResults) == 0 {
+			continue
+		}
+		for _, txResult := range dataBody.TxResults {
+			for _, instr := range txResult.ClientTransaction.Instructions {
+				if instr.InstanceID.String() == instid || instr.DeriveID("").String() == instid {
+					occurences++
+					out.WriteString("<div class=\"occurence\">")
+					fmt.Fprintf(out, "<p>Accepted? <b>%v</b><br>", txResult.Accepted)
+					fmt.Fprintf(out, "BlockIndex: %d<p>", ret.Blocks[0].Index)
+					fmt.Fprintf(out, "<pre>%v", instr)
+					if instr.Spawn != nil {
+						projectDataBuf := instr.Spawn.Args.Search("projectData")
+						projectData := &projectc.ProjectData{}
+						err := protobuf.Decode(projectDataBuf, projectData)
+						if err != nil {
+							return xerrors.Errorf("failed to decode projectData: %v", err)
+						}
+						out.WriteString(projectData.String())
+					}
+					out.WriteString("</pre></div>")
+				}
+			}
+		}
+	}
+
+	prolog := fmt.Sprintf("<h4>Checked %d blocks and found %d requests.</h4>", nblocks, occurences)
+	log.Info(prolog + out.String())
+
+	return nil
 }

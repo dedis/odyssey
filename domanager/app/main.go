@@ -88,12 +88,14 @@ func main() {
 	router.Handle("/datasets/{id}", http.HandlerFunc(controllers.DatasetShowHandler(store, conf)))
 	router.Handle("/datasets/{id}/attributes", http.HandlerFunc(controllers.DatasetShowAttributesHandler(store, conf)))
 	router.Handle("/datasets/{id}/archive", http.HandlerFunc(controllers.DatasetShowArchiveHandler(store, conf)))
+	router.Handle("/datasets/{id}/audit", http.HandlerFunc(controllers.DatasetShowAuditHandler(store, conf)))
 	router.Handle("/datasets/{id}/debug", http.HandlerFunc(controllers.DatasetShowDebugHandler(store, conf)))
 	router.Handle("/", http.HandlerFunc(controllers.HomeHandler(store, conf)))
 	router.Handle("/healthz", healthz())
 	router.Handle("/showtasks", http.HandlerFunc(controllers.ShowtasksIndexHandler(store, conf)))
 	router.Handle("/showtasks/{id}", http.HandlerFunc(controllers.ShowtasksShowHandler(store, conf)))
 	router.Handle("/tasks/{id}", http.HandlerFunc(dsmanagercontrollers.TasksShowHandler(store)))
+	router.Handle("/lifecycle", http.HandlerFunc(controllers.ShowLifecycle(store, conf)))
 
 	nextRequestID := func() string {
 		return fmt.Sprintf("%d", time.Now().UnixNano())

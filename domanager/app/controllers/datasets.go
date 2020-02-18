@@ -131,6 +131,18 @@ func DatasetShowArchiveHandler(store *sessions.CookieStore,
 	}
 }
 
+// DatasetShowAuditHandler ...
+func DatasetShowAuditHandler(store *sessions.CookieStore,
+	conf *models.Config) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			datasetsShowAuditGet(w, r, store, conf)
+		}
+	}
+}
+
 // DatasetShowDebugHandler ...
 func DatasetShowDebugHandler(store *sessions.CookieStore,
 	conf *models.Config) http.HandlerFunc {
@@ -1492,6 +1504,85 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 
 	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.Index),
 		fmt.Sprintf("Task to set dataset in archived mode with index %d created", task.Index), w, r, store)
+}
+
+func datasetsShowAuditGet(w http.ResponseWriter, r *http.Request,
+	store *sessions.CookieStore, conf *models.Config) {
+
+	params := mux.Vars(r)
+	id := params["id"]
+	if id == "" {
+		xhelpers.RedirectWithErrorFlash("/", "failed to get the dataset id "+
+			"in url", w, r, store)
+		return
+	}
+
+	session, err := models.GetSession(store, r)
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", "failed to get session: "+
+			err.Error(), w, r, store)
+		return
+	}
+	if !session.IsLogged() {
+		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+			"access this page", w, r, store)
+		return
+	}
+
+	cmd := exec.Command("./catadmin", "-c", conf.ConfigPath, "audit",
+		"dataset", "-instid", id, "-bc", session.BcPath)
+
+	log.Info(fmt.Sprintf("command created: %s", cmd.Args))
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err = cmd.Run()
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", fmt.Sprintf("failed to get the "+
+			"audit log: %s - Output: %s - Err: %s", err.Error(),
+			outb.String(), errb.String()), w, r, store)
+		return
+	}
+
+	type viewData struct {
+		Title     string
+		Flash     []xhelpers.Flash
+		Session   *models.Session
+		AuditHTML string
+		ID        string
+		ShortID   string
+	}
+
+	t, err := template.ParseFiles("views/layout.gohtml", "views/datasets/audit.gohtml")
+	if err != nil {
+		fmt.Printf("Error with template: %s\n", err.Error())
+		xhelpers.RedirectWithErrorFlash("/",
+			fmt.Sprintf("<pre>Error with template:\n%s</pre>", err.Error()), w, r, store)
+		return
+	}
+
+	flashes, err := xhelpers.ExtractFlash(w, r, store)
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", "failed to extract flash", w, r, store)
+		return
+	}
+
+	p := &viewData{
+		Title:     "Your datasets",
+		Flash:     flashes,
+		Session:   session,
+		AuditHTML: outb.String(),
+		ID:        id,
+		ShortID:   id[:8] + "...",
+	}
+
+	err = t.ExecuteTemplate(w, "layout", p)
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", fmt.Sprintf(
+			"Error while executing template: %s\n", err.Error()), w, r, store)
+		return
+	}
+
 }
 
 func datasetsShowDebugGet(w http.ResponseWriter, r *http.Request,

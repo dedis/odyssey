@@ -4,7 +4,7 @@
 <div class="pure-g">
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     <div class="pure-u-1 pure-u-sm-1-2">
-    
+
         <h1>Your datasets</h1>
 
         <p><a class="pure-button" href="/">🔙 Back to 🏠</a></p>
@@ -18,6 +18,7 @@
                 <thead>
                     <tr>
                         <th>Action</th>
+                        <th></th>
                         <th>Title</th>
                         <th>Description</th>
                         <th>CloudURL</th>
@@ -29,7 +30,12 @@
                 <tbody>
                     {{ range .Datasets }}
                         <tr>
-                            <td><a class="pure-button pure-button-primary" href="/datasets/{{.CalypsoWriteID}}">edit</a></td>
+                            <td>
+                              <a class="pure-button pure-button-primary" href="/datasets/{{.CalypsoWriteID}}">edit</a>
+                            </td>
+                            <td>
+                              <a class="pure-button" href="/datasets/{{ .CalypsoWriteID }}/audit">audit</a>
+                            </td>
                             <td>{{ .Title }}</td>
                             <td>{{ .Description }}</td>
                             <td>{{ .CloudURL }}</td>

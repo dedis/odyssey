@@ -408,4 +408,42 @@ var cmds = cli.Commands{
 			},
 		},
 	},
+	{
+		Name:  "audit",
+		Usage: "Audit access on a dataset or display the lifecycle of a project",
+		Subcommands: cli.Commands{
+			{
+				Name:   "dataset",
+				Usage:  "display in HTML format all the access performed on the given Calypso write ID",
+				Action: auditDataset,
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:   "bc",
+						EnvVar: "BC",
+						Usage:  "the ByzCoin config to use (required)",
+					},
+					cli.StringFlag{
+						Name:  "instid, i",
+						Usage: "The Calypso write ID",
+					},
+				},
+			},
+			{
+				Name:   "project",
+				Usage:  "display in HTML format the evolution of the project, ie. all the instructions concerned by the given instanceID",
+				Action: auditProject,
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:   "bc",
+						EnvVar: "BC",
+						Usage:  "the ByzCoin config to use (required)",
+					},
+					cli.StringFlag{
+						Name:  "instid, i",
+						Usage: "The project instance ID",
+					},
+				},
+			},
+		},
+	},
 }

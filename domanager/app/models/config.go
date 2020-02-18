@@ -5,7 +5,6 @@ package models
 type Config struct {
 	ConfigPath string
 	CatalogID  string
-	BCPath     string
 	LtsID      string
 	LtsKey     string
 }

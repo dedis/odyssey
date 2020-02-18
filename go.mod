@@ -20,6 +20,7 @@ require (
 	go.dedis.ch/onet/v3 v3.1.0
 	go.dedis.ch/protobuf v1.0.11
 	go.etcd.io/bbolt v1.3.3
+	golang.org/x/sys v0.0.0-20190912141932-bc967efca4b8
 	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898
 	google.golang.org/appengine v1.4.0
 	gopkg.in/urfave/cli.v1 v1.20.0

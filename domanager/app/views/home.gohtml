@@ -4,7 +4,7 @@
 <div class="pure-g">
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     <div class="pure-u-1 pure-u-sm-1-2">
-    
+
         <h1>Data owner app</h1>
 
         <p>🐠</p>
@@ -22,11 +22,22 @@
             </div>
         </div>
 
-        <h3>Tasks</h3>
-        
-        <p>You can check the past and current tasks.<p>
-        <p><a class="pure-button" href="/showtasks">➡️ See the list of tasks</a></p>
-        
+        <div class="pure-g">
+          <div class="pure-u-1 pure-u-sm-1-2 sub-block">
+            <h3>Tasks</h3>
+            <p>You can check the past and current tasks.<p>
+            <p><a class="pure-button" href="/showtasks">➡️ See the list of tasks</a></p>
+          </div>
+          <div class="pure-u-1 pure-u-sm-1-2 sub-block">
+            <h3>Check a project's lifecycle</h3>
+            <p>You can display the evolution of a project to audit its life-cycle.<p>
+            <form action="/lifecycle" method="get">
+              <input required pattern="[a-f0-9]{64}" type="text" id="piid" placeholder="project instance ID" name="piid">
+              <input class="pure-button" type="submit" value="See lifecycle">
+            </form>
+          </div>
+        </div>
+
     </div>
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
 </div>
@@ -35,6 +46,10 @@
     div.sub-block {
         box-sizing: border-box;
         padding: 10px;
+    }
+    input#piid {
+      padding: 5px;
+      margin: 0 0 5px 0;
     }
 </style>
 

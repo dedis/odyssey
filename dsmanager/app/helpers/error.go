@@ -115,7 +115,7 @@ func RedirectWithErrorFlash(path, message string, w http.ResponseWriter, r *http
 	log.Error(message)
 	err := AddFlash(w, r, fmt.Sprintf("<pre>%s</pre>", message), store, Error)
 	if err != nil {
-		SendRequestError(errors.New("failed to add error flash"), w)
+		SendRequestError(errors.New("failed to add error flash: "+err.Error()), w)
 		return
 	}
 	http.Redirect(w, r, path, http.StatusSeeOther)
