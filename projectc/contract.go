@@ -1,6 +1,7 @@
 package projectc
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -169,18 +170,53 @@ func (c *contractProject) Spawn(rst byzcoin.ReadOnlyStateTrie, inst byzcoin.Inst
 
 	// Read and parse the project data, which normally contains only the list of
 	// datasets, but user can actually fill it with more information.
-	projectDataBuf := inst.Spawn.Args.Search("projectData")
-	var projectData ProjectData
-	if len(projectDataBuf) == 0 {
-		return nil, nil, xerrors.New("didn't find the 'projectData' argument")
-	}
-	err = protobuf.Decode(projectDataBuf, &projectData)
-	if err != nil {
-		return nil, nil, xerrors.Errorf("failed to decode projectData: %v", err)
+	// We expect the following:
+	// - instids: the list of instance ids (calypso write), a string separated by
+	// 						comas
+	// - pubkey: the public key that will have access to the enclave
+
+	instID := inst.Spawn.Args.Search("datasetIDs")
+	if instID == nil {
+		return nil, nil, xerrors.New("datasetIDs not found in spawm arguments")
 	}
 
+	instIDstr := string(instID)
+
+	r, err := regexp.Compile("^[0-9a-f]{64}(,[0-9a-f]{64})*$")
+	if err != nil {
+		return nil, nil, xerrors.New("failed to build regex: " + err.Error())
+	}
+	instIDstr = strings.Trim(instIDstr, " \n\r")
+	ok := r.MatchString(instIDstr)
+	if !ok {
+		return nil, nil, xerrors.New("Got unexpected 'instids': " + instIDstr)
+	}
+
+	instIDlist := strings.Split(instIDstr, ",")
+
+	pubKey := inst.Spawn.Args.Search("accessPubKey")
+	if pubKey == nil {
+		return nil, nil, xerrors.New("accessPubKey not found in spawn arguments")
+	}
+
+	pubKeyStr := string(pubKey)
+
+	datasets := make([]byzcoin.InstanceID, len(instIDlist))
+	for i, instID := range instIDlist {
+		instidbuf, err := hex.DecodeString(instID)
+		if err != nil {
+			return nil, nil, xerrors.New("failed to decode instance id: " + err.Error())
+		}
+		datasets[i] = byzcoin.NewInstanceID(instidbuf)
+	}
+
+	projectData := ProjectData{}
+
 	projectData.Status = empty
-	projectDataBuf, err = protobuf.Encode(&projectData)
+	projectData.AccessPubKey = pubKeyStr
+	projectData.Datasets = datasets
+	projectData.Metadata = &catalogc.Metadata{}
+	projectDataBuf, err := protobuf.Encode(&projectData)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("failed to encode back the projectData: %v", err)
 	}

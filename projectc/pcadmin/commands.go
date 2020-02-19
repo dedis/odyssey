@@ -40,10 +40,6 @@ var cmds = cli.Commands{
 								Name:  "pubKey, pk",
 								Usage: "an RSA public key string of type 'ssh-rsa XXX...' (optional)",
 							},
-							cli.StringFlag{
-								Name:  "metadataJson, mJson",
-								Usage: "the metadata in JSON format (required)",
-							},
 						},
 					},
 					{

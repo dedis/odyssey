@@ -3,7 +3,6 @@ package clicontracts
 import (
 	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dedis/odyssey/catalogc"
 	"github.com/dedis/odyssey/projectc"
 	"github.com/urfave/cli"
 	"go.dedis.ch/cothority/v3"
@@ -72,53 +70,25 @@ func ProjectSpawn(c *cli.Context) error {
 		return errors.New("Got unexpected 'instids': " + instIDstr)
 	}
 
-	instIDlist := strings.Split(instIDstr, ",")
-
 	pubKey := c.String("pubKey")
-
-	metadataJSONStr := c.String("metadataJson")
-	if metadataJSONStr == "" {
-		return errors.New("please provide the metadata with --metadataJson")
-	}
-	metadata := &catalogc.Metadata{}
-	err = json.Unmarshal([]byte(metadataJSONStr), metadata)
-	if err != nil {
-		return xerrors.Errorf("failed to decode metadataJSON: %v", err)
-	}
-
-	projectData := projectc.ProjectData{}
-	projectData.AccessPubKey = pubKey
-	projectData.Metadata = metadata
-
-	datasets := make([]byzcoin.InstanceID, len(instIDlist))
-	for i, instID := range instIDlist {
-		instidbuf, err := hex.DecodeString(instID)
-		if err != nil {
-			return errors.New("failed to decode instance id: " + err.Error())
-		}
-		datasets[i] = byzcoin.NewInstanceID(instidbuf)
-	}
-
-	projectData.Datasets = datasets
-
-	projectDataBuf, err := protobuf.Encode(&projectData)
-	if err != nil {
-		return errors.New("failed to encode projectData: " + err.Error())
-	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
 
-	ctx := byzcoin.ClientTransaction{
-		Instructions: byzcoin.Instructions{{
-			InstanceID: byzcoin.NewInstanceID(d.GetBaseID()),
-			Spawn: &byzcoin.Spawn{
-				ContractID: projectc.ContractProjectID,
-				Args: byzcoin.Arguments{{
-					Name: "projectData", Value: projectDataBuf}},
+	ctx := byzcoin.NewClientTransaction(byzcoin.CurrentVersion, byzcoin.Instruction{
+		InstanceID: byzcoin.NewInstanceID(d.GetBaseID()),
+		Spawn: &byzcoin.Spawn{
+			ContractID: projectc.ContractProjectID,
+			Args: byzcoin.Arguments{
+				{
+					Name: "datasetIDs", Value: []byte(instIDstr),
+				},
+				{
+					Name: "accessPubKey", Value: []byte(pubKey),
+				},
 			},
-			SignerCounter: []uint64{counters.Counters[0] + 1},
-		}},
-	}
+		},
+		SignerCounter: []uint64{counters.Counters[0] + 1},
+	})
 
 	err = ctx.FillSignersAndSignWith(*signer)
 	if err != nil {
