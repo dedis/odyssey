@@ -14,6 +14,8 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
+    {{ template "headContent" .}}
+
     <title>{{ template "title" .}}</title>
   </head>
   <body>
@@ -61,4 +63,6 @@
 
   </body>
 </html>
+<!-- Can be redifined in the pages. We do it here to avoir a "not defined" error -->
 {{end}}
+{{define "headContent"}}{{end}}
