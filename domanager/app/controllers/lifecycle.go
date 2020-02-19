@@ -8,10 +8,12 @@ import (
 	"regexp"
 	"text/template"
 
+	"github.com/dedis/odyssey/catalogc"
 	"github.com/dedis/odyssey/domanager/app/models"
 	xhelpers "github.com/dedis/odyssey/dsmanager/app/helpers"
 	"github.com/gorilla/sessions"
 	"go.dedis.ch/onet/v3/log"
+	"go.dedis.ch/protobuf"
 )
 
 // ShowLifecycle ...
@@ -32,7 +34,7 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 		Title     string
 		Flash     []xhelpers.Flash
 		Session   *models.Session
-		Lifecycle string
+		AuditData catalogc.AuditData
 		ShortPID  string
 	}
 
@@ -82,7 +84,17 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	t, err := template.ParseFiles("views/layout.gohtml", "views/lifecycle.gohtml")
+	auditData := catalogc.AuditData{}
+	err = protobuf.Decode(outb.Bytes(), &auditData)
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", "failed to decode audit data: "+err.Error(), w, r, store)
+	}
+
+	t, err := template.New("lifecycle").Funcs(template.FuncMap{
+		"toString": func(buf []byte) string {
+			return string(buf)
+		},
+	}).ParseFiles("views/layout.gohtml", "views/lifecycle.gohtml")
 	if err != nil {
 		fmt.Printf("Error with template: %s\n", err.Error())
 		xhelpers.RedirectWithErrorFlash("/",
@@ -100,7 +112,7 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 		Title:     "Lifecycle",
 		Flash:     flashes,
 		Session:   session,
-		Lifecycle: outb.String(),
+		AuditData: auditData,
 		ShortPID:  piid[0][:8] + "...",
 	}
 

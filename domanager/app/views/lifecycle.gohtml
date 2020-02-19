@@ -12,7 +12,77 @@
         <p>🐠</p>
 
         <div class="audit">
-          {{ .Lifecycle }}
+          <p>
+            <b>{{ .AuditData.BlocksChecked }}</b> blocks checked and found
+            <b>{{ .AuditData.OccFound }}</b> concerned instructions
+          </p>
+          <div class="occurences">
+            {{ range $i, $block := .AuditData.Blocks }}
+              <div class="occurence">
+                <div class="block-info">
+                  <p class="block-index"><span>block</span><span>{{ $block.BlockIndex }}</span></p>
+                </div>
+                {{ range $j, $tx := $block.Transactions }}
+                  {{ if $tx.Accepted }}
+                    <div class="status ok">
+                      <span>Accepted</span>
+                    </div>
+                  {{ else }}
+                    <div class="status rejected">
+                      <span>Rejected</span>
+                    </div>
+                  {{ end }}
+                  {{ range $k, $instr := $tx.Instructions }}
+                    {{ if $instr.Spawn }}
+                      <div class="method spawn">
+                        <span>spawn</span>
+                      </div>
+                      <div class="code custom-scroll">
+                        <div class="line"><span class="inst">project</span> = new Project(</div>
+                        {{ range $l, $arg := $instr.Spawn.Args }}
+                          <div class="line">                         {{ $arg.Name }}: {{ toString $arg.Value }}</div>
+                        {{ end }}
+                      </div>
+                    {{ else if $instr.Invoke }}
+                      <div class="method invoke">
+                        <span>invoke</span>
+                      </div>
+                      <div class="code custom-scroll">
+                        <div class="line"><span class="inst">project</span>.{{ $instr.Invoke.Command }}(</div>
+                        {{ range $l, $arg := $instr.Invoke.Args }}
+                          <div class="line">                         {{ $arg.Name }}: {{ toString $arg.Value }}</div>
+                        {{ end }}
+                      </div>
+                    {{ else if $instr.Delete }}
+                      <div class="method delete">
+                        <span>delete</span>
+                      </div>
+                    {{ end }}
+                    <div class="user custom-scroll">
+                      <div><svg width="100%" height="100%" viewBox="0 0 16 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path d="M5.968,10.278c0.199,0 0.397,-0.017 0.593,-0.051c0.879,-0.153 1.602,-0.642 2.034,-1.375c0.841,-1.429 0.498,-3.348 -0.766,-4.277c-1.017,-0.748 -2.332,-0.822 -3.433,-0.193c-0.858,0.489 -1.476,1.538 -1.575,2.672c-0.087,1.002 0.244,1.892 0.909,2.444c0.604,0.501 1.423,0.78 2.238,0.78Zm-1.076,-5.028c0.341,-0.194 0.71,-0.291 1.078,-0.291c0.445,0 0.886,0.142 1.266,0.421c0.848,0.624 1.076,1.981 0.498,2.964c-0.362,0.611 -0.931,0.826 -1.345,0.898c-0.704,0.124 -1.497,-0.079 -2.02,-0.513c-0.409,-0.34 -0.61,-0.918 -0.552,-1.588c0.071,-0.804 0.502,-1.564 1.075,-1.891Z" style="fill-rule:nonzero;"/><path d="M1.979,16.617c2.706,-0.095 5.447,-0.092 8.144,0.013l0.02,0c0.261,0 0.479,-0.202 0.498,-0.464c0.12,-1.671 -0.49,-3.344 -1.592,-4.365c-0.915,-0.847 -2.075,-1.194 -3.353,-1.004c-0.985,0.145 -1.822,0.456 -2.489,0.923c-0.821,0.575 -1.385,1.409 -1.548,2.291c-0.05,0.271 0.129,0.532 0.401,0.583c0.271,0.05 0.532,-0.129 0.583,-0.401c0.116,-0.625 0.53,-1.228 1.138,-1.653c0.539,-0.377 1.232,-0.63 2.063,-0.753c0.969,-0.145 1.843,0.115 2.526,0.749c0.781,0.724 1.253,1.872 1.286,3.078c-2.558,-0.086 -5.148,-0.084 -7.71,0.006c-0.276,0.01 -0.492,0.241 -0.482,0.517c0.008,0.274 0.252,0.501 0.515,0.48Z" style="fill-rule:nonzero;"/><path d="M10.451,11.211c0.18,-0.673 0.764,-1.125 1.421,-1.177l1.132,-4.222l1.032,0.276l-0.139,0.516l1.032,0.277l-0.276,1.031l-1.032,-0.276l-0.717,2.675c0.543,0.374 0.823,1.056 0.643,1.729c-0.229,0.855 -1.108,1.362 -1.963,1.133c-0.855,-0.229 -1.362,-1.107 -1.133,-1.962Zm2.064,0.553c0.076,-0.285 -0.094,-0.578 -0.378,-0.655c-0.284,-0.076 -0.578,0.094 -0.654,0.378c-0.076,0.284 0.093,0.578 0.378,0.654c0.284,0.077 0.578,-0.093 0.654,-0.377Z" style="fill-rule:nonzero;"/></svg></div>
+                      <div>{{ $instr.SignerIdentities }}</div>
+                    </div>
+                    <details>
+                      <summary>details</summary>
+                      <pre class="custom-scroll">{{ $instr }}</pre>
+                    </details>
+                  {{ end }}
+                {{ end }}
+              </div>
+
+              {{ if ne $block.DeltaNext -1 }}
+                {{ if eq $block.DeltaNext 0 }}
+                  <div class="in-between single">
+                  </div>
+                 {{ else }}
+                   <div class="in-between multiple">
+                     <span>{{ $block.DeltaNext }}</span>
+                   </div>
+                 {{ end }}
+              {{ end }}
+
+            {{ end }}
+          </div>
         </div>
     </div>
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
@@ -46,10 +116,175 @@
     }
     .audit {
     }
-    .occurence {
-       padding: 20px 0 30px 0;
-       border-bottom: 5px solid rgba(0, 0, 0, 0.13);
+   .occurence {
+      padding: 10px 50px 40px 50px;
+      border-bottom: 8px solid rgba(0, 0, 0, 0.13);
+      background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+      border-radius:50px;
+      margin: 0 0 0px 0;
+      position: relative;
     }
+.occurence summary {
+  margin: 20px 0 0 0;
+  cursor: pointerdetails;
+}
+.block-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.block-index {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  min-height: 70px;
+  background-color: #fff;
+  border-radius: 50%;
+  font-size: 20px;
+}
+.block-index span:nth-child(1) {
+  font-size: 10px;
+  color grey;
+}
+.block-index span:nth-child(2) {
+  font-weight: bold;
+}
+.status {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.status span {
+  padding: 5px 9px;
+  border-radius: 15px;
+  font-size: 12px;
+  color: #fff;
+}
+.status.ok span {
+  background: yellowgreen;
+}
+.status.rejected span {
+  background: red;
+}
+.method {
+  padding: 0 0 20px 0;
+}
+.method span {
+  padding: 5px 9px;
+  border-radius: 15px;
+  font-size: 12px;
+  color: #fff;
+}
+.method.spawn span {
+  background-color: rgb(81, 11, 81);
+}
+.method.invoke span {
+  background-color: rgb(36, 36, 36);
+}
+.method.delete span {
+  background-color: brown;
+}
+.in-between {
+  width: 0;
+  margin: auto;
+}
+.in-between.single {
+  height: 50px;
+  border-left: 3px solid grey;
+}
+.in-between.multiple {
+  height: 90px;
+  border-left: 3px solid grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.in-between.multiple span {
+  background: #fff;
+  font-size: 12px;
+  color: grey;
+  border-top: 2px dashed grey;
+  border-bottom: 2px dashed grey;
+  padding: 15px 40px;
+  border-radius: 10px;
+}
+div.code {
+  overflow-x: auto;
+  font-family: monospace,monospace;
+  font-size: 1em;
+  white-space: nowrap;
+  padding: 5px 0 10px 5px;
+  margin: 8px 0;
+}
+div.code > div.line:not(:nth-child(2)) {
+  white-space: pre;
+}
+div.code > div.line:first-child, div.code > div.line:nth-child(2) {
+  display: inline-block;
+}
+div.code > div.line:last-child:after {
+  content: " )";
+}
+.inst {
+  padding: 0 5px 0 8px;
+  position: relative;
+  z-index: 2;
+  font-weight: bold;
+}
+  .inst:after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+    border-radius: 20px;
+  }
+.custom-scroll {
+}
+/* width */
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(241, 241, 241, 0.18);
+}
+  .custom-scroll::-webkit-scrollbar-track:hover {
+    background:  rgba(241, 241, 241, 0.8);
+  }
+
+/* Handle */
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #00b5e3;
+}
+
+/* Handle on hover */
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #00627B;
+}
+div.user {
+  padding: 20px 0 0 0;
+  display: flex;
+  flex-direction: row;
+  overflow: auto;
+  align-items: center;
+}
+div.user > div:first-child {
+  flex-shrink: 0;
+  padding: 0 10px 0 0;
+}
+div.user svg {
+  max-width: 40px;
+  fill: #000;
+}
 </style>
 
 <script>

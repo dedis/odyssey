@@ -465,18 +465,13 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 
 func createProjectInstace(idStr, pubKey string, conf *Config) (string, error) {
 
-	metadata := &catalogc.Metadata{}
-	metaDataJSON, err := json.Marshal(metadata)
-	metaDataJSONStr := string(metaDataJSON)
-
 	cmd := exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
 		"project", "spawn", "-is", idStr, "-bc", conf.BCPath, "-sign",
-		conf.KeyID, "-darc", conf.DarcID, "-pubKey", pubKey,
-		"-metadataJson", metaDataJSONStr)
+		conf.KeyID, "-darc", conf.DarcID, "-pubKey", pubKey)
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		return "", fmt.Errorf("failed to run the command: %s - "+
 			"Output: %s - Err: %s", err.Error(), outb.String(), errb.String())

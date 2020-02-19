@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strings"
 
+	"go.dedis.ch/cothority/v3/byzcoin"
 	"golang.org/x/xerrors"
 )
 
@@ -866,4 +867,35 @@ func (f FailedReason) String() string {
 	fmt.Fprintf(out, "-- Reason: %s\n", f.Reason)
 	fmt.Fprintf(out, "-- Dataset: %s\n", f.Dataset)
 	return out.String()
+}
+
+// AuditData is used by the catadmin cli to return audit infos
+type AuditData struct {
+	// BlocksChecked is the number of blocks checked
+	BlocksChecked int
+	// OccFound is the number of blocks concerned
+	OccFound int
+	// Blocks contains the list of audit blocks
+	Blocks []*AuditBlock
+}
+
+// AuditBlock is a tailored version of a skipblock that we need to display
+// something interesting
+type AuditBlock struct {
+	BlockIndex int
+	// The number of blocks before the previous in the list. If the current block
+	// has an index of 7 and the previous one in the list has an index of 5, then
+	// the delta is 1. This is handy for go templates where we cannot do
+	// aritmetic operations. The first one has a value of -1.
+	DeltaPrevious int
+	// The number of blocks after the next in the list. The last one has a value
+	// of -1.
+	DeltaNext    int
+	Transactions []*AuditTransaction
+}
+
+// AuditTransaction is a tailored version of a transaction for audit
+type AuditTransaction struct {
+	Accepted     bool
+	Instructions []*byzcoin.Instruction
 }

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/dedis/odyssey/catalogc"
 	"github.com/dedis/odyssey/projectc"
 	"github.com/urfave/cli"
 	"go.dedis.ch/cothority/v3"
@@ -134,7 +137,7 @@ func auditDataset(c *cli.Context) error {
 					fmt.Fprintf(out, "<pre>%v</pre>", instr)
 					if instr.GetType() == byzcoin.SpawnType {
 						projectInstID := instr.Spawn.Args.Search("projectInstID")
-						fmt.Fprintf(out, "<p>Project instance ID: %x</p>", projectInstID)
+						fmt.Fprintf(out, "<p>Project instance ID: <a href='/lifecycle?piid=%x'>%x</a></p>", projectInstID, projectInstID)
 						resp, err := cl.GetProofFromLatest(projectInstID)
 						if err != nil {
 							return xerrors.Errorf("failed to get project instance: %v", err)
@@ -192,7 +195,7 @@ func auditProject(c *cli.Context) error {
 		return xerrors.Errorf("failed to call PaginateRequest: %v", err)
 	}
 
-	out := new(strings.Builder)
+	blocks := make([]*catalogc.AuditBlock, 0)
 	occurences := 0
 	nblocks := 0
 
@@ -220,31 +223,63 @@ func auditProject(c *cli.Context) error {
 		if len(dataBody.TxResults) == 0 {
 			continue
 		}
+
+		transactionsRes := make([]*catalogc.AuditTransaction, 0)
 		for _, txResult := range dataBody.TxResults {
+			instrRes := make([]*byzcoin.Instruction, 0)
+
 			for _, instr := range txResult.ClientTransaction.Instructions {
 				if instr.InstanceID.String() == instid || instr.DeriveID("").String() == instid {
+					instrRes = append(instrRes, &instr)
 					occurences++
-					out.WriteString("<div class=\"occurence\">")
-					fmt.Fprintf(out, "<p>Accepted? <b>%v</b><br>", txResult.Accepted)
-					fmt.Fprintf(out, "BlockIndex: %d<p>", ret.Blocks[0].Index)
-					fmt.Fprintf(out, "<pre>%v", instr)
-					if instr.Spawn != nil {
-						projectDataBuf := instr.Spawn.Args.Search("projectData")
-						projectData := &projectc.ProjectData{}
-						err := protobuf.Decode(projectDataBuf, projectData)
-						if err != nil {
-							return xerrors.Errorf("failed to decode projectData: %v", err)
-						}
-						out.WriteString(projectData.String())
-					}
-					out.WriteString("</pre></div>")
 				}
 			}
+
+			if len(instrRes) != 0 {
+				auditTransaction := &catalogc.AuditTransaction{
+					Accepted:     txResult.Accepted,
+					Instructions: instrRes,
+				}
+				transactionsRes = append(transactionsRes, auditTransaction)
+			}
+		}
+
+		if len(transactionsRes) != 0 {
+			auditBlock := &catalogc.AuditBlock{
+				BlockIndex:   ret.Blocks[0].Index,
+				Transactions: transactionsRes,
+			}
+			blocks = append(blocks, auditBlock)
 		}
 	}
 
-	prolog := fmt.Sprintf("<h4>Checked %d blocks and found %d requests.</h4>", nblocks, occurences)
-	log.Info(prolog + out.String())
+	if len(blocks) > 0 {
+		blocks[0].DeltaPrevious = -1
+		blocks[len(blocks)-1].DeltaNext = -1
+		for i, block := range blocks[1:] {
+			block.DeltaPrevious = block.BlockIndex - blocks[i].BlockIndex - 1
+		}
+		for i, block := range blocks[:len(blocks)-1] {
+			block.DeltaNext = blocks[i+1].BlockIndex - block.BlockIndex - 1
+		}
+	}
+
+	result := catalogc.AuditData{
+		BlocksChecked: nblocks,
+		OccFound:      occurences,
+		Blocks:        blocks,
+	}
+
+	resultBuf, err := protobuf.Encode(&result)
+	if err != nil {
+		return xerrors.Errorf("failed to encode audit result: %v", err)
+	}
+
+	reader := bytes.NewReader(resultBuf)
+	_, err = io.Copy(os.Stdout, reader)
+	if err != nil {
+		return xerrors.Errorf("failed to export to stdout: %v", err)
+	}
 
 	return nil
 }
