@@ -512,18 +512,12 @@ removeVapp:
 		"setting the status to 'deletedOK' in the project's instance")
 	err = models.UpdateProjectcStatus(conf, "deletedOK", eproject.InstanceID)
 	if err != nil {
-		handleError("failed to update the contract status", err.Error())
+		handleError("failed to update the contract status",
+			"failed to update the contract status", err.Error())
 		return
 	}
 
 	delete(models.EProjectList, id)
-
-	err = models.UpdateProjectcStatus(conf, "deletedOK", eproject.InstanceID)
-	if err != nil {
-		handleError("failed to update the contract status",
-			"failed to update the status to 'deletedOK", err)
-		return
-	}
 
 	tef.FlushTaskEventCloseOK("vApp destroyed ", eproject.EnclaveName)
 
