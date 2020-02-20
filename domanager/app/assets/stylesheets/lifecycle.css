@@ -1,38 +1,38 @@
-    #loading {
-        visibility: hidden;
-    }
-    .sub-form {
-        margin-left: 25px;
-        padding-left: 15px;
-        border-left: 3px solid #f2f2f2;
-    }
-    .sub-form.disabled {
-        pointer-events: none;
-        opacity: .3;
-    }
+#loading {
+  visibility: hidden;
+}
+.sub-form {
+  margin-left: 25px;
+  padding-left: 15px;
+  border-left: 3px solid #f2f2f2;
+}
+.sub-form.disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}
 
-    .aligned-checkbox {
-        display: flex;
-        flex-direction: row;
-        margin: .5em 0;
-        align-items: center;
-    }
-    .aligned-checkbox input {
-        flex-shrink: 0;
-    }
-    .aligned-checkbox span {
-        padding: 0 5px 0 8px;
-    }
-    .audit {
-    }
-   .occurence {
-      padding: 10px 50px 40px 50px;
-      border-bottom: 8px solid rgba(0, 0, 0, 0.13);
-      background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
-      border-radius:50px;
-      margin: 0 0 0px 0;
-      position: relative;
-    }
+.aligned-checkbox {
+  display: flex;
+  flex-direction: row;
+  margin: 0.5em 0;
+  align-items: center;
+}
+.aligned-checkbox input {
+  flex-shrink: 0;
+}
+.aligned-checkbox span {
+  padding: 0 5px 0 8px;
+}
+.audit {
+}
+.occurence {
+  padding: 10px 50px 40px 50px;
+  border-bottom: 8px solid rgba(0, 0, 0, 0.13);
+  background: linear-gradient(90deg, #00c9ff 0%, #92fe9d 100%);
+  border-radius: 50px;
+  margin: 0 0 0px 0;
+  position: relative;
+}
 .occurence summary {
   margin: 20px 0 0 0;
   cursor: pointerdetails;
@@ -122,7 +122,7 @@
 }
 div.code {
   overflow-x: auto;
-  font-family: monospace,monospace;
+  font-family: monospace, monospace;
   font-size: 1em;
   white-space: nowrap;
   padding: 5px 0 10px 5px;
@@ -131,7 +131,8 @@ div.code {
 div.code > div.line:not(:nth-child(2)) {
   white-space: pre;
 }
-div.code > div.line:first-child, div.code > div.line:nth-child(2) {
+div.code > div.line:first-child,
+div.code > div.line:nth-child(2) {
   display: inline-block;
 }
 div.code > div.line:last-child:after {
@@ -143,17 +144,17 @@ div.code > div.line:last-child:after {
   z-index: 2;
   font-weight: bold;
 }
-  .inst:after {
-    content: "";
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    bottom: -2px;
-    left: -2px;
-    background: rgba(255, 255, 255, 0.1);
-    z-index: -1;
-    border-radius: 20px;
-  }
+.inst:after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: -1;
+  border-radius: 20px;
+}
 .custom-scroll {
 }
 /* width */
@@ -166,9 +167,9 @@ div.code > div.line:last-child:after {
 .custom-scroll::-webkit-scrollbar-track {
   background: rgba(241, 241, 241, 0.18);
 }
-  .custom-scroll::-webkit-scrollbar-track:hover {
-    background:  rgba(241, 241, 241, 0.8);
-  }
+.custom-scroll::-webkit-scrollbar-track:hover {
+  background: rgba(241, 241, 241, 0.8);
+}
 
 /* Handle */
 .custom-scroll::-webkit-scrollbar-thumb {
@@ -177,18 +178,23 @@ div.code > div.line:last-child:after {
 
 /* Handle on hover */
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #00627B;
+  background: #00627b;
 }
 div.user {
   padding: 20px 0 0 0;
   display: flex;
   flex-direction: row;
   overflow: auto;
-  align-items: center;
+  align-items: flex-end;
 }
 div.user > div:first-child {
   flex-shrink: 0;
   padding: 0 10px 0 0;
+}
+div.user > p {
+  font-size: 12px;
+  margin: 0;
+  padding: 0 0 5px 0;
 }
 div.user svg {
   max-width: 40px;

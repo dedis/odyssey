@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/sessions"
 	"go.dedis.ch/onet/v3/log"
 	"go.dedis.ch/protobuf"
+	"golang.org/x/xerrors"
 )
 
 // ShowLifecycle ...
@@ -31,11 +32,14 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 	store *sessions.CookieStore, conf *models.Config) {
 
 	type viewData struct {
-		Title     string
-		Flash     []xhelpers.Flash
-		Session   *models.Session
-		AuditData catalogc.AuditData
-		ShortPID  string
+		Title            string
+		Flash            []xhelpers.Flash
+		Session          *models.Session
+		AuditData        catalogc.AuditData
+		ShortPID         string
+		DataScientistID  string
+		EnclaveManagerID string
+		EnclaveID        string
 	}
 
 	session, err := models.GetSession(store, r)
@@ -90,6 +94,55 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 		xhelpers.RedirectWithErrorFlash("/", "failed to decode audit data: "+err.Error(), w, r, store)
 	}
 
+	dataScientistID, err := func() (string, error) {
+		for _, block := range auditData.Blocks {
+			for _, tx := range block.Transactions {
+				for _, instr := range tx.Instructions {
+					// we assume that only the data scientist signs the spawn request
+					if instr.Spawn != nil {
+						return instr.SignerIdentities[0].String(), nil
+					}
+				}
+			}
+		}
+		return "", xerrors.New("spawn instruction not found")
+	}()
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", "failed to get the datascientist id: "+err.Error(), w, r, store)
+	}
+
+	// return an empty string if the invoke:setURL instruction is not found
+	enclaveManagerID := func() string {
+		for _, block := range auditData.Blocks {
+			for _, tx := range block.Transactions {
+				for _, instr := range tx.Instructions {
+					// Only the enclave manager can call the "setURL" action
+					if instr.Invoke != nil && instr.Invoke.Command == "setURL" {
+						return instr.SignerIdentities[0].String()
+					}
+				}
+			}
+		}
+		return ""
+	}()
+
+	// return an empty string if the invoke:setEnclavePubKey instruction is not
+	// found
+	enclaveID := func() string {
+		for _, block := range auditData.Blocks {
+			for _, tx := range block.Transactions {
+				for _, instr := range tx.Instructions {
+					// Only the enclave manager can call the "setURL" action
+					if instr.Invoke != nil && instr.Invoke.Command == "setEnclavePubKey" {
+						pubKey := instr.Invoke.Args.Search("pubKey")
+						return string(pubKey)
+					}
+				}
+			}
+		}
+		return ""
+	}()
+
 	t, err := template.New("lifecycle").Funcs(template.FuncMap{
 		"toString": func(buf []byte) string {
 			return string(buf)
@@ -109,11 +162,14 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 	}
 
 	p := &viewData{
-		Title:     "Lifecycle",
-		Flash:     flashes,
-		Session:   session,
-		AuditData: auditData,
-		ShortPID:  piid[0][:8] + "...",
+		Title:            "Lifecycle",
+		Flash:            flashes,
+		Session:          session,
+		AuditData:        auditData,
+		ShortPID:         piid[0][:8] + "...",
+		DataScientistID:  dataScientistID,
+		EnclaveManagerID: enclaveManagerID,
+		EnclaveID:        enclaveID,
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
