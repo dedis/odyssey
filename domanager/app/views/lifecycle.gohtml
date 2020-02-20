@@ -85,7 +85,11 @@
                     </div>
                     <details>
                       <summary>details</summary>
-                      <pre class="custom-scroll">{{ $instr }}</pre>
+                      <pre class="custom-scroll">
+{{ $instr }}
+- Signatures:
+{{ range $u, $sig := $instr.Signatures }}{{ printf "-- %x" $sig }}{{ end }}
+                      </pre>
                     </details>
                   {{ end }}
                 {{ end }}
