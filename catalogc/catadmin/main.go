@@ -134,7 +134,6 @@ func auditDataset(c *cli.Context) error {
 					out.WriteString("<div class=\"occurence\">")
 					fmt.Fprintf(out, "<p>Accepted? <b>%v</b><br>", txResult.Accepted)
 					fmt.Fprintf(out, "BlockIndex: %d<p>", ret.Blocks[0].Index)
-					fmt.Fprintf(out, "<pre>%v</pre>", instr)
 					if instr.GetType() == byzcoin.SpawnType {
 						projectInstID := instr.Spawn.Args.Search("projectInstID")
 						fmt.Fprintf(out, "<p>Project instance ID: <a href='/lifecycle?piid=%x'>%x</a></p>", projectInstID, projectInstID)
@@ -147,20 +146,20 @@ func auditDataset(c *cli.Context) error {
 						if err != nil {
 							return xerrors.Errorf("failed to decode project instance: %v", err)
 						}
-						out.WriteString("<summary>")
-						out.WriteString("See the project attributes")
 						out.WriteString("<details>")
+						out.WriteString("<summary>See the project attributes</summary>")
 						fmt.Fprintf(out, "<pre>%v</pre>", projectInst)
 						out.WriteString("</details>")
-						out.WriteString("</summary>")
+						out.WriteString("</details>")
 					}
+					fmt.Fprintf(out, "<details><summary>See instruction</summary><pre>%v</pre></details>", instr)
 					out.WriteString("</div>")
 				}
 			}
 		}
 	}
 
-	prolog := fmt.Sprintf("<h4>Checked %d blocks and found %d requests.</h4>", nblocks, occurences)
+	prolog := fmt.Sprintf("<p>Checked <b>%d blocks</b> and found <b>%d requests</b>.</p>", nblocks, occurences)
 	log.Info(prolog + out.String())
 
 	return nil
