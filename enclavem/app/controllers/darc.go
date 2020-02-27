@@ -29,7 +29,7 @@ func DarcIndexHandler(store *sessions.CookieStore, conf *models.Config) http.Han
 
 func darcIndexPost(w http.ResponseWriter, r *http.Request,
 	store *sessions.CookieStore, conf *models.Config) {
-	// (!) This endpoint is publicly accessbile. In a production environement,
+	// (!) This endpoint is publicly accessbile. In a production environment,
 	// it should be protected by an authentication system, which is out of scope
 	// for this project.
 

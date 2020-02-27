@@ -5,34 +5,71 @@ the cloud provider or the executables that each component need.
 
 ## Cloud configuration
 
-Make sure you have an available cloud endpoint. Minio is a good choice.
-Here are the steps we followed to install Minio on our server:
+Make sure you have an available S3-compatible cloud endpoint.
+
+If you are using a remote cloud storage system, skip to
+"CloudStorage Setup" below.
+
+### Local Minio install
+
+If are not using a remote cloud storage system, Minio is a good choice
+for running your own. Here is how to install Minio for use in a
+local development setup.
+
+Make a copy of the `variables.sh.template` file, and edit it to set
+`MINIO_SECRET_KEY` to something of your own. Source the file:
+
+```
+$ cp variables.sh.template variables.sh
+# edit it
+$ source variables.sh
+```
+
+Get the binaries (Linux).
 
 ```
 $ wget https://dl.min.io/server/minio/release/linux-amd64/minio
-$ chmod +x minio
+$ wget https://dl.min.io/client/mc/release/linux-amd64/mc
+$ chmod +x minio mc
 $ mkdir data
-$ screen -S minio
-$ ./minio server --address :9990 /home/JohnDoe/data
-> <CTRL A> <D>
-$ sudo ufw allow 9990
+$ ./minio server --address localhost:9990 `pwd`/data
 ```
 
-As an example, here is how we would use it with the CLI Minio client:
+On MacOS:
 
 ```
-mc config host add dedis http://123.123.123.12:9990 <KEY> <SECRET>
-mc mb dedis/new_bucket
-echo "hello" | mc pipe "dedis/newbucket/$(date +%Y-%m-%d-%H%M-%S).txt"
+$ wget https://dl.min.io/server/minio/release/darwin-amd64/minio
+$ wget https://dl.min.io/client/mc/release/darwin-amd64/mc
+$ chmod +x minio mc
+$ mkdir data
+$ ./minio server --address localhost:9990 `pwd`/data
+```
+
+### Cloud Storage Setup
+
+If you are using Minio, use this line to set the config for the `mc` tool:
+
+```
+$ mc config host add dedis http://localhost:9990 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+```
+
+If you are using another remote cloud storage system, you'll need to check the
+docs for how to configure `mc` for it.
+
+Now you need to make a bucket for datasets, which must be named `dedis/datasets`.
+
+```
+$ mc mb dedis/datasets
 ```
 
 ## Generate the executables
 
-We heavily make use of direct call to executables as a mean to interface
-with cothority. As such, you will need to generate them and set up each
-components with the appropriate executables. Instructions on how to
-generate them are in the next section "Prerequiste". Here is a summary
-of the exec dependencies of each components:
+We heavily make use of direct calls to executables as a means to interface
+with Cothority. As such, you will need to build them and make sure they
+are in the PATH.
+
+Here is a summary
+of the executables needed by each component:
 
 |               |catadmin|cryptutil|pcadmin|bcadmin|csadmin|
 |---------------|--------|---------|-------|-------|-------|
@@ -42,58 +79,35 @@ of the exec dependencies of each components:
 |`enclavem/app` |        |         | x     | x     | x     |
 
 
-## Prerequisite
-
-Make sure you use a local version of cothority based on the
-"odyssey-needs" branch (`git checkout odyssey-needs`), as well as the
-local version of odyssey. For that, add the following replace directives
-in your `odyssey/go.mod` file:
+You can build all the required binaries and install them into $GOPATH/bin like this:
 
 ```
-replace go.dedis.ch/cothority/v3 => /Users/whatever/GitHub/cothority
-replace github.com/dedis/odyssey => /Users/whatever/GitHub/odyssey
+git clone https://github.com/dedis/cothority
+cd cothority
+go install ./...
+cd ..
+git clone https://github.com/dedis/odyssey
+cd odyssey
+go install ./...
 ```
-
-**catadmin**
-
-```
-cd catalogc/catadmin
-go build
-```
-
-**cryptutil**
-
-```
-cd cryptutil
-go build
-```
-
-**pcadmin**
-
-```
-cd projectc/pcadmin
-go build
-```
-
-**bcadmin**
-
-```
-cd cothority/byzcoin/bcadmin
-go build
-```
-
-**csadmin**
-
-```
-cd cothority/calypso/csadmin
-go build
-```
-
-Then you can copy each executable to the right places, according to the
-table above.
 
 There are additional setup steps for each component that you will find
 in their associated documentation (chapter "Components").
+
+## Run a set of local conodes, and start a ledger
+
+### Using a local ledger
+
+If you are not using a public ledger, you will need to run your own local one.
+
+...run conodes, make ledger, get bc file, set BC env variable in variables.sh, etc.
+
+### Using a public ledger
+
+If you are using a public ledger, the admin will ask for your public
+key and then give you instructions on how to use `bcadmin link` to connect
+to the ledger. The resulting `bc-*.cfg` file will be used instead of the
+one created in the previous section.
 
 ## Generate doc
 

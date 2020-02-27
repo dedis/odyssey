@@ -51,8 +51,6 @@ func emptySession() *Session {
 
 // IsLogged tells if the credential have been set
 func (s Session) IsLogged() bool {
-	log.Info("SessionsMap:\n%s", SessionsMap)
-
 	return s.BcPath != "" && s.Cfg != nil
 }
 

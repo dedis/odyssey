@@ -47,3 +47,4 @@ dsmanager/app/config.toml
 enclavem/app/config.toml
 ledger/bcadmin
 ledger/csadmin
+variables.sh
