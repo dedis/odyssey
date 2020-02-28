@@ -3,3 +3,5 @@ co*/
 log/
 public.toml
 running
+tmp/
+conode
