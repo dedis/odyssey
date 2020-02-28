@@ -1,3 +1,7 @@
-conode_data
-exe/*
+co*/
+*.db
+log/
+public.toml
+running
 tmp/
+conode

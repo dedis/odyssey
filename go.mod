@@ -15,7 +15,7 @@ require (
 	github.com/swaggo/http-swagger v0.0.0-20190614090009-c2865af9083e
 	github.com/swaggo/swag v1.6.3
 	github.com/urfave/cli v1.22.2
-	go.dedis.ch/cothority/v3 v3.1.3
+	go.dedis.ch/cothority/v3 v3.4.3
 	go.dedis.ch/kyber/v3 v3.0.12
 	go.dedis.ch/onet/v3 v3.1.1
 	go.dedis.ch/protobuf v1.0.11
@@ -25,7 +25,3 @@ require (
 	google.golang.org/appengine v1.4.0
 	gopkg.in/urfave/cli.v1 v1.20.0
 )
-
-replace go.dedis.ch/cothority/v3 => /Users/nkocher/GitHub/cothority
-
-replace github.com/dedis/odyssey => /Users/nkocher/GitHub/odyssey

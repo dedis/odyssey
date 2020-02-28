@@ -191,6 +191,13 @@ evtSource.onmessage = function(event) {
 }
 
 function toggle(el) {
+    // Do not let onclicks from finish selection collapse the div.
+    // https://stackoverflow.com/questions/31982407/prevent-onclick-event-when-selecting-text
+    var selection = window.getSelection();
+    if(selection.type === "Range") {
+        return;
+    }
+	
     var details = el.children[1];
     var isCollapsed = details.getAttribute('data-collapsed') === 'true';
     if (isCollapsed) {

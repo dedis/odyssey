@@ -10,9 +10,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"sort"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -45,7 +47,7 @@ func init() {
 	var err error
 	conf, err = parseConfig()
 	if err != nil {
-		log.Fatal("failed to load config", err)
+		log.Fatal("failed to load config: ", err)
 	}
 }
 
@@ -136,7 +138,14 @@ func main() {
 		close(done)
 	}()
 
-	logger.Println("Server is ready to handle requests at", listenAddr)
+	lu := &url.URL{Scheme: "http"}
+	if strings.HasPrefix(listenAddr, ":") {
+		lu.Host = "localhost" + listenAddr
+	} else {
+		lu.Host = listenAddr
+	}
+
+	logger.Println("Server is ready to handle requests at", lu)
 	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		logger.Fatalf("Could not listen on %s: %v\n", listenAddr, err)
@@ -153,7 +162,6 @@ func parseConfig() (*models.Config, error) {
 	if err != nil {
 		return nil, errors.New("failed to read config: " + err.Error())
 	}
-
 	return conf, nil
 }
 

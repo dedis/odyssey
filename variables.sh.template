@@ -10,6 +10,11 @@ export VDC_ID=
 export NETWORK_ID=
 export TEMPLATE_ID=
 
-export MINIO_ENDPOINT=
-export MINIO_KEY=
-export MINIO_SECRET=
+export MINIO_ENDPOINT=localhost:9990
+export MINIO_ACCESS_KEY=minioadmin
+export MINIO_SECRET_KEY=XXX-put-your-own-random-string-here-XXX
+
+# Suggested default, you can move this.
+export BC_CONFIG=$HOME/.odyssey-config
+# You will fill this in after `bcadmin create` or `bcadmin link`
+export BC=

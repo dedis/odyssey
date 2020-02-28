@@ -241,6 +241,8 @@ github.com/xtaci/kcp-go v5.4.5+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a
 github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae/go.mod h1:gXtu8J62kEgmN++bm9BVICuT/e8yiLI2KFobd/TRFsE=
 go.dedis.ch/cothority/v3 v3.1.3 h1:IKCEgC/MOD+gFRvOKGq0XQhg1Cml8LSoga+1IlcLXf0=
 go.dedis.ch/cothority/v3 v3.1.3/go.mod h1:9l9ftJQG/LJakHDm3RdrStrTsyMuHNr5h2A6IWrjAgY=
+go.dedis.ch/cothority/v3 v3.4.3 h1:U+RLWNQnyHwDIN7rhbExKm4JAJjlruDp+fwDeQ9Dom4=
+go.dedis.ch/cothority/v3 v3.4.3/go.mod h1:Gy/8a79zI3WNUSXICGwrG3XB1mZyRDnEZ4Hh1AXAe7w=
 go.dedis.ch/cothority/v4 v4.0.0-20191024075351-deb5ea40a851 h1:mCihsmpI/I/pR2x/5XkzUWYbHoa+3MNSSD8HMUOQxSE=
 go.dedis.ch/cothority/v4 v4.0.0-20191024075351-deb5ea40a851/go.mod h1:DiViybyklud/Qx4SlIVV7nVvZtYBQJGTL2ALxMPfsDU=
 go.dedis.ch/cothority/v4 v4.0.0-20191030120002-347c6f28ac39 h1:Jk5QIohnedI7BfzDO6ZWuswDLG+rxqHGcdB+c4L+zqk=
