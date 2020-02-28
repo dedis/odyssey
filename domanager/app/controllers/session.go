@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"text/template"
@@ -116,6 +117,17 @@ func sessionPost(w http.ResponseWriter, r *http.Request,
 			err.Error(), w, r, store)
 		return
 	}
+
+	// Check if the upload folder exist and create it if not
+	_, err = os.Stat("test")
+	if os.IsNotExist(err) {
+		err = os.Mkdir("uploads", 0755)
+		if err != nil {
+			xhelpers.RedirectWithErrorFlash("/", "failed to create the upload "+
+				"folder: "+err.Error(), w, r, store)
+		}
+	}
+
 	newpath, err := filepath.Abs(path.Join("uploads", handler.Filename))
 	if err != nil {
 		xhelpers.RedirectWithErrorFlash("/", "failed to get the path: "+
