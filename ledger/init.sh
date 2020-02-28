@@ -1,8 +1,9 @@
 #!/bin/sh
 
-# In this variant we use a cothority hosted on a remote server. We take the
-# assumption that the ledger has already been created and informations are saved
-# in the 'secret/' folder.
+# This file was initially a script to set up the ledger but it ended up being a
+# reference for all the commands one might need to run depending on its need. If
+# you are looking for instructions on how to setup a ledger then please read the
+# setup.md file in docs/
 
 #
 # Build conode, bcadmin, and csadmin
@@ -392,7 +393,7 @@ export BC_CONFIG="/Users/nkocher/GitHub/odyssey/secret/"
 
 bcadmin darc rule --sign $(cat darc_key.txt) --darc $(cat darc_id.txt) -id $(cat darc_id.txt) -rule "spawn:odysseycatalog"
 bcadmin darc rule --sign $(cat darc_key.txt) --darc $(cat darc_id.txt) -id $(cat darc_id.txt) -rule "invoke:odysseycatalog.addOwner"
-bcadmin darc rule --sign $(cat darc_key.txt) --darc $(cat darc_id.txt) -id $(cat darc_id.txt) -rule "invoke:odysseycatalog.odysseycatalog.updateMetadata"
+bcadmin darc rule --sign $(cat darc_key.txt) --darc $(cat darc_id.txt) -id $(cat darc_id.txt) -rule "invoke:odysseycatalog.updateMetadata"
 bcadmin darc rule --sign $(cat darc_key.txt) --darc $(cat darc_id.txt) -id $(cat darc_id.txt) -rule "invoke:odysseycatalog.deleteDataset"
 bcadmin darc rule --sign $(cat darc_key.txt) --darc $(cat darc_id.txt) -id $(cat darc_id.txt) -rule "invoke:odysseycatalog.archiveDataset"
 catadmin contract catalog spawn --darc $(cat darc_id.txt) --sign $(cat darc_key.txt) 
