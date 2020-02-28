@@ -9,7 +9,7 @@ type Config struct {
 	LtsKey     string
 	// Standalone mode means that the domanager will take responsibility itself
 	// for making the Darc that controls access to the write instance for new
-	// data sets. When Standalone is false (the default), domanager talks to
-	// the Enclave manager to create the Darc.
+	// data sets. When Standalone is false (the default), domanager talks to the
+	// Enclave manager to create the Darc.
 	Standalone bool
 }
