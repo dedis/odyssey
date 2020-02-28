@@ -25,13 +25,15 @@ func GetMinioClient() (*minio.Client, error) {
 			return nil, xerrors.New("MINIO_SECRET_KEY env variable is empty")
 		}
 
-		// Endpoint must be host:port, if they give us a url, parse those out for them.
+		// Endpoint must be host:port, if they give us a url, parse those out
+		// for them.
 		ep := os.Getenv("MINIO_ENDPOINT")
 		if strings.Contains(ep, "://") {
 			u, err := url.Parse(ep)
-			if err == nil {
-				ep = u.Host
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse minion endpoint url: %v", err)
 			}
+			ep = u.Host
 		}
 
 		var err error
