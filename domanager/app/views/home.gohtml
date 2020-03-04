@@ -5,9 +5,9 @@
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     <div class="pure-u-1 pure-u-sm-1-2">
 
-        <h1>Data owner app</h1>
+        <h1>Patient records manager</h1>
 
-        <p>🐠</p>
+        <p>👩‍⚕️</p>
 
         <div class="row">
             <div class="sub-block">
@@ -28,9 +28,9 @@
                       </g>
                   </svg>          
                 </div>
-                <h3>Upload a new dataset</h3>
-                <p>Upload a new dataset and set the attributes on it</p>
-                <p><a class="pure-button" href="/datasets/new">➡️ Upload a dataset</a></p>            
+                <h3>Upload new patient records</h3>
+                <p>Upload new patient records and set the attributes on them</p>
+                <p><a class="pure-button" href="/datasets/new">➡️ Upload patient records</a></p>            
             </div>
             <div class="sub-block">
                 <div class="icon">
@@ -65,8 +65,8 @@
                       </g>
                   </svg>
                 </div>
-                <h3>See my datasets</h3>
-                <p>Browse the list of your already uploaded datasets and manage them</p>
+                <h3>Browse the records</h3>
+                <p>Browse the list of your already uploaded records and manage them</p>
                 <p><a class="pure-button" href="/datasets">➡️ See your datasets</a></p>
             </div>
         </div>
@@ -77,7 +77,7 @@
               <svg width="100%" height="100%" viewBox="0 0 284 284" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g><path d="M131.347,88.029l97.339,0c4.847,0 8.886,-4.039 8.886,-8.886c0,-4.846 -4.039,-8.885 -8.886,-8.885l-97.339,0c-4.847,0 -8.886,4.039 -8.886,8.885c0,4.847 4.039,8.886 8.886,8.886Z" style="fill-rule:nonzero;"/><path d="M88.938,58.747l-19.993,21.608l-7.472,-8.078c-3.433,-3.635 -9.088,-3.837 -12.723,-0.404c-3.635,3.231 -3.837,8.886 -0.404,12.521l13.935,15.146c1.615,1.818 4.039,2.827 6.462,2.827c2.423,0 4.847,-1.009 6.462,-2.827l26.658,-28.676c3.433,-3.635 3.231,-9.29 -0.404,-12.521c-3.433,-3.433 -9.088,-3.231 -12.521,0.404Z" style="fill-rule:nonzero;"/><path d="M228.888,132.862l-97.541,0c-4.847,0 -8.886,4.039 -8.886,8.885c0,4.847 4.039,8.886 8.886,8.886l97.339,0c4.847,0 8.886,-4.039 8.886,-8.886c0,-4.846 -3.837,-8.885 -8.684,-8.885Z" style="fill-rule:nonzero;"/><path d="M88.938,121.351l-19.993,21.608l-7.472,-8.078c-3.433,-3.635 -9.088,-3.837 -12.723,-0.404c-3.635,3.231 -3.837,8.886 -0.404,12.521l13.935,15.146c1.615,1.818 4.039,2.827 6.462,2.827c2.423,0 4.847,-1.009 6.462,-2.827l26.658,-28.677c3.433,-3.635 3.231,-9.289 -0.404,-12.52c-3.433,-3.433 -9.088,-3.231 -12.521,0.404Z" style="fill-rule:nonzero;"/><path d="M228.888,195.466l-97.541,0c-4.847,0 -8.886,4.038 -8.886,8.885c0,4.847 4.039,8.886 8.886,8.886l97.339,0c4.847,0 8.886,-4.039 8.886,-8.886c0,-4.847 -3.837,-8.885 -8.684,-8.885Z" style="fill-rule:nonzero;"/><path d="M88.938,183.954l-19.993,21.609l-7.472,-8.078c-3.433,-3.635 -9.088,-3.837 -12.723,-0.404c-3.635,3.433 -3.837,9.088 -0.404,12.521l13.935,15.146c1.615,1.818 4.039,2.827 6.462,2.827c2.423,0 4.847,-1.009 6.462,-2.827l26.86,-28.475c3.433,-3.635 3.231,-9.289 -0.404,-12.52c-3.635,-3.434 -9.29,-3.232 -12.723,0.201Z" style="fill-rule:nonzero;"/></g></svg>
             </div>
             <h3>Tasks</h3>
-            <p>You can check the past and current tasks.<p>
+            <p>Check the past and current tasks.<p>
             <p><a class="pure-button" href="/showtasks">➡️ See the list of tasks</a></p>
           </div>
           <div class="sub-block">
@@ -133,6 +133,28 @@
           flex-direction: column;
       }
     }
+      div.sub-block h3 {
+        padding: 5px;
+        margin: 0;
+      }
+      div.sub-block .icon {
+        padding: 5px 0 0 0;
+      }
+      div.sub-block .icon svg {
+        max-width: 100px;
+      }
+      div.sub-block .icon svg * {
+        fill: #9797dd;
+        transition: fill .4s ease;
+      }
+      div.sub-block:hover svg * {
+        fill: #6464cd;
+      }
+    @media screen and (max-width: 800px) {
+        div.row {
+            flex-direction: column;
+        }
+      }
     input#piid {
       padding: 5px;
       margin: 0 0 5px 0;
