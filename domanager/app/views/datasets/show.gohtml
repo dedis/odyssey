@@ -59,9 +59,11 @@
             <p style="color: darkred">No metadata associated with this dataset found</p>
         {{ end }}
 
-        <h3>Audit access on this dataset</h3>
-        <p>This action displays all the access requested on this dataset</p>
-        <p><a class="pure-button" href="/datasets/{{ .Dataset.CalypsoWriteID }}/audit">see access</a></p>
+        {{ if not .IsStandalone }}
+            <h3>Audit access on this dataset</h3>
+            <p>This action displays all the access requested on this dataset</p>
+            <p><a class="pure-button" href="/datasets/{{ .Dataset.CalypsoWriteID }}/audit">see access</a></p>
+        {{ end }}
 
         <h3>Remove access to this dataset</h3>
         <p>This action can not be undone and prevents anyone to further use this dataset. It does the following:<br>

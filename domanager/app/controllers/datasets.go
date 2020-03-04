@@ -159,10 +159,11 @@ func datasetsGet(w http.ResponseWriter, r *http.Request,
 	store *sessions.CookieStore, conf *models.Config) {
 
 	type viewData struct {
-		Title    string
-		Flash    []xhelpers.Flash
-		Session  *models.Session
-		Datasets []*catalogc.Dataset
+		Title        string
+		Flash        []xhelpers.Flash
+		Session      *models.Session
+		Datasets     []*catalogc.Dataset
+		IsStandalone bool
 	}
 
 	session, err := models.GetSession(store, r)
@@ -219,10 +220,11 @@ func datasetsGet(w http.ResponseWriter, r *http.Request,
 	}
 
 	p := &viewData{
-		Title:    "Your datasets",
-		Flash:    flashes,
-		Session:  session,
-		Datasets: datasets,
+		Title:        "Your datasets",
+		Flash:        flashes,
+		Session:      session,
+		Datasets:     datasets,
+		IsStandalone: conf.Standalone,
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
@@ -793,14 +795,15 @@ func datasetsShow(w http.ResponseWriter, r *http.Request,
 	// we have everything we need, let's render the view
 
 	type viewData struct {
-		Title    string
-		Flash    []xhelpers.Flash
-		Session  *models.Session
-		Dataset  *catalogc.Dataset
-		DarcID   string
-		DarcStr  string
-		Uses     []string
-		Purposes []string
+		Title        string
+		Flash        []xhelpers.Flash
+		Session      *models.Session
+		Dataset      *catalogc.Dataset
+		DarcID       string
+		DarcStr      string
+		Uses         []string
+		Purposes     []string
+		IsStandalone bool
 	}
 
 	t, err := template.New("template").Funcs(template.FuncMap{
@@ -827,14 +830,15 @@ func datasetsShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	p := &viewData{
-		Title:    "Your datasets",
-		Flash:    flashes,
-		Session:  session,
-		Dataset:  dataset,
-		DarcID:   darcID,
-		DarcStr:  darcStr,
-		Uses:     uses,
-		Purposes: purposes,
+		Title:        "Your datasets",
+		Flash:        flashes,
+		Session:      session,
+		Dataset:      dataset,
+		DarcID:       darcID,
+		DarcStr:      darcStr,
+		Uses:         uses,
+		Purposes:     purposes,
+		IsStandalone: conf.Standalone,
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
