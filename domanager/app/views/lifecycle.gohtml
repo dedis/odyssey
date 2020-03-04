@@ -45,9 +45,9 @@
                         <span>spawn</span>
                       </div>
                       <div class="code custom-scroll">
-                        <div class="line"><span class="inst">project</span> = new Project(</div>
+                        <div class="line"><span class="inst">{{ $instr.Spawn.ContractID }}</span> = new (</div>
                         {{ range $l, $arg := $instr.Spawn.Args }}
-                          <div class="line">                         {{ $arg.Name }}: {{ toString $arg.Value }}</div>
+                          <div class="line">        {{ $arg.Name }}: {{ toString $arg.Value }}</div>
                         {{ end }}
                       </div>
 
@@ -56,14 +56,17 @@
                         <span>invoke</span>
                       </div>
                       <div class="code custom-scroll">
-                        <div class="line"><span class="inst">project</span>.{{ $instr.Invoke.Command }}(</div>
+                        <div class="line"><span class="inst">{{ $instr.Invoke.ContractID }}</span>.{{ $instr.Invoke.Command }}(</div>
                         {{ range $l, $arg := $instr.Invoke.Args }}
-                          <div class="line">                         {{ $arg.Name }}: {{ toString $arg.Value }}</div>
+                          <div class="line">        {{ $arg.Name }}: {{ toString $arg.Value }}</div>
                         {{ end }}
                       </div>
                     {{ else if $instr.Delete }}
                       <div class="method delete">
                         <span>delete</span>
+                      </div>
+                      <div class="code custom-scroll">
+                        <div class="line"><span class="inst">{{ $instr.Invoke.ContractID }}</span>.delete()(</div>
                       </div>
                     {{ end }}
                     <div class="user custom-scroll">
