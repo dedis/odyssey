@@ -134,7 +134,7 @@ bcadmin create ledger/conode/tmp/public.toml
 export BC="path/to/folder/bc-BYZCOIN_ID.cfg"
 ```
 
-It is also a good idead to save the `export BC=...` command in the
+It is also a good idea to save the `export BC=...` command in the
 `variables.sh`.
 
 Upon creation, bcadmin created for you the admin identity and DARC, which are
