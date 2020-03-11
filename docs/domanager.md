@@ -14,8 +14,8 @@ The following executables are needed at the root of `domanager/app`:
 Put them there with:
 
 ```
-$ cd domanager/app
-$ cp `go env GOPATH`/bin/{bcadmin,catadmin,csadmin} .
+cd domanager/app
+cp `go env GOPATH`/bin/{bcadmin,catadmin,csadmin} .
 ```
 
 ## Configuration
@@ -33,9 +33,22 @@ To create a new catalog, ensure that your Darc has the spawn:catalog rule on it,
 and then use `catadmin`. You will need the `BC` variable set, which should be
 set in your `variables.sh` file.
 
+```bash
+source ../../variables.sh
+# This command outputs the CATALOG_INSTANCE_ID
+catadmin contract catalog spawn
 ```
-$ source ../../variables.sh
-$ catadmin contract catalog spawn
+
+Each data owner, represented as an identity string and DARC, must be first added
+to the catalog before being able to upload a dataset. The following commads add
+the current identity set in the BC config file to the catalog:
+
+```bash
+# Spot your identity, something like "ed25519:aef123..."
+bcadmin info
+catadmin contract catalog invoke addOwner -i CATALOG_INSTANCE_ID --firstname John --lastname Doe --identityStr IDENTITY
+# If you print the catalog, you can notice the change
+catadmin contract catalog get -i CATALOG_INSTANCE_ID
 ```
 
 ## Enclave manager
