@@ -119,7 +119,7 @@ func sessionPost(w http.ResponseWriter, r *http.Request,
 	}
 
 	// Check if the upload folder exist and create it if not
-	_, err = os.Stat("test")
+	_, err = os.Stat("uploads")
 	if os.IsNotExist(err) {
 		err = os.Mkdir("uploads", 0755)
 		if err != nil {

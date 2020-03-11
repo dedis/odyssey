@@ -103,16 +103,17 @@ If you are not using a public ledger, you will need to run your own local one.
 #### Run the nodes
 
 Build the conode binary and use the `run_nodes.sh` script in order to get a set
-of conodes up and running:
+of conodes up and running. This command will put the conodes data under the
+"cothority_data" folder (and create it if needed):
 
 ```bash
 cd ledger/conode
 go build
-./run_nodes.sh -d tmp -v 2
+./run_nodes.sh -d cothority_data -v 2
 ```
 
 This command will run 3 nodes, saving their databases and credentials in the
-`ledger/conode/tmp` folder.
+`ledger/conode/cothority_data` folder.
 
 #### Initialize a new skipchain
 
@@ -128,7 +129,7 @@ Create a new skipchain:
 
 ```bash
 # This file was created by the run_nodes.sh script
-bcadmin create ledger/conode/tmp/public.toml 
+bcadmin create ledger/conode/cothority_data/public.toml 
 # The output of the command offers you to export the BC variable. Copy/past the
 # last line into to your terminal
 export BC="path/to/folder/bc-BYZCOIN_ID.cfg"
@@ -163,9 +164,9 @@ private key file and the Byzcoin ID. The Byzcoin ID can be retreived with the
 # Display the configuration info: spot the Byzcoin ID
 bcadmin info
 # Authorize each node:
-csadmin authorize ledger/conode/tmp/co1/private.toml BYZCOIN_ID
-csadmin authorize ledger/conode/tmp/co2/private.toml BYZCOIN_ID
-csadmin authorize ledger/conode/tmp/co3/private.toml BYZCOIN_ID
+csadmin authorize ledger/conode/cothority_data/co1/private.toml BYZCOIN_ID
+csadmin authorize ledger/conode/cothority_data/co2/private.toml BYZCOIN_ID
+csadmin authorize ledger/conode/cothority_data/co3/private.toml BYZCOIN_ID
 ```
 
 The next step is to setup a long term secret and then launch a distributed key
