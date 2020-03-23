@@ -19,16 +19,21 @@
     <title>{{ template "title" .}}</title>
   </head>
   <body>
-    <div class="pure-g header">
-      <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
-      <div class="pure-u-1 pure-u-sm-1-2 header-content">
-        {{ if .Session.IsLogged }}
-          <p>You are logged as <a href="/profile">{{ .Session.GetShortIdentity }}</a>
-        {{ else }}
-          <a href="/signin">Sign in</a>
-        {{ end }}
+    <div class="header">
+      <div class="header-wrapper">
+        <div class="left">
+          <p>
+            <a href="/"><img src="/assets/images/logo.png"></a>
+          </p>
+        </div>
+        <div class="right">
+          {{ if .Session.IsLogged }}
+            <p>You are logged as <a href="/profile">{{ .Session.GetShortIdentity }}</a>
+          {{ else }}
+            <a href="/signin">Sign in</a>
+          {{ end }}
+        </div>
       </div>
-      <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     </div>
 
     {{ if .Flash }}
@@ -55,9 +60,38 @@
       table.tasks {
         width: 100%;
       }
-      div.header-content {
+      div.header {
+        width: 100%;
+        padding: 15px 20px 7px 20px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 3px 0 rgba(0,0,0,0.22);
+      }
+      div.header div.header-wrapper {
+        max-width: 880px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+      div.header div.header-wrapper div.right {
         text-align: right;
-        padding: 5px;
+        flex: 1;
+      }
+      div.header div.header-wrapper div.left {
+        text-align: left;
+        flex: 1;
+      }
+      div.header div.header-wrapper div.left img {
+        max-width: 300px;
+      }
+      @media screen and (max-width: 700px) {
+        div.header div.header-wrapper {
+            flex-direction: column;
+        }
       }
     </style>
 
