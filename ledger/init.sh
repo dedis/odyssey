@@ -449,7 +449,7 @@ read -r -d '' JSONATTR << EOM
 					"attributes": [{
 						"id": "use_predefined_purpose_legal",
 						"name": "use_predefined_purpose_legal",
-						"description": "To meet SR's legal or regulatory requirements",
+						"description": "To meet company's legal or regulatory requirements",
 						"type": "checkbox",
 						"rule_type": "allowed",
 						"attributes": []
@@ -463,7 +463,7 @@ read -r -d '' JSONATTR << EOM
 					}, {
 						"id": "use_predefined_purpose_essential",
 						"name": "use_predefined_purpose_essential",
-						"description": "To perform an essential function of SR's business (for example, reserving, develop and improve costing/pricing models, portfolio management, enable risk modelling and accumulation control)",
+						"description": "To perform an essential function of company's business (for example, reserving, develop and improve costing/pricing models, portfolio management, enable risk modelling and accumulation control)",
 						"type": "checkbox",
 						"rule_type": "allowed",
 						"attributes": []
@@ -482,9 +482,9 @@ read -r -d '' JSONATTR << EOM
 						"rule_type": "allowed",
 						"attributes": []
 					}, {
-						"id": "use_predefined_purpose_sole_sr",
-						"name": "use_predefined_purpose_sole_sr",
-						"description": "For the sole benefit of SR",
+						"id": "use_predefined_purpose_sole_company",
+						"name": "use_predefined_purpose_sole_company",
+						"description": "For the sole benefit of the company",
 						"type": "checkbox",
 						"rule_type": "allowed",
 						"attributes": []
@@ -547,14 +547,14 @@ read -r -d '' JSONATTR << EOM
 			}, {
 				"id": "access_internal",
 				"name": "access",
-				"description": "SR internal",
+				"description": "internal",
 				"type": "radio",
 				"rule_type": "must_have",
 				"attributes": []
 			}, {
 				"id": "access_defined_group",
 				"name": "access",
-				"description": "SR defined group",
+				"description": "defined group",
 				"type": "radio",
 				"rule_type": "must_have",
 				"attributes": [{
@@ -593,7 +593,7 @@ read -r -d '' JSONATTR << EOM
 			"text_validates": "use_retention_policy_description"
 		},{
 			"id": "access_defined_group_description_enforcement",
-			"description": "I certify that the result will only be used by this specific group from SR",
+			"description": "I certify that the result will only be used by this specific group",
 			"value_from_id": "access_defined_group_description",
 			"trigger_id": "access_defined_group",
 			"trigger_value": "",
