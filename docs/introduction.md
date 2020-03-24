@@ -32,21 +32,36 @@ Additionally, some tools were needed to support the system:
 ### Data Owner Manager (upload and management of datasets)
 
 <figure>
-    <img src="assets/dom1.png">
+    <img src="assets/screenshots/dom7.png">
     <figcaption>Welcome page</figcaption>
 </figure>
 
 <figure>
-    <img src="assets/dom2.png">
+    <img src="assets/screenshots/dom1.png">
+    <figcaption>Upload of a dataset</figcaption>
+</figure>
+
+<figure>
+    <img src="assets/screenshots/dom3.png">
+    <figcaption>Task created to upload a dataset</figcaption>
+</figure>
+
+<figure>
+    <img src="assets/screenshots/dom2.png">
     <figcaption>List of datasets</figcaption>
 </figure>
 
 <figure>
-    <img src="assets/dom3.png">
-    <figcaption>List of datasets</figcaption>
+    <img src="assets/screenshots/dom4.png">
+    <figcaption>Edition of dataset: General infos</figcaption>
 </figure>
 
 <figure>
-    <img src="assets/dom4.png">
-    <figcaption>Edition of dataset</figcaption>
+    <img src="assets/screenshots/dom5.png">
+    <figcaption>Edition of dataset: Attributes</figcaption>
+</figure>
+
+<figure>
+    <img src="assets/screenshots/dom6.png">
+    <figcaption>Edition of dataset: Special actions and DARC</figcaption>
 </figure>
