@@ -26,3 +26,27 @@ Additionally, some tools were needed to support the system:
   datasets along with their attributes that control their acess
 - **Cryptutil**, a command line tool to encrypt and decrypt data with AES-CGM
 - **Enclave**, scripts used on the enclave (ie. VMs)
+
+## Screenshots
+
+### Data Owner Manager (upload and management of datasets)
+
+<figure>
+    <img src="assets/dom1.png">
+    <figcaption>Welcome page</figcaption>
+</figure>
+
+<figure>
+    <img src="assets/dom2.png">
+    <figcaption>List of datasets</figcaption>
+</figure>
+
+<figure>
+    <img src="assets/dom3.png">
+    <figcaption>List of datasets</figcaption>
+</figure>
+
+<figure>
+    <img src="assets/dom4.png">
+    <figcaption>Edition of dataset</figcaption>
+</figure>
