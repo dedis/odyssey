@@ -42,28 +42,80 @@ Additionally, some tools were needed to support the system:
 </figure>
 
 <figure>
-    <img src="assets/screenshots/dom3.png">
     <figcaption>Task created to upload a dataset</figcaption>
+    <img src="assets/screenshots/dom3.png">
 </figure>
 
 <figure>
-    <img src="assets/screenshots/dom2.png">
     <figcaption>List of datasets</figcaption>
+    <img src="assets/screenshots/dom2.png">
 </figure>
 
 <figure>
-    <img src="assets/screenshots/dom4.png">
     <figcaption>Edition of dataset: General infos</figcaption>
+    <img src="assets/screenshots/dom4.png">
 </figure>
 
 <figure>
-    <img src="assets/screenshots/dom5.png">
     <figcaption>Edition of dataset: Attributes</figcaption>
+    <img src="assets/screenshots/dom5.png">
 </figure>
 
 <figure>
-    <img src="assets/screenshots/dom6.png">
     <figcaption>Edition of dataset: Special actions and DARC</figcaption>
+    <img src="assets/screenshots/dom6.png">
+</figure>
+
+<figure>
+    <figcaption>Audit of a dataset access</figcaption>
+    <img src="assets/screenshots/dom8.png">
+</figure>
+
+<figure>
+    <figcaption>Lifecycle of a project</figcaption>
+    <img src="assets/screenshots/dom9.png">
+</figure>
+
+<figure>
+    <figcaption>Lifecycle of a project (enclave destruction)</figcaption>
+    <img src="assets/screenshots/dom10.png">
+</figure>
+
+### Data Scientist Manager (use of datasets on enclaves)
+
+<figure>
+    <figcaption>Welcome page</figcaption>
+    <img src="assets/screenshots/dsm1.png">
+</figure>
+
+<figure>
+    <figcaption>Project creation: selection of a dataset</figcaption>
+    <img src="assets/screenshots/dsm7.png">
+</figure>
+
+<figure>
+    <figcaption>Project page</figcaption>
+    <img src="assets/screenshots/dsm2.png">
+</figure>
+
+<figure>
+    <figcaption>Request to create the project: enclave initialization</figcaption>
+    <img src="assets/screenshots/dsm3.png">
+</figure>
+
+<figure>
+    <figcaption>A failed attempty to unlock the enclave</figcaption>
+    <img src="assets/screenshots/dsm6.png">
+</figure>
+
+<figure>
+    <figcaption>Attribute update on a project after a failed attempt</figcaption>
+    <img src="assets/screenshots/dsm5.png">
+</figure>
+
+<figure>
+    <figcaption>Access page of the enclave (after successful unlock)</figcaption>
+    <img src="assets/screenshots/dsm4.png">
 </figure>
 
 <style>
