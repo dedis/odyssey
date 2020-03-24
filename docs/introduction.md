@@ -32,13 +32,13 @@ Additionally, some tools were needed to support the system:
 ### Data Owner Manager (upload and management of datasets)
 
 <figure>
-    <img src="assets/screenshots/dom7.png">
     <figcaption>Welcome page</figcaption>
+    <img src="assets/screenshots/dom7.png">
 </figure>
 
 <figure>
-    <img src="assets/screenshots/dom1.png">
     <figcaption>Upload of a dataset</figcaption>
+    <img src="assets/screenshots/dom1.png">
 </figure>
 
 <figure>
@@ -65,3 +65,9 @@ Additionally, some tools were needed to support the system:
     <img src="assets/screenshots/dom6.png">
     <figcaption>Edition of dataset: Special actions and DARC</figcaption>
 </figure>
+
+<style>
+  figcaption {
+    text-align: center;
+  }
+</style>
