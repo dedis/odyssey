@@ -19,6 +19,10 @@ projects. You will find 3 components:
 - **Data Owner Manager**, user application that allows one to upload and update datasets
 - **Enclave Manager**, server application that handles the lifecycle of enclaves
 
+![DSM logo](assets/dsm-logo.png)
+![DOM logo](assets/dom-logo.png)
+![ENM logo](assets/enm-logo.png)
+
 Additionally, some tools were needed to support the system:
 
 - **Projectc**, a smart contract holding the attributes of a project
