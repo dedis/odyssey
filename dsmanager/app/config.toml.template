@@ -1,8 +1,9 @@
 # InstanceID of the catalog contract. You can create a catalog instance with
-# the catadmin CLI.
+# the catadmin CLI. See the instructions from the DOManager to create one.
 CatalogID = ""
 
-# Path to the BcConfig file.
+# Path to the BcConfig file. This file should be given to you by your blockchain
+# manager.
 BCPath = "/path/to/bc-...cfg"
 
 # Darc of the data scientist. This darc should be allowed to spawn and update an

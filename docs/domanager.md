@@ -1,5 +1,7 @@
 # Data Owner Manager
 
+![DOM logo](assets/dom-logo.png)
+
 This components allows a data owner to upload a dataset, as well as setting
 attributes on it.
 
@@ -11,7 +13,8 @@ The following executables are needed at the root of `domanager/app`:
 - catadmin
 - csadmin
 
-Put them there with:
+If you followed the [setup instructions](setup.md#generate-the-executables)
+those executables should already be on your gopath. Put them there with:
 
 ```
 cd domanager/app
@@ -20,7 +23,7 @@ cp `go env GOPATH`/bin/{bcadmin,catadmin,csadmin} .
 
 ## Configuration
 
-You must have the variables from `variables.sh` loaded in your shell.
+You must have the MINO_* variables from `variables.sh` loaded in your shell.
 (See section "Setup, Cloud configuration".)
 
 Then rename `app/config.toml.template` to `app/config.toml` and fill it
