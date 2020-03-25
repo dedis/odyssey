@@ -1,6 +1,6 @@
 # Data Scientist Manager
 
-![DOM logo](assets/dsm-logo.png)
+![DSM logo](assets/dsm-logo.png)
 
 This component allows a data scientist to request and use datasets based on the
 attributes of a project. The system only releases datasets if the attributes of
