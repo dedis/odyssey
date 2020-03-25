@@ -1,5 +1,9 @@
 # Auditable Sharing and Management of Sensitive Data Across Jurisdictions
 
+<center>
+<img src="assets/odyssey-components.png">
+</center>
+
 Because sharing sensitive data between multiple distrustfull parties can
 be a challenge, Odyssey make use of state-of-the-art secret management
 service on the blockchain, coupled with an enclave delivery mechanism,
