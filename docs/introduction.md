@@ -37,14 +37,10 @@ Additionally, some tools were needed to support the system:
 
 ## Demo
 
-Here is a 15minutes video that walks throught the whole process of uploading a
+Here is a 15 minutes video that walks throught the whole process of uploading a
 dataset to its use via a secure enclave.
 
-<video width="320" height="240" controls>
-  <source src="assets/demo.mp4" type="video/mp4">
-Your browser does not support the video tag. You can still go to the video in 
-`assets/demo.mp4`.
-</video>
+...to come
 
 ## Screenshots
 
