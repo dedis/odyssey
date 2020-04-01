@@ -1,3 +1,0 @@
-# Bell 🔔
-
-The Blockchain Shell
