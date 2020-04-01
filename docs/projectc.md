@@ -1,19 +1,26 @@
 # Projectc 
 
-This is the project contract
+In the `projectc` folder you'll find the definition of the "project contract"
+and its corresponding CLI `pcadmin`.
 
-## Purpose
+## Project contract
 
-Holds the project contract, which is instantiated each time a data
-scientist makes a request. The project instance holds all the
-informations about a project.
+The "project contract" is the smart contract that holds all the informations
+about a project that a data scientist creates in order to request datasets.
+Hence, an instance of a "project contract" is created each time a data scientist
+request one or more datasets. You can have a look at `projectc/contract.go` in
+order to see what informations an instance of this contract holds.
 
-## Set up
+## pcadmin
 
-We need a local version of the cothority repository and do two things:
+The "project contract" has its own CLI `pcadmin`. If you followed the [setup
+instructions](setup.md#generate-the-executables) the pcadmin executable should
+already be in your path. Otherwise you can do the following:
 
-1. In the `/conode/conode.go` add this import directive:  
-`_ "github.com/dedis/odyssey/projectc"`
-2. In the `go.mod` of the cothority, add this directive at the very end
-   (adapt to your path):  
-`replace github.com/dedis/odyssey v0.0.0 => /Users/nkocher/GitHub/odyssey`
+```bash
+cd projectc/pcadmin
+go install
+```
+
+You can use the `-h` argument to get help on how to use the CLI. For example
+`pcadmin -h`.

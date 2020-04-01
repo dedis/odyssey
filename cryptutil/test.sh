@@ -64,18 +64,35 @@ testEncrypt() {
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeef" --initVal "00112233445566778899aabb"
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddee" --initVal "00112233445566778899aabb"
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeefg" --initVal "00112233445566778899aabb"
-    # wrong input vector length / type
+    # wrong init val length / type
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeeff" --initVal "00112233445566778899aab"
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeeff" --initVal "00112233445566778899aa"
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeeff" --initVal "00112233445566778899aabg"
-    # wrong key and input vector
+    # wrong key and init valu
     testFail $cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeef" --initVal "00112233445566778899aab"
     testFail $cryptutil encrypt --data "Hello world." --key "12" --initVal "abcd"
     testFail $cryptutil encrypt --data "Hello world." --key "xasf3sf" --initVal "2132ga"
+    # good keyAndInitVal
+    testOK $cryptutil encrypt  --data "Hello world." --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb"
+    testOK $cryptutil encrypt  --data "Hello world." --key "aaa" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb"
+    testOK $cryptutil encrypt  --data "Hello world." --initVal "aaa" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb"
+    testOK $cryptutil encrypt  --data "Hello world." --key "aaa" --initVal "aaa" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb"
+    # wrong keyAndInitVal
+    testFail $cryptutil encrypt  --data "Hello world." --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aab"
+    testFail $cryptutil encrypt  --data "Hello world." --key "aaa" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabbb"
+    testFail $cryptutil encrypt  --data "Hello world." --initVal "aaa" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabx"
+    testFail $cryptutil encrypt  --data "Hello world." --key "aaa" --initVal "aaa" --keyAndInitVal "a"
 
     # Check output
     OUTRES=$($cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeeff" --initVal "00112233445566778899aabb")
     expected="ef5a516eddc4a6656a3f17351b7ffebbe9f8b8c8b282470b59b72c09"
+    matchOK "$OUTRES" "^$expected$"
+    # Check output with keyAndInitVal
+    OUTRES=$($cryptutil encrypt --data "Hello world." --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb")
+    matchOK "$OUTRES" "^$expected$"
+    # Now providind both --key / --initVal and --keyAndInitVal
+    # --keyAndInitVal should be used
+    OUTRES=$($cryptutil encrypt --data "Hello world." --key "00112233445566778899aabbccddeefa" --initVal "00112233445566778899aaba" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb")
     matchOK "$OUTRES" "^$expected$"
 
     # Data from file
@@ -123,12 +140,10 @@ testDecrypt() {
     matchOK "$OUTRES" "^$expected$"
     # Check output with keyAndInitVal
     OUTRES=$($cryptutil decrypt --data "ef5a516eddc4a6656a3f17351b7ffebbe9f8b8c8b282470b59b72c09" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb")
-    expected="Hello world."
     matchOK "$OUTRES" "^$expected$"
     # Now providind both --key / --initVal and --keyAndInitVal
     # --keyAndInitVal should be used
     OUTRES=$($cryptutil decrypt --data "ef5a516eddc4a6656a3f17351b7ffebbe9f8b8c8b282470b59b72c09" --key "00112233445566778899aabbccddeefa" --initVal "00112233445566778899aaba" --keyAndInitVal "00112233445566778899aabbccddeeff00112233445566778899aabb")
-    expected="Hello world."
     matchOK "$OUTRES" "^$expected$"
 
     # Data from file 

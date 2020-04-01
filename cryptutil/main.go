@@ -48,6 +48,10 @@ func init() {
 					Name:  "initVal, iv",
 					Usage: "The 96 bits initialization value encoded as hexadecimal string (= 12 hex chars)",
 				},
+				cli.StringFlag{
+					Name:  "keyAndInitVal",
+					Usage: "The key and initialization value as one 56 chars hex string (key || initVal). If used, the arguments --key and --initVal are not used.",
+				},
 				cli.BoolFlag{
 					Name:  "readData, rd",
 					Usage: "Read data from stdin. Cannot be used with --data",
@@ -120,32 +124,50 @@ func encrypt(c *cli.Context) error {
 		dataBuf = []byte(data)
 	}
 
-	key := c.String("key")
-	if key == "" {
-		return errors.New("please provide a key with --key")
-	}
+	var key, iv string
+	var keyBuf, ivBuf []byte
 
-	iv := c.String("initVal")
-	if iv == "" {
-		return errors.New("please provice an initialization value with --initVal")
-	}
+	keyAndInitVal := c.String("keyAndInitVal")
+	if keyAndInitVal != "" {
+		keyAndInitValBuf, err := hex.DecodeString(keyAndInitVal)
+		if err != nil {
+			return errors.New("failed to decode keyAndInitVal: " + err.Error())
+		}
+		// 16 bytes = 128 bits, 12 bytes = 96 bits
+		if len(keyAndInitValBuf) != 16+12 {
+			return fmt.Errorf("length of key + initVal must be 224 bits, not %d",
+				len(keyAndInitValBuf)*8)
+		}
+		keyBuf = keyAndInitValBuf[:16]
+		ivBuf = keyAndInitValBuf[16:]
+	} else {
+		key = c.String("key")
+		if key == "" {
+			return errors.New("please provide a key with --key")
+		}
 
-	keyBuf, err := hex.DecodeString(key)
-	if err != nil {
-		return errors.New("failed to decode key as hexadecimal: " + err.Error())
-	}
-	if len(keyBuf) != 16 {
-		return fmt.Errorf("length of key must be 128 bits, not %d",
-			len(keyBuf)*8)
-	}
+		iv = c.String("initVal")
+		if iv == "" {
+			return errors.New("please provice an initialization value with --initVal")
+		}
 
-	ivBuf, err := hex.DecodeString(iv)
-	if err != nil {
-		return errors.New("failed to decode initVal as hexadecimal: " + err.Error())
-	}
-	if len(ivBuf) != 12 {
-		return fmt.Errorf("length of initialization value must be 96 bits, not %d",
-			len(ivBuf)*8)
+		keyBuf, err = hex.DecodeString(key)
+		if err != nil {
+			return errors.New("failed to decode key as hexadecimal: " + err.Error())
+		}
+		if len(keyBuf) != 16 {
+			return fmt.Errorf("length of key must be 128 bits, not %d",
+				len(keyBuf)*8)
+		}
+
+		ivBuf, err = hex.DecodeString(iv)
+		if err != nil {
+			return errors.New("failed to decode initVal as hexadecimal: " + err.Error())
+		}
+		if len(ivBuf) != 12 {
+			return fmt.Errorf("length of initialization value must be 96 bits, not %d",
+				len(ivBuf)*8)
+		}
 	}
 
 	block, err := aes.NewCipher(keyBuf)

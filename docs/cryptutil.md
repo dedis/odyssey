@@ -9,24 +9,51 @@ Based on https://gist.github.com/kkirsche/e28da6754c39d5e7ea10
 
 ## Set up
 
-**Install cryptutil**
+If you followed the [setup instructions](setup.md#generate-the-executables) the
+cryptutil executable should already be in your path. Otherwise you can do the
+following:
 
 ```bash
-cd /Users/nkocher/GitHub/odyssey/cryptutil
+cd cryptutil
 go install
 ```
 
-**Encrypt the datasets**
+## Use
+
+You can use the `-h` argument to get help. For example `cryptutil -h`.
+
+## Example
+
+
+**Encrypt a dataset**
 
 ```bash
-cryptutil encrypt --key KEY --initVal INIT_VAL --readData -export < /Users/nkocher/GitHub/odyssey/secret/datasets/1_titanic.csv  > /Users/nkocher/GitHub/odyssey/secret/datasets/1_titanic.csv.aes
+cryptutil encrypt --key aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --initVal bbbbbbbbbbbbbbbbbbbbbbbb --readData -export < titanic.csv > titanic.csv.aes
 ```
 
-Same for the second dataset.
-
-**Launch the tests**
+**Decrypt a dataset**
 
 ```bash
-cd /Users/nkocher/GitHub/odyssey/cryptutil
+cryptutil decrypt --key aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --initVal bbbbbbbbbbbbbbbbbbbbbbbb --readData -export < titanic.csv.aes > titanic.csv  
+```
+
+We can use a condensed version with the `keyAndInitVal` option: 
+
+**Encrypt a dataset (condensed)**
+
+```bash
+cryptutil encrypt --keyAndInitVal aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbb --readData -export < titanic.csv > titanic.csv.aes
+```
+
+**Decrypt a dataset (condensed)**
+
+```bash
+cryptutil decrypt --keyAndInitVal aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbb --readData -export < titanic.csv.aes > titanic.csv  
+```
+
+## Tests
+
+```bash
+cd cryptutil
 ./test.sh
 ```
