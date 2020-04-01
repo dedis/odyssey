@@ -82,7 +82,7 @@ of the executables needed by each component:
 You can build all the required binaries and install them into $GOPATH/bin by
 using the Makefile:
 
-```
+```make
 make
 ```
 
@@ -90,7 +90,7 @@ Note that this target compile "bcadmin" and "csadmin" with the v3.4.4 of
 cothority, which could erase a more recent version that is already in your
 $GOPATH. If you do not want that you can manually select the needed executables:
 
-```
+```make
 make catadmin cryptutil pcadmin
 ```
 
