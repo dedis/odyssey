@@ -54,6 +54,18 @@ catadmin contract catalog invoke addOwner -i CATALOG_INSTANCE_ID --firstname Joh
 catadmin contract catalog get -i CATALOG_INSTANCE_ID
 ```
 
+If you are not in a standalone mode then you might want to set the attributes on
+the catalog. You can use the attributes described in the [definition section](https://dedis.github.io/odyssey/#/attributes?id=definition) of the attribute documentation.
+
+```bash
+read -r -d '' JSONATTR << EOM
+{
+...your JSON attributes...
+}
+EOM
+catadmin contract catalog invoke updateMetadata -i CATALOG_INSTANCE_ID --metadataJSON "$JSONATTR"
+```
+
 ## Enclave manager
 
 In order to upload new datasets, the enclave manager must be running on

@@ -1,19 +1,38 @@
 # Attributes
 
-We identified three main type of attributes that the data owners should be able
-to set in order to gain full control of their datasets:
+Attributes are what control access to datasets. A data owner sets attributes on
+its datasets and a data scientist set the attributes on a project that requires
+to use the datasets. The attributes of the project must comply with the
+attributes of the selected datasets. For example, there might be an attribute of
+type "use" that defines the authorized use of a dataset. Let's say a data owner
+uploads a dataset and sets the following authorized uses:
 
-- **purpose**
-- **classification**
-- **access**
+Authorized uses for dataset X:
+- [ ] authorized for use A
+- [x] authorized for use B
+- [ ] authorized for use C 
+
+Then, if a data scientist requests "dataset X" in the context of "project Y"
+with the following attributes:
+
+Uses attributes on project Y:
+- [ ] need authorized use A
+- [x] need authorized use B
+- [x] need authorized use C
+
+The project wont be validated because it requests dataset X that doesn't allow
+the "use C".
 
 The attributes can be described in json syntax, which is convenient to update
-the catalog. The attributes are split into two categories: must_have and
-allowed. A "must_have" attribute is an attribute that must be selected by the
-data scientist to be accepted. This is the case of the "access" attributes. An
-"allowed" attribute is an attribute that can be selected by the data scientist
-but is not compulsory. This is the case of the "purpose" and "classification"
-attributes.
+the catalog. The attributes are split into two categories: "must_have" and
+"allowed". A "must_have" attribute is an attribute that must be selected by the
+data scientist to be accepted. In our previous example, the "use" attribute is
+of type "allowed": if "use C" is allowed on a dataset that doesn't mean that a
+data scientist must select "use C" to be accepted. An example of a "must_have"
+attribute is an attribute that defines the accreditation needed to use a
+dataset. If a dataset sets a required accreditation attribute "confidential"
+then a data scientist must have this accreditation and set it in the project for
+the project to be accepted.
 
 An attribute can have a "delegated_enforcement", which is necessary for
 attributes that can not be automatically validated because there is a textual
@@ -22,11 +41,15 @@ descriptions are written in a special "delegated_enforcement" section, where we
 link delegated attributes and the textual description with their IDs.
 
 Finally, we designed attributes to be recursively defined, ie. an attribute can
-have multiple attributes, which can have multiple attributes and so on. This
-gives us a flexible way to define complex attributes structures.
+have multiple nested attributes, which can then have multiple nested attributes
+and so on. This gives us a flexible way to define complex attributes structures.
 
 ## Definition
 
+We used the following attributes definition in our demo. This definition is
+applied on the instance of a "catalog contract". See the [catalog
+section](https://dedis.github.io/odyssey/#/domanager?id=catalog) of the data
+owner manager in order to set it on the catalog.
 
 ```json
 {
