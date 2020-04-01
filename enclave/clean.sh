@@ -1,4 +1,6 @@
 #!/bin/sh
+# this file is a utility script that we launch before creating a new template
+# image. This script ensures no unwanted files are left behind.
 
 rm /home/enclave/.first
 rm /home/enclave/.endpoint

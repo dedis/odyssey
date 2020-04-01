@@ -3,6 +3,7 @@
 - [Setup](setup.md)
 - [Design](design.md)
 - [Attributes](attributes.md)
+- [Tests](tests.md)
 - **Components**
 - [Data Owner Manager](domanager.md)
 - [Data Scientist Manager](dsmanager.md)
