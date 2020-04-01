@@ -78,3 +78,15 @@ to set `Standalone = true`.
 ## Run
 
 From `domanager/app` run `go run main.go`. The app is reachable from: http://localhost:5002/
+
+## Login
+
+To login you need to provide a credential file. This file is made with
+`bcadmin`. For this step you need the `roster.toml` file which contains the
+definition of the ledger and the ByzcoinID. Given that you are in the same
+folder that contains your private key, you can create this credential file with
+this command:
+
+```bash
+bcadmin -c . link ../roster.toml BYZCOIN_ID --darc DARC_ID --id DARC_KEY
+```

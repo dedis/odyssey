@@ -1,15 +1,19 @@
 #!/bin/sh
+# THis file should be renamed to `variables.sh`, filled appropriately and 
+# executed before launching the {dsmanager,enmanager,domanager} apps.
+
+# The following block of variables is only needed for the enclave manager.
 # VCD = VCloud Director
 # VDC = Virtual Data Center
 export VCD_PASS=
 export VCD_HOST=
 export VCD_API_USER=
 export VCD_ORG_NAME=
-
 export VDC_ID=
 export NETWORK_ID=
 export TEMPLATE_ID=
 
+# The rest of this file is needed for every apps.
 export MINIO_ENDPOINT=localhost:9990
 export MINIO_ACCESS_KEY=minioadmin
 export MINIO_SECRET_KEY=XXX-put-your-own-random-string-here-XXX
