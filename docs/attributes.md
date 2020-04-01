@@ -48,8 +48,8 @@ and so on. This gives us a flexible way to define complex attributes structures.
 
 We used the following attributes definition in our demo. This definition is
 applied on the instance of a "catalog contract". See the [catalog
-section](https://dedis.github.io/odyssey/#/domanager?id=catalog) of the data
-owner manager in order to set it on the catalog.
+section](https://dedis.github.io/odyssey/#/domanager?id=catalog) of the Data
+Owner Manager in order to set it on the catalog.
 
 ```json
 {
@@ -257,8 +257,12 @@ owner manager in order to set it on the catalog.
 
 ## DARC
 
-Translated into DARC custom attributes, a data owner can express the three types
-of attributes with the following rules:
+The Data Owner Manager automatically translates the attributes set on the
+catalog to DARC definition on the "spawn:calypsoread" action of the
+corresponding dataset. Note: The Data Owner Manager adapts the HTML form
+displayed to update the attribute of datasets from the definition stored on the
+catalog. Here is the corresponding DARC definition of the attributes described in the
+previous section:
 
 ```
 Darc(data owner)
@@ -286,4 +290,263 @@ Darc(data owner)
 			classification_personal=checked&
 			access_defined_group=checked&
 			access_defined_group_description_29e58702ba0524ef9eac162914016241f795137aef54a2670979e887925ed9fa=This+is+the+specific+group+description
+```
+
+## Textual representation
+
+For the record, here is the textual representation of an instance of those
+attribures print by the "catalog contract":
+
+```
+- Metadata:
+-- AttributesGroups:
+--- AttributesGroups[0]:
+---- AttributesGroup:
+----- Title: Use
+----- Description: How this dataset can be used
+----- ConsumerDescription: Please tell us how the result will be used
+----- Attributes:
+------ Attributes[0]:
+------- Attribute:
+-------- ID: use_restricted
+-------- Description: The use of this dataset is restricted
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: use_restricted
+-------- Value: 
+-------- DelegatedEnforcement: true
+-------- Attributes:
+--------- Attributes[0]:
+---------- Attribute:
+----------- ID: use_restricted_description
+----------- Description: Please describe the restriction
+----------- Type: text
+----------- RuleType: must_have
+----------- Name: use_restricted_description
+----------- Value: 
+----------- DelegatedEnforcement: true
+----------- Attributes:
+------ Attributes[1]:
+------- Attribute:
+-------- ID: use_retention_policy
+-------- Description: There is a special retention policy for this dataset
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: use_retention_policy
+-------- Value: 
+-------- DelegatedEnforcement: true
+-------- Attributes:
+--------- Attributes[0]:
+---------- Attribute:
+----------- ID: use_retention_policy_description
+----------- Description: Please describe the retention policy
+----------- Type: text
+----------- RuleType: must_have
+----------- Name: use_retention_policy_description
+----------- Value: 
+----------- DelegatedEnforcement: true
+----------- Attributes:
+------ Attributes[2]:
+------- Attribute:
+-------- ID: use_predefined_purpose
+-------- Description: Can be used for the following predefined-purposess
+-------- Type: checkbox
+-------- RuleType: allowed
+-------- Name: use_predefined_purpose
+-------- Value: checked
+-------- DelegatedEnforcement: false
+-------- Attributes:
+--------- Attributes[0]:
+---------- Attribute:
+----------- ID: use_predefined_purpose_legal
+----------- Description: To meet company's legal or regulatory requirements
+----------- Type: checkbox
+----------- RuleType: allowed
+----------- Name: use_predefined_purpose_legal
+----------- Value: checked
+----------- DelegatedEnforcement: false
+----------- Attributes:
+--------- Attributes[1]:
+---------- Attribute:
+----------- ID: use_predefined_purpose_analytics_counterparty
+----------- Description: To provide analytics to the counterparty of the contract from which data is sourced/for the counterparty's benefit
+----------- Type: checkbox
+----------- RuleType: allowed
+----------- Name: use_predefined_purpose_analytics_counterparty
+----------- Value: checked
+----------- DelegatedEnforcement: false
+----------- Attributes:
+--------- Attributes[2]:
+---------- Attribute:
+----------- ID: use_predefined_purpose_essential
+----------- Description: To perform an essential function of company's business (for example, reserving, develop and improve costing/pricing models, portfolio management, enable risk modelling and accumulation control)
+----------- Type: checkbox
+----------- RuleType: allowed
+----------- Name: use_predefined_purpose_essential
+----------- Value: 
+----------- DelegatedEnforcement: false
+----------- Attributes:
+--------- Attributes[3]:
+---------- Attribute:
+----------- ID: use_predefined_purpose_analytics_multiple_counterparty
+----------- Description: To provide analytics to multiple counterparties / for the benefit of multiple counterparties
+----------- Type: checkbox
+----------- RuleType: allowed
+----------- Name: use_predefined_purpose_analytics_multiple_counterparty
+----------- Value: 
+----------- DelegatedEnforcement: false
+----------- Attributes:
+--------- Attributes[4]:
+---------- Attribute:
+----------- ID: use_predefined_purpose_general_information
+----------- Description: To provide general information to the public
+----------- Type: checkbox
+----------- RuleType: allowed
+----------- Name: use_predefined_purpose_general_information
+----------- Value: 
+----------- DelegatedEnforcement: false
+----------- Attributes:
+--------- Attributes[5]:
+---------- Attribute:
+----------- ID: use_predefined_purpose_sole_company
+----------- Description: For the sole benefit of the company
+----------- Type: checkbox
+----------- RuleType: allowed
+----------- Name: use_predefined_purpose_sole_company
+----------- Value: 
+----------- DelegatedEnforcement: false
+----------- Attributes:
+--- AttributesGroups[1]:
+---- AttributesGroup:
+----- Title: Classification
+----- Description: The following classification types apply on my dataset
+----- ConsumerDescription: I have the right to work with the following types of data
+----- Attributes:
+------ Attributes[0]:
+------- Attribute:
+-------- ID: classification_public
+-------- Description: Public information
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: classification_public
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+------ Attributes[1]:
+------- Attribute:
+-------- ID: classification_internal
+-------- Description: Internal data
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: classification_internal
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+------ Attributes[2]:
+------- Attribute:
+-------- ID: classification_confidential
+-------- Description: Confidential data
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: classification_confidential
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+------ Attributes[3]:
+------- Attribute:
+-------- ID: classification_critical
+-------- Description: Critical data
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: classification_critical
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+------ Attributes[4]:
+------- Attribute:
+-------- ID: classification_personal
+-------- Description: Personal data
+-------- Type: checkbox
+-------- RuleType: must_have
+-------- Name: classification_personal
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+--- AttributesGroups[2]:
+---- AttributesGroup:
+----- Title: Access
+----- Description: Tell us who can access the data
+----- ConsumerDescription: Please select who will have access the the result
+----- Attributes:
+------ Attributes[0]:
+------- Attribute:
+-------- ID: access_unrestricted
+-------- Description: No restriction
+-------- Type: radio
+-------- RuleType: must_have
+-------- Name: access
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+------ Attributes[1]:
+------- Attribute:
+-------- ID: access_internal
+-------- Description: internal
+-------- Type: radio
+-------- RuleType: must_have
+-------- Name: access
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+------ Attributes[2]:
+------- Attribute:
+-------- ID: access_defined_group
+-------- Description: defined group
+-------- Type: radio
+-------- RuleType: must_have
+-------- Name: access
+-------- Value: 
+-------- DelegatedEnforcement: false
+-------- Attributes:
+--------- Attributes[0]:
+---------- Attribute:
+----------- ID: access_defined_group_description
+----------- Description: Please specify the group
+----------- Type: text
+----------- RuleType: must_have
+----------- Name: access_defined_group_description
+----------- Value: 
+----------- DelegatedEnforcement: true
+----------- Attributes:
+-- DelegatedEnforcement:
+--- DelegatedEnforcement:
+---- Description: some restriction can not be automatically checked. Therefore, you are requested to agree on the following attributes.
+---- Attributes:
+----- Attributes[0]:
+------ EnforcementAttribute:
+------- ID: use_restricted_description_enforcement
+------- Description: I agree on this restriction use
+------- ValueFromID: use_restricted_description
+------- TriggerID: use_restricted
+------- TriggerValue: 
+------- CheckValidates: [use_restricted]
+------- TextValidates: use_restricted_description
+----- Attributes[1]:
+------ EnforcementAttribute:
+------- ID: use_retention_policy_description_enforcement
+------- Description: I agree on this retention policy
+------- ValueFromID: use_retention_policy_description
+------- TriggerID: use_retention_policy
+------- TriggerValue: 
+------- CheckValidates: [use_retention_policy]
+------- TextValidates: use_retention_policy_description
+----- Attributes[2]:
+------ EnforcementAttribute:
+------- ID: access_defined_group_description_enforcement
+------- Description: I certify that the result will only be used by this specific group
+------- ValueFromID: access_defined_group_description
+------- TriggerID: access_defined_group
+------- TriggerValue: 
+------- CheckValidates: []
+------- TextValidates: access_defined_group_description
 ```

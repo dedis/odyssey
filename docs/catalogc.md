@@ -5,11 +5,12 @@ and its corresponding CLI `catadmin`.
 
 ## Catalog contract
 
-The catalog contract stores the list of authorized owners along with
-their dataset. The best way to discover how data is stored on the
-catalog is to have a look at `catalogc/data.go`. We allow each owner to
-edit its own space on the catalog by checking that the identity of the
-owner corresponds to the identity stored at the requested space.
+The catalog contract stores the list of authorized owners along with their
+dataset. It is also responsible for storing the attributes that can be set on
+datasets. The best way to discover how data is stored on the catalog is to have
+a look at `catalogc/data.go`. We allow each owner to edit its own space on the
+catalog by checking that the identity of the owner corresponds to the identity
+stored at the requested space.
 
 ## catadmin
 
