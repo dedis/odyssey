@@ -4,43 +4,53 @@
 <img src="assets/odyssey-components.png">
 </center>
 
-Because sharing sensitive data between multiple distrustfull parties can
-be a challenge, Odyssey make use of state-of-the-art secret management
-service on the blockchain, coupled with an enclave delivery mechanism,
-to ensure controlled and safe delivery of the data, as well as proper
-destruction of the data with a controlled life-cycle. At rest, data is
-stored encrypted on a private cloud provider. Data can be requested and
-decrypted based on the attributes of a project that clearly defines the
-context on wich the data will be used. Data is never decrypted outside a
-virtual machine (VM) created on fly for that purpose. The lifecycle of
-the VM ensures that unencrypted data is deleted after use, preventing
-accidental or malicious leakage.
+Odyssey is a set of applications and tools that enables the sharing sensitive
+data between multiple distrustfull parties. This project uses state-of-the-art
+secret management service [1] on the blockchain [2] coupled with an enclave
+delivery mechanism. This uniq combination provides auditable access on shared
+datasets, collective agreement, and controled life-cycle of the data that
+prevents malicious or accidental leakage of data. At rest, data is stored
+encrypted on a private cloud provider. Data can be requested and decrypted based
+on the attributes of a project that clearly defines the context on wich the data
+will be used. Those attributes are stored on the blockchain and the data is
+released when a quorum of nodes agree that the attributes of the project comply
+with the defined use of the data. The data is never decrypted outside a virtual
+machine (VM) created on fly for that purpose. The lifecycle of the VM ensures
+that unencrypted data is deleted after use, preventing accidental or malicious
+leakage.
 
-This repo holds all the components necessary to run the Odyssey
-projects. You will find 3 components:
+[1] [Calypso - Auditable Sharing of Private Data over Blockchains](https://eprint.iacr.org/2018/209)  
+[2] [OmniLedger: A Secure, Scale-Out, Decentralized Ledger via Sharding](https://eprint.iacr.org/2017/406)
 
-- **Data Scientist Manager**, user application that delivers requested datasets to an encalve
-- **Data Owner Manager**, user application that allows one to upload and update datasets
+This repo holds all the components necessary to run the Odyssey projects. You
+will find 3 components:
+
+- **Data Scientist Manager**, user application that delivers requested datasets
+  to an encalve
+- **Data Owner Manager**, user application that allows one to upload and update
+  datasets
 - **Enclave Manager**, server application that handles the lifecycle of enclaves
 
-![DSM logo](assets/dsm-logo.png)
-![DOM logo](assets/dom-logo.png)
-![ENM logo](assets/enm-logo.png)
+![DSM logo](assets/dsm-logo.png) ![DOM logo](assets/dom-logo.png) ![ENM
+logo](assets/enm-logo.png)
 
 Additionally, some tools were needed to support the system:
 
 - **Projectc**, a smart contract holding the attributes of a project
-- **Catalogc**, a smart contract holding the catalog of available
-  datasets along with their attributes that control their acess
+- **Catalogc**, a smart contract holding the catalog of available datasets along
+  with their attributes that control their acess
 - **Cryptutil**, a command line tool to encrypt and decrypt data with AES-CGM
 - **Enclave**, scripts used on the enclave (ie. VMs)
+
+
 
 ## Demo
 
 Here is a 15 minutes video that walks throught the whole process of uploading a
 dataset to its use via a secure enclave.
 
-[see the video](https://drive.google.com/file/d/1QBvqjBjUS3q0Z9CShm4pR7lBC6wbj6cw/view)
+[see the
+video](https://drive.google.com/file/d/1QBvqjBjUS3q0Z9CShm4pR7lBC6wbj6cw/view)
 
 ## Screenshots
 
