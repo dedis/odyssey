@@ -40,7 +40,7 @@ Additionally, some tools were needed to support the system:
 Here is a 15 minutes video that walks throught the whole process of uploading a
 dataset to its use via a secure enclave.
 
-...to come
+[see the video](https://drive.google.com/file/d/1QBvqjBjUS3q0Z9CShm4pR7lBC6wbj6cw/view)
 
 ## Screenshots
 
