@@ -79,16 +79,19 @@ of the executables needed by each component:
 |`enclavem/app` |        |         | x     | x     | x     |
 
 
-You can build all the required binaries and install them into $GOPATH/bin like this:
+You can build all the required binaries and install them into $GOPATH/bin by
+using the Makefile:
 
 ```
-git clone https://github.com/dedis/cothority
-cd cothority
-go install ./...
-cd ..
-git clone https://github.com/dedis/odyssey
-cd odyssey
-go install ./...
+make
+```
+
+Note that this target compile "bcadmin" and "csadmin" with the v3.4.4 of
+cothority, which could erase a more recent version that is already in your
+$GOPATH. If you do not want that you can manually select the needed executables:
+
+```
+make catadmin cryptutil pcadmin
 ```
 
 There are additional setup steps for each component that you will find
@@ -258,3 +261,11 @@ yarn run serve
 Click on Roster on the top right corner. Add the contents of your `roster.toml` in the dialog and click save.
 
 Select the skipchain from the dropdown menu. Use the `Status` tab to see the list of conodes and the `Graph` tab to see a visualisation of the blocks.
+
+## Test
+
+You can launch all the tests with:
+
+```make
+make test
+```
