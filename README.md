@@ -1,10 +1,14 @@
+**Browse the doc at
+[https://dedis.github.io/odyssey/](https://dedis.github.io/odyssey/), or
+directly in [/docs](/docs)**
+
 # odyssey
 
 Auditable Sharing and Management of Sensitive Data Across Jurisdictions.
 
-Browse the doc at
-[https://dedis.github.io/odyssey/](https://dedis.github.io/odyssey/), or
-directly in [/docs](/docs)
+<center>
+<img src="docs/assets/odyssey-components.png">
+</center>
 
 Odyssey is a set of applications and tools that enables the sharing sensitive
 data between multiple distrustfull parties. This project uses state-of-the-art
@@ -43,3 +47,9 @@ Additionally, some tools were needed to support the system:
   with their attributes that control their acess
 - **Cryptutil**, a command line tool to encrypt and decrypt data with AES-CGM
 - **Enclave**, scripts used on the enclave (ie. VMs)
+
+---
+
+See the full documentation in
+[https://dedis.github.io/odyssey/](https://dedis.github.io/odyssey/), or
+directly in [/docs](/docs)
