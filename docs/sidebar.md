@@ -1,6 +1,7 @@
 - **General purpose**
 - [Introduction](introduction.md)
 - [Setup](setup.md)
+- [vCloud setup](cloudVM.md)
 - [Design](design.md)
 - [Attributes](attributes.md)
 - [Tests](tests.md)
