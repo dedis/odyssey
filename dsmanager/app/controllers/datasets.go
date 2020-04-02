@@ -17,7 +17,7 @@ import (
 )
 
 // DatasetsIndexHandler ...
-func DatasetsIndexHandler(gs *sessions.CookieStore, conf *models.Config, db *bolt.DB) http.HandlerFunc {
+func DatasetsIndexHandler(gs sessions.Store, conf *models.Config, db *bolt.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -26,7 +26,7 @@ func DatasetsIndexHandler(gs *sessions.CookieStore, conf *models.Config, db *bol
 	}
 }
 
-func datasetsGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func datasetsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Credentials", "false")
 
@@ -44,7 +44,6 @@ func datasetsGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieS
 
 	datasets, err := getDatasets(conf)
 	if err != nil {
-		fmt.Println("Got an error: " + err.Error())
 		helpers.AddFlash(w, r, fmt.Sprintf("<pre>Failed to get datasets:\n%s</pre>", err.Error()), store, helpers.Error)
 	}
 

@@ -15,7 +15,7 @@ import (
 )
 
 // AuthorizeHandler ...
-func AuthorizeHandler(gs *sessions.CookieStore) http.HandlerFunc {
+func AuthorizeHandler(gs sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -26,7 +26,7 @@ func AuthorizeHandler(gs *sessions.CookieStore) http.HandlerFunc {
 	}
 }
 
-func authorizeGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore) {
+func authorizeGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 	type viewData struct {
 		Title string
 		Flash []helpers.Flash
@@ -53,7 +53,7 @@ func authorizeGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieSto
 	}
 }
 
-func authorizePost(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore) {
+func authorizePost(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 	// Parse our multipart form, 10 << 20 specifies a maximum
 	// upload of 10 MB files.
 	r.ParseMultipartForm(10 << 20)

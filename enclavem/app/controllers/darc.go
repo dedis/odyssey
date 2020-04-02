@@ -18,7 +18,7 @@ import (
 )
 
 // DarcIndexHandler ...
-func DarcIndexHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func DarcIndexHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -28,7 +28,7 @@ func DarcIndexHandler(store *sessions.CookieStore, conf *models.Config) http.Han
 }
 
 func darcIndexPost(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// (!) This endpoint is publicly accessbile. In a production environment,
 	// it should be protected by an authentication system, which is out of scope
 	// for this project.

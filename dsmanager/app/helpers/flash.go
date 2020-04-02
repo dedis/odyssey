@@ -26,7 +26,7 @@ type Flash struct {
 }
 
 // AddFlash ...
-func AddFlash(w http.ResponseWriter, r *http.Request, msg string, store *sessions.CookieStore, ft FlashType) error {
+func AddFlash(w http.ResponseWriter, r *http.Request, msg string, store sessions.Store, ft FlashType) error {
 	session, err := store.Get(r, "flash-session")
 	if err != nil {
 		return errors.New("failed to get flash-session: " + err.Error())
@@ -40,7 +40,7 @@ func AddFlash(w http.ResponseWriter, r *http.Request, msg string, store *session
 }
 
 // ExtractFlash ...
-func ExtractFlash(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) ([]Flash, error) {
+func ExtractFlash(w http.ResponseWriter, r *http.Request, store sessions.Store) ([]Flash, error) {
 	session, err := store.Get(r, "flash-session")
 	if err != nil {
 		return nil, errors.New("failed to get flash-session: " + err.Error())

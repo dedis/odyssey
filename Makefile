@@ -31,4 +31,6 @@ pcadmin:
 	echo "📌 pcadmin installed globally"
 
 test:
-	cd cryptutil && ./test.sh
+	@echo "🔎 testing cryptutil..." && cd cryptutil && ./test.sh > /dev/null && echo "...✔️ test OK"
+	@echo "🔎 testing catalogc..." && cd catalogc && go test > /dev/null && echo "...✔️ test OK"
+	@echo "🔎 testing domanager..." && cd domanager/app && go test > /dev/null && echo "...✔️ test OK"

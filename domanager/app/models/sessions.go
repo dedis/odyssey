@@ -22,7 +22,7 @@ type Session struct {
 
 // GetSession return the current session. An error can happen if we can't get
 // the session. If the session is not created we return an empty session.
-func GetSession(store *sessions.CookieStore, r *http.Request) (*Session, error) {
+func GetSession(store sessions.Store, r *http.Request) (*Session, error) {
 	session, err := store.Get(r, "signin-session")
 	if err != nil {
 		return emptySession(), xerrors.Errorf("failed to get the signin "+
@@ -55,7 +55,7 @@ func (s Session) IsLogged() bool {
 }
 
 // LogIn sets the bcPath and cfg static variables by loading the config
-func LogIn(bcPath string, store *sessions.CookieStore, r *http.Request, w http.ResponseWriter) error {
+func LogIn(bcPath string, store sessions.Store, r *http.Request, w http.ResponseWriter) error {
 	cfg, _, err := lib.LoadConfig(bcPath)
 	if err != nil {
 		return xerrors.Errorf("failed to load config: %v", err)
@@ -121,7 +121,7 @@ func (s *Session) PrepareBeforeMarshal() {
 }
 
 // Destroy removes the session from the maps and delets the config file
-func (s Session) Destroy(store *sessions.CookieStore, r *http.Request,
+func (s Session) Destroy(store sessions.Store, r *http.Request,
 	w http.ResponseWriter) error {
 
 	sess, err := store.Get(r, "signin-session")

@@ -22,7 +22,7 @@ import (
 )
 
 // ProjectsIndexHandler ...
-func ProjectsIndexHandler(store *sessions.CookieStore,
+func ProjectsIndexHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,7 @@ func ProjectsIndexHandler(store *sessions.CookieStore,
 }
 
 // ProjectsShowHandler ...
-func ProjectsShowHandler(gs *sessions.CookieStore,
+func ProjectsShowHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +64,7 @@ func ProjectsShowHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsShowAttributesHandler ...
-func ProjectsShowAttributesHandler(gs *sessions.CookieStore,
+func ProjectsShowAttributesHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +88,7 @@ func ProjectsShowAttributesHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsShowEnclaveHandler ...
-func ProjectsShowEnclaveHandler(gs *sessions.CookieStore,
+func ProjectsShowEnclaveHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -114,7 +114,7 @@ func ProjectsShowEnclaveHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsShowUnlockHandler ...
-func ProjectsShowUnlockHandler(gs *sessions.CookieStore,
+func ProjectsShowUnlockHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +138,7 @@ func ProjectsShowUnlockHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsShowDebugHandler ...
-func ProjectsShowDebugHandler(gs *sessions.CookieStore,
+func ProjectsShowDebugHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -150,7 +150,7 @@ func ProjectsShowDebugHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsShowStatusHandler ...
-func ProjectsShowStatusHandler(gs *sessions.CookieStore,
+func ProjectsShowStatusHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -174,7 +174,7 @@ func ProjectsShowStatusHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsShowStatusStreamHandler ...
-func ProjectsShowStatusStreamHandler(gs *sessions.CookieStore,
+func ProjectsShowStatusStreamHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -186,7 +186,7 @@ func ProjectsShowStatusStreamHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsRequestsShowHandler ...
-func ProjectsRequestsShowHandler(gs *sessions.CookieStore,
+func ProjectsRequestsShowHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -198,7 +198,7 @@ func ProjectsRequestsShowHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsRequestsShowCloudstreamHandler ...
-func ProjectsRequestsShowCloudstreamHandler(gs *sessions.CookieStore,
+func ProjectsRequestsShowCloudstreamHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -210,7 +210,7 @@ func ProjectsRequestsShowCloudstreamHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsRequestsShowStatusStreamHandler ...
-func ProjectsRequestsShowStatusStreamHandler(gs *sessions.CookieStore,
+func ProjectsRequestsShowStatusStreamHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -222,7 +222,7 @@ func ProjectsRequestsShowStatusStreamHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsRequestsTasksShowStreamHandler ...
-func ProjectsRequestsTasksShowStreamHandler(gs *sessions.CookieStore,
+func ProjectsRequestsTasksShowStreamHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -234,7 +234,7 @@ func ProjectsRequestsTasksShowStreamHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsRequestsTasksShowDebugHandler ...
-func ProjectsRequestsTasksShowDebugHandler(gs *sessions.CookieStore,
+func ProjectsRequestsTasksShowDebugHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -246,7 +246,7 @@ func ProjectsRequestsTasksShowDebugHandler(gs *sessions.CookieStore,
 }
 
 // ProjectsRequestsTasksShowStatusHandler ...
-func ProjectsRequestsTasksShowStatusHandler(gs *sessions.CookieStore,
+func ProjectsRequestsTasksShowStatusHandler(gs sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -276,7 +276,7 @@ func ProjectsRequestsTasksShowStatusHandler(gs *sessions.CookieStore,
 // @Param datasetIDs formData string true "list of dataset IDs separated by commas"
 // @Router /projects [post]
 func projectsPost(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title    string
@@ -324,7 +324,7 @@ func projectsPost(w http.ResponseWriter, r *http.Request,
 // @Produce  html
 // @Router /projects [get]
 func projectsIndexGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	t, err := template.ParseFiles("views/layout.gohtml", "views/projects/index.gohtml")
 	if err != nil {
@@ -363,7 +363,7 @@ func projectsIndexGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	id := params["id"]
@@ -577,7 +577,7 @@ func projectsShowGet(w http.ResponseWriter, r *http.Request,
 // At the moment this method only retries to prepare the enclave. We may further
 // want to update the datasets of the project, or the title.
 func projectsShowPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// we assume that r.ParseForm() has already been called.
 
 	params := mux.Vars(r)
@@ -639,7 +639,7 @@ func projectsShowPut(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowDelete(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// we assume that r.ParseForm() has already been called.
 
 	params := mux.Vars(r)
@@ -663,7 +663,7 @@ func projectsShowDelete(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowAttributesGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	id := params["id"]
@@ -803,7 +803,7 @@ func projectsShowAttributesGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowAttributesPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// Here we assume that "r.ParseForm" has already been called
 
 	params := mux.Vars(r)
@@ -831,7 +831,7 @@ func projectsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowEnclaveGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title   string
@@ -901,7 +901,7 @@ func projectsShowEnclaveGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowEnclaveDelete(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// Here we assume that "r.ParseForm" has already been called
 
 	params := mux.Vars(r)
@@ -929,7 +929,7 @@ func projectsShowEnclaveDelete(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowUnlockPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// Here we assume that "r.ParseForm" has already been called
 
 	params := mux.Vars(r)
@@ -957,7 +957,7 @@ func projectsShowUnlockPut(w http.ResponseWriter, r *http.Request,
 }
 
 func projectShowDebugGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title   string
@@ -1002,7 +1002,7 @@ func projectShowDebugGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowStatusPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// Here we assume that "r.ParseForm" has already been called
 
 	params := mux.Vars(r)
@@ -1031,7 +1031,7 @@ func projectsShowStatusPut(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsShowStatusStreamGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -1102,7 +1102,7 @@ func projectsShowStatusStreamGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsRequestShowGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	pid := params["pid"]
@@ -1193,7 +1193,7 @@ func projectsRequestShowGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsRequestShowCloudstreamGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -1283,7 +1283,7 @@ func projectsRequestShowCloudstreamGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsRequestShowStatusStreamGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -1377,7 +1377,7 @@ func projectsRequestShowStatusStreamGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsRequestTasksShowStream(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -1499,7 +1499,7 @@ func projectsRequestTasksShowStream(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsRequestTasksShowDebugGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	pid := params["pid"]
@@ -1589,7 +1589,7 @@ func projectsRequestTasksShowDebugGet(w http.ResponseWriter, r *http.Request,
 }
 
 func projectsRequestTasksShowStatusPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// Here we assume that "r.ParseForm" has already been called
 
 	params := mux.Vars(r)

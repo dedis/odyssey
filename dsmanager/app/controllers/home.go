@@ -11,7 +11,7 @@ import (
 )
 
 // HomeHandler ...
-func HomeHandler(gs *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func HomeHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -21,7 +21,7 @@ func HomeHandler(gs *sessions.CookieStore, conf *models.Config) http.HandlerFunc
 }
 
 // HomeGet ...
-func HomeGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore, conf *models.Config) {
+func HomeGet(w http.ResponseWriter, r *http.Request, gs sessions.Store, conf *models.Config) {
 	type viewData struct {
 		Title string
 		Flash []helpers.Flash

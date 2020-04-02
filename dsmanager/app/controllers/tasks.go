@@ -13,7 +13,7 @@ import (
 )
 
 // TasksShowHandler ...
-func TasksShowHandler(gs *sessions.CookieStore) http.HandlerFunc {
+func TasksShowHandler(gs sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -24,7 +24,7 @@ func TasksShowHandler(gs *sessions.CookieStore) http.HandlerFunc {
 	}
 }
 
-func tasksShowGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+func tasksShowGet(w http.ResponseWriter, r *http.Request, store sessions.Store) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		helpers.RedirectWithErrorFlash("/", "the response writer does not "+

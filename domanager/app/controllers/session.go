@@ -15,7 +15,7 @@ import (
 )
 
 // SessionHandler ...
-func SessionHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func SessionHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -37,7 +37,7 @@ func SessionHandler(store *sessions.CookieStore, conf *models.Config) http.Handl
 }
 
 // SessionProfileHandler ...
-func SessionProfileHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func SessionProfileHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -47,7 +47,7 @@ func SessionProfileHandler(store *sessions.CookieStore, conf *models.Config) htt
 }
 
 func sessionGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title   string
@@ -90,7 +90,7 @@ func sessionGet(w http.ResponseWriter, r *http.Request,
 }
 
 func sessionPost(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	// Parse our multipart form, 10 << 20 specifies a maximum
 	// upload of 10 MB files.
@@ -153,7 +153,7 @@ func sessionPost(w http.ResponseWriter, r *http.Request,
 }
 
 func sessionDelete(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	session, err := models.GetSession(store, r)
 	if err != nil {
@@ -173,7 +173,7 @@ func sessionDelete(w http.ResponseWriter, r *http.Request,
 }
 
 func profileGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title   string

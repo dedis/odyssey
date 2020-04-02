@@ -14,7 +14,7 @@ import (
 )
 
 // ShowtasksIndexHandler ...
-func ShowtasksIndexHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func ShowtasksIndexHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -37,7 +37,7 @@ func ShowtasksIndexHandler(store *sessions.CookieStore, conf *models.Config) htt
 }
 
 // ShowtasksShowHandler ...
-func ShowtasksShowHandler(store *sessions.CookieStore,
+func ShowtasksShowHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +48,7 @@ func ShowtasksShowHandler(store *sessions.CookieStore,
 	}
 }
 
-func showtasksGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 
 	t, err := template.ParseFiles("views/layout.gohtml", "views/tasks/index.gohtml")
 	if err != nil {
@@ -95,14 +95,14 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store *sessions.Cookie
 	}
 }
 
-func showtasksIndexDelete(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func showtasksIndexDelete(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 
 	xhelpers.TaskList = make([]*xhelpers.Task, 0)
 
 	xhelpers.RedirectWithInfoFlash("/showtasks", "tasks deleted", w, r, store)
 }
 
-func showtaskShowGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func showtaskShowGet(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	indexStr := params["id"]

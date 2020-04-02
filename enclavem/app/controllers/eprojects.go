@@ -24,7 +24,7 @@ import (
 )
 
 // EProjectsIndexHandler ...
-func EProjectsIndexHandler(store *sessions.CookieStore) http.HandlerFunc {
+func EProjectsIndexHandler(store sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -46,7 +46,7 @@ func EProjectsIndexHandler(store *sessions.CookieStore) http.HandlerFunc {
 }
 
 // EProjectsShowHandler ...
-func EProjectsShowHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func EProjectsShowHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -68,7 +68,7 @@ func EProjectsShowHandler(store *sessions.CookieStore, conf *models.Config) http
 }
 
 // EProjectsShowUnlockHandler ...
-func EProjectsShowUnlockHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func EProjectsShowUnlockHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -88,7 +88,7 @@ func EProjectsShowUnlockHandler(store *sessions.CookieStore, conf *models.Config
 }
 
 func eProjectsIndexGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore) {
+	store sessions.Store) {
 
 	t, err := template.ParseFiles("views/layout.gohtml", "views/eprojects/index.gohtml")
 	if err != nil {
@@ -125,7 +125,7 @@ func eProjectsIndexGet(w http.ResponseWriter, r *http.Request,
 }
 
 func eProjectsIndexDelete(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore) {
+	store sessions.Store) {
 
 	for k, eproject := range models.EProjectList {
 		token, err := helpers.GetToken(w)
@@ -179,7 +179,7 @@ func eProjectsIndexDelete(w http.ResponseWriter, r *http.Request,
 }
 
 func eProjectsShowGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore) {
+	store sessions.Store) {
 
 	params := mux.Vars(r)
 	id := params["instID"]
@@ -226,7 +226,7 @@ func eProjectsShowGet(w http.ResponseWriter, r *http.Request,
 
 // Called from the data scientist manager
 func eProjectsShowDelete(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -524,7 +524,7 @@ removeVapp:
 }
 
 func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// We assume that r.ParseForm() has already been called
 
 	flusher, ok := w.(http.Flusher)

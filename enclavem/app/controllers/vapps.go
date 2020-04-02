@@ -32,7 +32,7 @@ import (
 // VappsIndexHandler points to:
 // GET /Vapps
 // POST /Vapps
-func VappsIndexHandler(gs *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func VappsIndexHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -45,7 +45,7 @@ func VappsIndexHandler(gs *sessions.CookieStore, conf *models.Config) http.Handl
 
 // VappsShowHandler points to:
 // GET /Vapps/{id}
-func VappsShowHandler(gs *sessions.CookieStore) http.HandlerFunc {
+func VappsShowHandler(gs sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -55,7 +55,7 @@ func VappsShowHandler(gs *sessions.CookieStore) http.HandlerFunc {
 }
 
 // VappsIndexGet retrives the list of vApps and sends its json representation
-func VappsIndexGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore) {
+func VappsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 
 	token, err := helpers.GetToken(w)
 	if err != nil {
@@ -113,7 +113,7 @@ func VappsIndexGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieSt
 // written its newly created public key on the cloud endpoint. If everything
 // goes well the vApp is power off.
 // TODO: if an error occurs we should ensure that the created vApp is destroyed
-func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore, conf *models.Config) {
+func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, conf *models.Config) {
 	// Apparently, we must do this at the begining, after what the reader is
 	// closed and we get a "http: invalid Read on closed Body"
 	err := r.ParseForm()
@@ -1221,7 +1221,7 @@ setproperty:
 }
 
 // VappsShowGet gets a single vApp and sends its json representation
-func VappsShowGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore) {
+func VappsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 	params := mux.Vars(r)
 	id := params["id"]
 	if id == "" {

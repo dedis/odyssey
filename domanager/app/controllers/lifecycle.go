@@ -18,7 +18,7 @@ import (
 )
 
 // ShowLifecycle ...
-func ShowLifecycle(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func ShowLifecycle(store sessions.Store, conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -29,7 +29,7 @@ func ShowLifecycle(store *sessions.CookieStore, conf *models.Config) http.Handle
 }
 
 func lifecycleGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title            string

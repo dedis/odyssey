@@ -14,7 +14,7 @@ import (
 )
 
 // RequestsIndexHandler ...
-func RequestsIndexHandler(gs *sessions.CookieStore, conf *models.Config, db *bolt.DB) http.HandlerFunc {
+func RequestsIndexHandler(gs sessions.Store, conf *models.Config, db *bolt.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -24,7 +24,7 @@ func RequestsIndexHandler(gs *sessions.CookieStore, conf *models.Config, db *bol
 }
 
 // RequestsShowHandler ...
-func RequestsShowHandler(gs *sessions.CookieStore, conf *models.Config, db *bolt.DB) http.HandlerFunc {
+func RequestsShowHandler(gs sessions.Store, conf *models.Config, db *bolt.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -33,7 +33,7 @@ func RequestsShowHandler(gs *sessions.CookieStore, conf *models.Config, db *bolt
 	}
 }
 
-func requestsGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func requestsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 
 	t, err := template.ParseFiles("views/layout.gohtml", "views/requests/index.gohtml")
 	if err != nil {
@@ -69,7 +69,7 @@ func requestsGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieS
 	}
 }
 
-func requestsSwhoGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func requestsSwhoGet(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	indexStr := params["id"]

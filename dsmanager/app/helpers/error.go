@@ -2,13 +2,13 @@ package helpers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 	"go.dedis.ch/onet/v3/log"
+	"golang.org/x/xerrors"
 )
 
 /*
@@ -111,11 +111,11 @@ func NewNotAcceptedError(resp *http.Response) RequestError {
 // RedirectWithErrorFlash sets an error flash and redirect to the path. If there
 // is an error during this process, raises a json error. One must return after
 // calling this function.
-func RedirectWithErrorFlash(path, message string, w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+func RedirectWithErrorFlash(path, message string, w http.ResponseWriter, r *http.Request, store sessions.Store) {
 	log.Error(message)
 	err := AddFlash(w, r, fmt.Sprintf("<pre>%s</pre>", message), store, Error)
 	if err != nil {
-		SendRequestError(errors.New("failed to add error flash: "+err.Error()), w)
+		SendRequestError(xerrors.Errorf("failed to add error flash: %v", err), w)
 		return
 	}
 	http.Redirect(w, r, path, http.StatusSeeOther)
@@ -124,10 +124,10 @@ func RedirectWithErrorFlash(path, message string, w http.ResponseWriter, r *http
 // RedirectWithWarningFlash sets a warning flash and redirect to the path. If
 // there is an error during this process, raises a json error. One must return
 // after calling this function.
-func RedirectWithWarningFlash(path, message string, w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+func RedirectWithWarningFlash(path, message string, w http.ResponseWriter, r *http.Request, store sessions.Store) {
 	err := AddFlash(w, r, fmt.Sprintf("%s", message), store, Warning)
 	if err != nil {
-		SendRequestError(errors.New("failed to add warning flash"), w)
+		SendRequestError(xerrors.Errorf("failed to add warning flash: %v", err), w)
 		return
 	}
 	http.Redirect(w, r, path, http.StatusSeeOther)
@@ -136,10 +136,10 @@ func RedirectWithWarningFlash(path, message string, w http.ResponseWriter, r *ht
 // RedirectWithInfoFlash sets a warning flash and redirect to the path. If
 // there is an error during this process, raises a json error. One must return
 // after calling this function.
-func RedirectWithInfoFlash(path, message string, w http.ResponseWriter, r *http.Request, store *sessions.CookieStore) {
+func RedirectWithInfoFlash(path, message string, w http.ResponseWriter, r *http.Request, store sessions.Store) {
 	err := AddFlash(w, r, fmt.Sprintf("%s", message), store, Info)
 	if err != nil {
-		SendRequestError(errors.New("failed to add info flash"), w)
+		SendRequestError(xerrors.Errorf("failed to add info flash: %v", err), w)
 		return
 	}
 	http.Redirect(w, r, path, http.StatusSeeOther)

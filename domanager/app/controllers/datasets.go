@@ -30,7 +30,7 @@ import (
 )
 
 // DatasetIndexHandler ...
-func DatasetIndexHandler(store *sessions.CookieStore,
+func DatasetIndexHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,7 @@ func DatasetIndexHandler(store *sessions.CookieStore,
 }
 
 // DatasetNewHandler ...
-func DatasetNewHandler(store *sessions.CookieStore,
+func DatasetNewHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func DatasetNewHandler(store *sessions.CookieStore,
 }
 
 // DatasetShowHandler ...
-func DatasetShowHandler(store *sessions.CookieStore,
+func DatasetShowHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +84,7 @@ func DatasetShowHandler(store *sessions.CookieStore,
 }
 
 // DatasetShowAttributesHandler ...
-func DatasetShowAttributesHandler(store *sessions.CookieStore,
+func DatasetShowAttributesHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +108,7 @@ func DatasetShowAttributesHandler(store *sessions.CookieStore,
 }
 
 // DatasetShowArchiveHandler ...
-func DatasetShowArchiveHandler(store *sessions.CookieStore,
+func DatasetShowArchiveHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +132,7 @@ func DatasetShowArchiveHandler(store *sessions.CookieStore,
 }
 
 // DatasetShowAuditHandler ...
-func DatasetShowAuditHandler(store *sessions.CookieStore,
+func DatasetShowAuditHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +144,7 @@ func DatasetShowAuditHandler(store *sessions.CookieStore,
 }
 
 // DatasetShowDebugHandler ...
-func DatasetShowDebugHandler(store *sessions.CookieStore,
+func DatasetShowDebugHandler(store sessions.Store,
 	conf *models.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +156,7 @@ func DatasetShowDebugHandler(store *sessions.CookieStore,
 }
 
 func datasetsGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title        string
@@ -260,7 +260,7 @@ var readRule = regexp.MustCompile(`spawn:calypsoRead - "(.*)"`)
 var attrRule = regexp.MustCompile(`.*\b*(\(\s*attr:allowed:[^\s]*\s*&\s*attr:must_have:[^\s]*\s*\))`)
 
 func datasetsPost(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	session, err := models.GetSession(store, r)
 	if err != nil {
@@ -586,7 +586,7 @@ func datasetsPost(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsNew(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	type viewData struct {
 		Title   string
@@ -637,7 +637,7 @@ func datasetsNew(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsShow(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	id := params["id"]
@@ -850,7 +850,7 @@ func datasetsShow(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsShowPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// we assume that r.ParseForm() has already been called.
 
 	params := mux.Vars(r)
@@ -933,7 +933,7 @@ func datasetsShowPut(w http.ResponseWriter, r *http.Request,
 // This function should not be called be the dataset owner, it is here for debug
 // purpose
 func datasetsShowDelete(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// we assume that r.ParseForm() has already been called.
 
 	params := mux.Vars(r)
@@ -1062,7 +1062,7 @@ func datasetsShowDelete(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// we assume that r.ParseForm() has already been called.
 
 	params := mux.Vars(r)
@@ -1318,7 +1318,7 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 	// we assume that r.ParseForm() has already been called.
 
 	params := mux.Vars(r)
@@ -1561,7 +1561,7 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsShowAuditGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	id := params["id"]
@@ -1640,7 +1640,7 @@ func datasetsShowAuditGet(w http.ResponseWriter, r *http.Request,
 }
 
 func datasetsShowDebugGet(w http.ResponseWriter, r *http.Request,
-	store *sessions.CookieStore, conf *models.Config) {
+	store sessions.Store, conf *models.Config) {
 
 	params := mux.Vars(r)
 	id := params["id"]

@@ -11,7 +11,7 @@ import (
 )
 
 // HomeHandler ...
-func HomeHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerFunc {
+func HomeHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -21,7 +21,9 @@ func HomeHandler(store *sessions.CookieStore, conf *models.Config) http.HandlerF
 }
 
 // HomeGet ...
-func HomeGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore, conf *models.Config) {
+func HomeGet(w http.ResponseWriter, r *http.Request, store sessions.Store,
+	conf *models.Config) {
+
 	type viewData struct {
 		Title   string
 		Flash   []xhelpers.Flash
@@ -36,7 +38,8 @@ func HomeGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore
 	t, err := template.ParseFiles("views/layout.gohtml", "views/home.gohtml")
 	if err != nil {
 		fmt.Printf("Error with template: %s\n", err.Error())
-		xhelpers.AddFlash(w, r, fmt.Sprintf("<pre>Error with template:\n%s</pre>", err.Error()), store, xhelpers.Error)
+		xhelpers.AddFlash(w, r, fmt.Sprintf("<pre>Error with template:\n%s</pre>",
+			err.Error()), store, xhelpers.Error)
 	}
 
 	flashes, err := xhelpers.ExtractFlash(w, r, store)
@@ -46,9 +49,8 @@ func HomeGet(w http.ResponseWriter, r *http.Request, store *sessions.CookieStore
 
 	session, err := models.GetSession(store, r)
 	if err != nil {
-		xhelpers.RedirectWithErrorFlash("/", "failed to get session: "+
-			err.Error(), w, r, store)
-		return
+		xhelpers.AddFlash(w, r, "failed to get session: "+err.Error(), store,
+			xhelpers.Error)
 	}
 
 	p := &viewData{

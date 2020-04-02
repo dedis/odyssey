@@ -16,7 +16,7 @@ import (
 
 // OrgsIndexHandler points to:
 // GET /Orgs
-func OrgsIndexHandler(gs *sessions.CookieStore) http.HandlerFunc {
+func OrgsIndexHandler(gs sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -27,7 +27,7 @@ func OrgsIndexHandler(gs *sessions.CookieStore) http.HandlerFunc {
 
 // OrgsShowHandler points to:
 // GET /Orgs/{id}
-func OrgsShowHandler(gs *sessions.CookieStore) http.HandlerFunc {
+func OrgsShowHandler(gs sessions.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -37,7 +37,7 @@ func OrgsShowHandler(gs *sessions.CookieStore) http.HandlerFunc {
 }
 
 // OrgsIndexGet return a json representation of a list of orgs
-func OrgsIndexGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore) {
+func OrgsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 
 	token, err := helpers.GetToken(w)
 	if err != nil {
@@ -113,7 +113,7 @@ func OrgsIndexGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieSto
 }
 
 // OrgsShowGet gets a single org and sends a json representation of it
-func OrgsShowGet(w http.ResponseWriter, r *http.Request, gs *sessions.CookieStore) {
+func OrgsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 	params := mux.Vars(r)
 	id := params["id"]
 	if id == "" {
