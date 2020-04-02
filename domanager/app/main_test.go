@@ -17,7 +17,7 @@ import (
 )
 
 // I should be able to browse the home page without any problem
-func TestHome_normal(t *testing.T) {
+func Test_Home(t *testing.T) {
 	gob.Register(xhelpers.Flash{})
 	gob.Register(models.Session{})
 
@@ -33,9 +33,9 @@ func TestHome_normal(t *testing.T) {
 	require.Equal(t, 200, resp.StatusCode)
 }
 
-// It I am not logged I should not be able to go to the upload of a dataset or
+// If I am not logged I should not be able to go to the upload of a dataset or
 // the list of uploaded datasets
-func TestDataset_notLogged(t *testing.T) {
+func Test_NotLogged(t *testing.T) {
 	gob.Register(xhelpers.Flash{})
 	gob.Register(models.Session{})
 
@@ -45,6 +45,7 @@ func TestDataset_notLogged(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.Handle("/", controllers.HomeHandler(store, conf))
 	mux.Handle("/datasets", controllers.DatasetIndexHandler(store, conf))
+	mux.Handle("/datasets/new", controllers.DatasetNewHandler(store, conf))
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
@@ -57,6 +58,7 @@ func TestDataset_notLogged(t *testing.T) {
 	}
 	client := &http.Client{Jar: jar}
 
+	// Checking /datasets
 	req, err := http.NewRequest("GET", server.URL+"/datasets", nil)
 	require.NoError(t, err)
 
@@ -69,6 +71,20 @@ func TestDataset_notLogged(t *testing.T) {
 	// We should have a message telling us to login
 	bodyBuf, err := ioutil.ReadAll(resp.Body)
 	loginMessage := regexp.MustCompile("you need to be logged in to access this page")
+	require.True(t, loginMessage.MatchString(string(bodyBuf)))
+
+	// Checking /datasets/new
+	req, err = http.NewRequest("GET", server.URL+"/datasets/new", nil)
+	require.NoError(t, err)
+
+	resp, err = client.Do(req)
+	require.NoError(t, err)
+	require.Equal(t, 200, resp.StatusCode)
+
+	// We should have been redirected to home (ie. "")
+	require.Equal(t, "", resp.Header.Get("Location"))
+	// We should have a message telling us to login
+	bodyBuf, err = ioutil.ReadAll(resp.Body)
 	require.True(t, loginMessage.MatchString(string(bodyBuf)))
 }
 
