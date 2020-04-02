@@ -18,7 +18,7 @@ capable of and responsible for operating a hypervisor which will be used
 to spawn, run, and destroy enclaves. In our system, this hypervisor is
 the enclave manager.
 
-### Authroised users
+### Authorised users
 
 Authorised users are expected to not be malicious. They are motivated by
 the commitment to their job, and share the goals of the organisation,
@@ -33,9 +33,6 @@ organisation by collecting evidence of wrongdoing.
 
 **Logical view, cothority centric**
 <center><img src="assets/cothority_view.png"/></center>
-
-**Logical view, components' interactions**
-<center><img src="assets/logical_view.png"/></center>
 
 **UML component diagram**
 <center><img src="assets/components_uml.png"/></center>

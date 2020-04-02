@@ -1,82 +1,145 @@
 @startuml
 
+note "Updated Apr. 2nd 2020" as note
+
 interface "HTTP" as http1
 interface "HTTP" as http2
+interface "HTTP REST API" as http3
+
+interface "vCloud REST API" as http_vcloud
+interface "HTTP" as http_cloud
 
 component [cothority]
 
-node "Datas scientist manager" {
-    http1 - [ds app]
+node "Data Owner Manager" {
+    http1 - [DOManager]
+    
+    interface "Go exec" as goexec11
+    component [bcadmin] as bcadmin11
+    goexec11 -- [bcadmin11]
+    [DOManager] --> goexec11
+    
+    interface "Go exec" as goexec12
+    component [csadmin] as csadmin11
+    goexec12 -- [csadmin11]
+    [DOManager] --> goexec12
+    
+    interface "Go exec" as goexec13
+    component [catadmin] as catadmin11
+    goexec13 -- [catadmin11]
+    [DOManager] --> goexec13
+
+    [DOManager] --> http3
+
+    [bcadmin11] -> [cothority]
+    [catadmin11] -> [cothority]
+    [csadmin11] -> [cothority]
+    
+    [DOManager] --> http_cloud
+}
+
+[Browser1] --> http1
+[Browser2] --> http2
+
+
+node "Data Scientist Manager" {
+    http2 - [DSManager]
 
     interface "Go exec" as goexec1
     component [bcadmin] as bcadmin1
-    goexec1 -down- [bcadmin1]
-    [ds app] --> goexec1
+    goexec1 -- [bcadmin1]
+    [DSManager] --> goexec1
     
     interface "Go exec" as goexec2
     component [csadmin] as csadmin1
-    goexec2 -down- [csadmin1]
-    [ds app] --> goexec2
+    goexec2 -- [csadmin1]
+    [DSManager] --> goexec2
     
     interface "Go exec" as goexec3
     component [pcadmin] as pcadmin1
-    goexec3 -down- [pcadmin1]
-    [ds app] --> goexec3
+    goexec3 -- [pcadmin1]
+    [DSManager] --> goexec3
 
-    [ds app] --> http2
+    interface "Go exec" as goexec3.2
+    component [catadmin] as catadmin1
+    goexec3.2 -- [catadmin1]
+    [DSManager] --> goexec3.2
+
+    [DSManager] --> http3
 
     [bcadmin1] -> [cothority]
     [pcadmin1] -> [cothority]
     [csadmin1] -> [cothority]
+    [catadmin1] -> [cothority]
+    
+    [DSManager] --> http_cloud
 }
-
-[Browser] --> http1
-
-interface "HTTP" as http_vcloud
-interface "HTTP" as http_cloud
 
 http_vcloud - [VMware vCloud] 
 
-node "Enclave manager" {
+node "Enclave Manager" {
     interface "Go exec" as goexec4
     component [bcadmin] as bcadmin2
-    goexec4 -down- [bcadmin2]
-    [em app] --> goexec4
+    goexec4 -- [bcadmin2]
+    [ENManager] --> goexec4
     
     interface "Go exec" as goexec5
     component [csadmin] as csadmin2
-    goexec5 -down- [csadmin2]
-    [em app] --> goexec5
+    goexec5 -- [csadmin2]
+    [ENManager] --> goexec5
     
     interface "Go exec" as goexec6
     component [pcadmin] as pcadmin2
-    goexec6 -down- [pcadmin2]
-    [em app] --> goexec6
+    goexec6 -- [pcadmin2]
+    [ENManager] --> goexec6
 
-    http2 - [em app]
+    http3 -- [ENManager]
     
     
-    [em app] --> http_vcloud
-    [em app] --> http_cloud
+    [ENManager] --> http_vcloud
+    [ENManager] --> http_cloud
     
-    [bcadmin2] -> [cothority]
-    [pcadmin2] -> [cothority]
-    [csadmin2] -> [cothority]
+    [bcadmin2] --> [cothority]
+    [pcadmin2] --> [cothority]
+    [csadmin2] --> [cothority]
 }
 
 node "vApp (enclave instance)" {
     interface "Go exec" as goexec7
+    interface "Go exec" as goexec8
+    interface "Go exec" as goexec9
+    interface "Go exec" as goexec10
+    
     component [bcadmin] as bcadmin3
-    goexec7 -down- [bcadmin3]
+    component [csadmin] as csadmin3
+    component [cryptutil] as cryputil3
+    component [pcadmin] as pcadmin3
+    
+    goexec7 -- [bcadmin3]
+    goexec8 -- [csadmin3]
+    goexec9 -- [cryputil3]
+    goexec10 -- [pcadmin3]
     
     [Ubuntu] --> goexec7
+    [Ubuntu] --> goexec8
+    [Ubuntu] --> goexec9
+    [Ubuntu] --> goexec10
+    
     [Ubuntu] --> http_cloud
     
-    [bcadmin3] -> [cothority]
+    [bcadmin3] --> [cothority]
+    [csadmin3] --> [cothority]
+    [pcadmin3] --> [cothority]
+    [cryputil3] --> [cothority]
 }
 
 [VMware vCloud] --> [Ubuntu]
 
 http_cloud - [Cloud provider]
+
+[DOManager] -[hidden]down- [DSManager]
+[DSManager] -[hidden]down- [ENManager]
+[ENManager] -[hidden]down- [Ubuntu]
+[ENManager] -[hidden]down- [Cloud provider]
 
 @enduml

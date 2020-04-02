@@ -143,12 +143,13 @@ git checkout tags/v3.4.4
 GOPATH=~/ ~/go/bin/go install ./byzcoin/bcadmin
 GOPATH=~/ ~/go/bin/go install ./calypso/csadmin
 
-# install pcadmin
+# install pcadmin and cryptutil
 cd /tmp
 git clone https://github.com/dedis/odyssey.git
 cd odyssey
-# this will install pcadmin in ~/bin
+# this will install the executables in ~/bin
 GOPATH=~/ ~/go/bin/go install ./projectc/pcadmin
+GOPATH=~/ ~/go/bin/go install ./cryptutil
 
 # The starup script expects the executable to be in the home directory
 mv ~/bin/* ~/
