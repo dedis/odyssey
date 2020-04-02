@@ -16,6 +16,8 @@ func TestCatalogScenario(t *testing.T) {
 	local := onet.NewTCPTest(cothority.Suite)
 	defer local.CloseAll()
 
+	counter := uint64(0)
+
 	signer := darc.NewSignerEd25519(nil, nil)
 	_, roster, _ := local.GenTree(3, true)
 
@@ -26,7 +28,8 @@ func TestCatalogScenario(t *testing.T) {
 			"invoke:odysseycatalog.updateDataset",
 			"invoke:odysseycatalog.deleteOwner",
 			"invoke:odysseycatalog.updateMetadata",
-			"invoke:odysseycatalog.deleteDataset"}, signer.Identity())
+			"invoke:odysseycatalog.deleteDataset",
+			"invoke:odysseycatalog.archiveDataset"}, signer.Identity())
 	require.Nil(t, err)
 	gDarc := &genesisMsg.GenesisDarc
 
@@ -37,14 +40,14 @@ func TestCatalogScenario(t *testing.T) {
 
 	// ------------------------------------------------------------------------
 	// Spawn
-
+	counter++
 	ctx, err := cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID: byzcoin.NewInstanceID(gDarc.GetBaseID()),
 		Spawn: &byzcoin.Spawn{
 			ContractID: ContractCatalogID,
 			Args:       []byzcoin.Argument{},
 		},
-		SignerCounter: []uint64{1},
+		SignerCounter: []uint64{counter},
 	})
 	require.NoError(t, err)
 	require.Nil(t, ctx.FillSignersAndSignWith(signer))
@@ -111,11 +114,11 @@ func TestCatalogScenario(t *testing.T) {
 			},
 		},
 	}
-
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{2},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -146,11 +149,11 @@ func TestCatalogScenario(t *testing.T) {
 			},
 		},
 	}
-
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{3},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -233,7 +236,7 @@ func TestCatalogScenario(t *testing.T) {
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{3},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -273,10 +276,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{4},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -363,7 +367,7 @@ func TestCatalogScenario(t *testing.T) {
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{4},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -407,10 +411,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{5},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -481,6 +486,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: example.com
 -------- SHA2: abcd
 -------- IdentityStr: darc:aef123
+-------- IsArchived: false
 -------- Metadata:
 `
 	require.Equal(t, expected, catalogData.String())
@@ -520,7 +526,51 @@ func TestCatalogScenario(t *testing.T) {
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{5},
+		SignerCounter: []uint64{counter},
+	})
+	require.Nil(t, nil)
+
+	err = ctx.FillSignersAndSignWith(signer)
+	require.Nil(t, err)
+
+	_, err = cl.AddTransactionAndWait(ctx, 10)
+	require.Nil(t, err)
+
+	local.WaitDone(genesisMsg.BlockInterval)
+
+	// ------------------------------------------------------------------------
+	// Archive a dataset
+
+	identityStr = "darc:aef123"
+	calypsoWriteID = "abcdef1234"
+	dataset = Dataset{
+		Title:       "title2",
+		Description: "description2",
+		CloudURL:    "example.com/2",
+		SHA2:        "abcdef",
+	}
+
+	datasetBuf, err = protobuf.Encode(&dataset)
+	require.Nil(t, err)
+
+	invoke = byzcoin.Invoke{
+		ContractID: ContractCatalogID,
+		Command:    "archiveDataset",
+		Args: byzcoin.Arguments{
+			{
+				Name: "identityStr", Value: []byte(identityStr),
+			},
+			{
+				Name: "calypsoWriteID", Value: []byte(calypsoWriteID),
+			},
+		},
+	}
+
+	counter++
+	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
+		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
+		Invoke:        &invoke,
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -564,10 +614,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{6},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -591,6 +642,8 @@ func TestCatalogScenario(t *testing.T) {
 		SHA2:           "abcdef",
 		IdentityStr:    identityStr,
 		CalypsoWriteID: calypsoWriteID,
+		IsArchived:     true,
+		Metadata:       &Metadata{},
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
@@ -638,7 +691,11 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: example.com/2
 -------- SHA2: abcdef
 -------- IdentityStr: darc:aef123
+-------- IsArchived: true
 -------- Metadata:
+--------- Metadata:
+---------- AttributesGroups:
+---------- DelegatedEnforcement:
 `
 	require.Equal(t, expected, catalogData.String())
 	local.WaitDone(genesisMsg.BlockInterval)
@@ -677,7 +734,7 @@ func TestCatalogScenario(t *testing.T) {
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{6},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -748,6 +805,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: 10.10.10.10/new.aes
 -------- SHA2: 12345678abcd
 -------- IdentityStr: darc:aef123
+-------- IsArchived: false
 -------- Metadata:
 `
 	require.Equal(t, expected, catalogData.String())
@@ -785,10 +843,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{7},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -868,6 +927,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: 10.10.10.10/new.aes
 -------- SHA2: 12345678abcd
 -------- IdentityStr: darc:aef123
+-------- IsArchived: false
 -------- Metadata:
 ------ Datasets[1]:
 ------- Dataset:
@@ -877,6 +937,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: other link
 -------- SHA2: other hash
 -------- IdentityStr: darc:aef123
+-------- IsArchived: false
 -------- Metadata:
 `
 	require.Equal(t, expected, catalogData.String())
@@ -915,10 +976,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{8},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -956,7 +1018,7 @@ func TestCatalogScenario(t *testing.T) {
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{8},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -1041,6 +1103,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: 10.10.10.10/new.aes
 -------- SHA2: 12345678abcd
 -------- IdentityStr: darc:aef123
+-------- IsArchived: false
 -------- Metadata:
 ------ Datasets[1]:
 ------- Dataset:
@@ -1050,6 +1113,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: other link
 -------- SHA2: other hash
 -------- IdentityStr: darc:aef123
+-------- IsArchived: false
 -------- Metadata:
 --- Owners[1]:
 ---- Owner:
@@ -1080,10 +1144,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{9},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -1167,6 +1232,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: 10.10.10.10/new.aes
 -------- SHA2: 12345678abcd
 -------- IdentityStr: darc:bbbbbb
+-------- IsArchived: false
 -------- Metadata:
 ------ Datasets[1]:
 ------- Dataset:
@@ -1176,6 +1242,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: other link
 -------- SHA2: other hash
 -------- IdentityStr: darc:bbbbbb
+-------- IsArchived: false
 -------- Metadata:
 --- Owners[1]:
 ---- Owner:
@@ -1206,10 +1273,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{10},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -1284,6 +1352,7 @@ func TestCatalogScenario(t *testing.T) {
 -------- CloudURL: other link
 -------- SHA2: other hash
 -------- IdentityStr: darc:bbbbbb
+-------- IsArchived: false
 -------- Metadata:
 --- Owners[1]:
 ---- Owner:
@@ -1310,10 +1379,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{11},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -1437,10 +1507,11 @@ func TestCatalogScenario(t *testing.T) {
 		},
 	}
 
+	counter++
 	ctx, err = cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID:    byzcoin.NewInstanceID(instIDBuf),
 		Invoke:        &invoke,
-		SignerCounter: []uint64{12},
+		SignerCounter: []uint64{counter},
 	})
 	require.Nil(t, nil)
 
@@ -1495,76 +1566,95 @@ func TestCatalogScenario(t *testing.T) {
 ----- AttributesGroup:
 ------ Title: Use
 ------ Description: How this dataset can be used
+------ ConsumerDescription: 
 ------ Attributes:
 ------- Attributes[0]:
 -------- Attribute:
 --------- ID: use_restricted
 --------- Description: The use of this dataset is restricted
 --------- Type: checkbox
+--------- RuleType: 
 --------- Name: 
 --------- Value: 
+--------- DelegatedEnforcement: false
 --------- Attributes:
 ---------- Attributes[0]:
 ----------- Attribute:
 ------------ ID: use_restricted_description
 ------------ Description: Please describe the restriction
 ------------ Type: text
+------------ RuleType: 
 ------------ Name: 
 ------------ Value: This is my custom restriction
+------------ DelegatedEnforcement: false
 ------------ Attributes:
 ------- Attributes[1]:
 -------- Attribute:
 --------- ID: use_predefined_purposes
 --------- Description: Can be used for the following predefined-purposess
 --------- Type: checkbox
+--------- RuleType: 
 --------- Name: 
 --------- Value: 
+--------- DelegatedEnforcement: false
 --------- Attributes:
 ---------- Attributes[0]:
 ----------- Attribute:
 ------------ ID: use_predefined_purposes_legal
 ------------ Description: To meet legal or regulatory requirements
 ------------ Type: checkbox
+------------ RuleType: 
 ------------ Name: 
 ------------ Value: 
+------------ DelegatedEnforcement: false
 ------------ Attributes:
 ---------- Attributes[1]:
 ----------- Attribute:
 ------------ ID: use_predefined_purposes_analytics_counterparty
 ------------ Description: To provide analytics to the counterparty of the contract from which data is sourced/for the counterparty's benefit
 ------------ Type: checkbox
+------------ RuleType: 
 ------------ Name: 
 ------------ Value: 
+------------ DelegatedEnforcement: false
 ------------ Attributes:
 ---- AttributesGroups[1]:
 ----- AttributesGroup:
 ------ Title: Access
 ------ Description: Tell us who can access the data
+------ ConsumerDescription: 
 ------ Attributes:
 ------- Attributes[0]:
 -------- Attribute:
 --------- ID: access_unrestricted
 --------- Description: No restriction
 --------- Type: radio
+--------- RuleType: 
 --------- Name: access
 --------- Value: 
+--------- DelegatedEnforcement: false
 --------- Attributes:
 ------- Attributes[1]:
 -------- Attribute:
 --------- ID: access_defined_group
 --------- Description: SR defined group
 --------- Type: radio
+--------- RuleType: 
 --------- Name: access
 --------- Value: 
+--------- DelegatedEnforcement: false
 --------- Attributes:
 ---------- Attributes[0]:
 ----------- Attribute:
 ------------ ID: access_defined_group_description
 ------------ Description: Please specify the group
 ------------ Type: text
+------------ RuleType: 
 ------------ Name: 
 ------------ Value: 
+------------ DelegatedEnforcement: false
 ------------ Attributes:
+--- DelegatedEnforcement:
 `
 	require.Equal(t, expected, catalogData.String())
 	local.WaitDone(genesisMsg.BlockInterval)
