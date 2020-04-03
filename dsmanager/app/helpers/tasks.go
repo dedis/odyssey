@@ -24,20 +24,20 @@ type StatusTask string
 type TaskEventType string
 
 const (
-	// StatusWorking ...
+	// StatusWorking says the task is working
 	StatusWorking = "working"
-	// StatusFinished ...
+	// StatusFinished says the task is done
 	StatusFinished = "finished"
-	// StatusErrored ...
+	// StatusErrored says the task errored and is done
 	StatusErrored = "errored"
-	// TypeInfo ...
+	// TypeInfo is the standard event type
 	TypeInfo = "info"
-	// TypeError ...
+	// TypeError is an event type that indicates an error
 	TypeError = "error"
-	// TypeImportantInfo ...
+	// TypeImportantInfo is an event type that indicates an important event
 	TypeImportantInfo = "importantInfo"
-	// TypeCloseOK indicates that the stream should be closed. That should be used
-	// once the task ended well.
+	// TypeCloseOK indicates that the stream should be closed. That should be
+	// used once the task ended well.
 	TypeCloseOK = "closeOK"
 	// TypeCloseError should be used to indicate that the stream is closed with
 	// an error
@@ -57,10 +57,10 @@ type TaskEvent struct {
 // field.
 type TaskEventSorter []*TaskEvent
 
-// Len returns the len ...
+// Len returns the len
 func (p TaskEventSorter) Len() int { return len(p) }
 
-// Swap swaps ...
+// Swap swaps
 func (p TaskEventSorter) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 
 // Less compares two projects based on their CreatedAt fields
@@ -75,7 +75,29 @@ func (p TaskEventSorter) Less(i, j int) bool {
 	return t1.Before(t2)
 }
 
-// Task ...
+// TaskI ...
+type TaskI interface {
+	CloseError(source, msg, details string)
+	AddInfo(source, msg, details string)
+	AddInfof(source, msg, details string, args ...interface{})
+	CloseOK(source, msg, details string)
+}
+
+// TaskFactoryI ...
+type TaskFactoryI interface {
+	GetTask(title string) TaskI
+}
+
+// DefaultTaskFactory ...
+type DefaultTaskFactory struct{}
+
+// GetTask ...
+func (dtf DefaultTaskFactory) GetTask(title string) TaskI {
+	return NewTask(title)
+}
+
+// Task implements a publisher/subscriber pattern that allows us to
+// asynchronously handle tasks in our app.
 type Task struct {
 	sync.Mutex
 	// A random string
@@ -110,10 +132,10 @@ func (t *Task) PrepareBeforeMarshal() {
 // TaskSorter is used to define a sorter that sorts tasks by their Index field
 type TaskSorter []*Task
 
-// Len returns the len ...
+// Len returns the len
 func (p TaskSorter) Len() int { return len(p) }
 
-// Swap swaps ...
+// Swap swaps
 func (p TaskSorter) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 
 // Less compares two Task based on their CreatedAt fields
