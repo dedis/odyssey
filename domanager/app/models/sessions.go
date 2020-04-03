@@ -71,7 +71,10 @@ func LogIn(bcPath string, store sessions.Store, r *http.Request, w http.Response
 
 	SaveSession(randKey, bcPath, &cfg)
 
-	sess.Save(r, w)
+	err = sess.Save(r, w)
+	if err != nil {
+		return xerrors.Errorf("failed to save session: %v", err)
+	}
 
 	return nil
 }

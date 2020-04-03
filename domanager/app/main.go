@@ -157,11 +157,12 @@ func main() {
 
 // parseConfig parses the config file and return a config struct
 func parseConfig() (*models.Config, error) {
-	conf := &models.Config{}
-	_, err := toml.DecodeFile("config.toml", conf)
+	tomlConf := &models.TOMLConfig{}
+	_, err := toml.DecodeFile("config.toml", tomlConf)
 	if err != nil {
 		return nil, errors.New("failed to read config: " + err.Error())
 	}
+	conf := &models.Config{tomlConf, xhelpers.DefaultTaskFactory{}}
 	return conf, nil
 }
 
