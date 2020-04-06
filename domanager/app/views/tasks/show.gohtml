@@ -7,16 +7,16 @@
         <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
         <div class="pure-u-1 pure-u-sm-1-2">
             <p><a class="pure-button" href="/showtasks">🔙 Back to the list of tasks</a></p>
-            {{ .Request.GoBackLink }}
+            {{ .Task.GetGobackLink }}
         </div>
         <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     </div>
     <div class="pure-u-1 main-content">
         <div class="main-content-wrapper">
-            <p class="description">{{.Request.Description}}</p>
+            <p class="description">{{.Task.GetDescription}}</p>
             <p class="status">{{.StatusImg}}</p>
             <div id="logs">
-                {{ range $i, $d := .Request.History }}
+                {{ range $i, $d := .Task.GetHistory }}
                     {{ if eq $d.Type "closeOK" }}
                         <div onclick="toggle(this)" class="log last ok">
                     {{ else if eq $d.Type "closeError" }}
@@ -149,7 +149,7 @@
 
 <script>
 var url = new URL(window.location.href);
-const evtSource = new EventSource("/tasks/"+"{{.Request.Index}}", {withCredentials: false });
+const evtSource = new EventSource("/tasks/"+"{{.Task.GetIndex}}", {withCredentials: false });
 
 evtSource.onmessage = function(event) {
 

@@ -2,8 +2,10 @@ package helpers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -12,10 +14,10 @@ import (
 )
 
 // TaskList are all the chans concerning tasks
-var TaskList = make([]*Task, 0)
+// var TaskList = make([]*Task, 0)
 
 // TaskListLock is a mutex to be used when updating the TaskList
-var TaskListLock = &sync.Mutex{}
+// var TaskListLock = &sync.Mutex{}
 
 // StatusTask ...
 type StatusTask string
@@ -75,25 +77,122 @@ func (p TaskEventSorter) Less(i, j int) bool {
 	return t1.Before(t2)
 }
 
-// TaskI ...
+// TaskManagerI defines all the primitives needed to handle tasks.
+type TaskManagerI interface {
+	NewTask(title string) TaskI
+	NumTasks() int
+	GetTask(index int) TaskI
+	GetSortedTasks() []TaskI
+	DeleteAllTasks()
+	RestoreTasks(tasks []TaskI) error
+}
+
+// DefaultTaskManager provides a default implementation of the TaskManager
+// interface.
+type DefaultTaskManager struct {
+	sync.Mutex
+	taskList []*Task
+}
+
+// NewDefaultTaskManager return a new DefaultTaskManager
+func NewDefaultTaskManager() *DefaultTaskManager {
+	return &DefaultTaskManager{
+		taskList: make([]*Task, 0),
+	}
+}
+
+// NewTask return a new Task
+func (dtm *DefaultTaskManager) NewTask(title string) TaskI {
+	dtm.Lock()
+	index := len(dtm.taskList)
+	idStr := RandString(16)
+	task := &Task{
+		ID:          idStr,
+		Index:       index,
+		Subscribers: make([]*Subscriber, 0),
+		History:     make([]*TaskEvent, 0),
+		Status:      StatusWorking,
+		Description: title,
+		StartD:      time.Now().Format("02-01-2006 15:04:05..999"),
+		EndD:        "?",
+	}
+	dtm.taskList = append(dtm.taskList, task)
+	dtm.Unlock()
+	return task
+}
+
+// NumTasks ...
+func (dtm *DefaultTaskManager) NumTasks() int {
+	return len(dtm.taskList)
+}
+
+// GetTask ...
+func (dtm *DefaultTaskManager) GetTask(index int) TaskI {
+	return dtm.taskList[index]
+}
+
+// GetSortedTasks ...
+func (dtm *DefaultTaskManager) GetSortedTasks() []TaskI {
+	sorted := make([]*Task, len(dtm.taskList))
+	copy(sorted, dtm.taskList)
+	sort.Sort(sort.Reverse(TaskSorter(sorted)))
+
+	result := make([]TaskI, dtm.NumTasks())
+	for i, el := range sorted {
+		result[i] = el
+	}
+	return result
+}
+
+// DeleteAllTasks deletes all the tasks
+func (dtm *DefaultTaskManager) DeleteAllTasks() {
+	dtm.taskList = make([]*Task, 0)
+}
+
+// RestoreTasks sets the provided tasks in the task list. The previous tasks are
+// deleted.
+func (dtm *DefaultTaskManager) RestoreTasks(tasks []TaskI) error {
+	dtm.DeleteAllTasks()
+	dtm.taskList = make([]*Task, len(tasks))
+
+	for i, task := range tasks {
+		if task.GetIndex() >= len(tasks) || task.GetIndex() < 0 {
+			return fmt.Errorf("found anormal index on task: 0 > "+
+				"(index) %d >= len(TaskList) %d", task.GetIndex(), len(tasks))
+		}
+
+		dtm.taskList[i] = &Task{
+			Index:       task.GetIndex(),
+			ID:          task.GetID(),
+			Status:      task.GetStatus(),
+			GoBackLink:  task.GetGobackLink(),
+			Description: task.GetDescription(),
+			History:     task.GetHistory(),
+		}
+	}
+
+	return nil
+}
+
+// TaskI defines the primitives needed for a standard task. This abstraction
+// allows us to better test our program.
 type TaskI interface {
 	CloseError(source, msg, details string)
 	AddInfo(source, msg, details string)
 	AddInfof(source, msg, details string, args ...interface{})
 	CloseOK(source, msg, details string)
-}
-
-// TaskFactoryI ...
-type TaskFactoryI interface {
-	GetTask(title string) TaskI
-}
-
-// DefaultTaskFactory ...
-type DefaultTaskFactory struct{}
-
-// GetTask ...
-func (dtf DefaultTaskFactory) GetTask(title string) TaskI {
-	return NewTask(title)
+	AddTaskEvent(event TaskEvent)
+	Subscribe() *Subscriber
+	SetGobackLink(link string)
+	GetIndex() int
+	GetID() string
+	GetStatus() StatusTask
+	SetStatus(StatusTask)
+	GetGobackLink() string
+	GetDescription() string
+	GetHistory() []*TaskEvent
+	SetSubscribers([]*Subscriber)
+	Marshall() ([]byte, error)
 }
 
 // Task implements a publisher/subscriber pattern that allows us to
@@ -124,6 +223,17 @@ func (t *Task) PrepareAfterUnmarshal() {
 	t.Subscribers = make([]*Subscriber, 0)
 }
 
+// Marshall ...
+func (t *Task) Marshall() ([]byte, error) {
+	t.PrepareBeforeMarshal()
+	taskBuf, err := json.Marshal(t)
+	if err != nil {
+		return nil, errors.New("failed to marshal task: " + err.Error())
+	}
+
+	return taskBuf, nil
+}
+
 // PrepareBeforeMarshal should be called before marshalling a task
 func (t *Task) PrepareBeforeMarshal() {
 	t.Subscribers = nil
@@ -144,24 +254,24 @@ func (p TaskSorter) Less(i, j int) bool {
 }
 
 // NewTask creates a task and returns it
-func NewTask(description string) *Task {
-	TaskListLock.Lock()
-	index := len(TaskList)
-	idStr := RandString(16)
-	task := &Task{
-		ID:          idStr,
-		Index:       index,
-		Subscribers: make([]*Subscriber, 0),
-		History:     make([]*TaskEvent, 0),
-		Status:      StatusWorking,
-		Description: description,
-		StartD:      time.Now().Format("02-01-2006 15:04:05..999"),
-		EndD:        "?",
-	}
-	TaskList = append(TaskList, task)
-	TaskListLock.Unlock()
-	return task
-}
+// func NewTask(description string) *Task {
+// 	TaskListLock.Lock()
+// 	index := len(TaskList)
+// 	idStr := RandString(16)
+// 	task := &Task{
+// 		ID:          idStr,
+// 		Index:       index,
+// 		Subscribers: make([]*Subscriber, 0),
+// 		History:     make([]*TaskEvent, 0),
+// 		Status:      StatusWorking,
+// 		Description: description,
+// 		StartD:      time.Now().Format("02-01-2006 15:04:05..999"),
+// 		EndD:        "?",
+// 	}
+// 	TaskList = append(TaskList, task)
+// 	TaskListLock.Unlock()
+// 	return task
+// }
 
 // Subscriber is a client that subscribes to be notified. We store the past
 // events so that the client can catch up.
@@ -198,6 +308,12 @@ func (t *Task) Subscribe() *Subscriber {
 	return newClient
 }
 
+// SetSubscribers sets the subscribers. It is usefull in the "before/after
+// marshal"
+func (t *Task) SetSubscribers(subscribers []*Subscriber) {
+	t.Subscribers = subscribers
+}
+
 // AddTaskEvent adds a new event and notify the subscribers. If the event is of type
 // closeOK or closeError, then the task is ended and the subscibers are closed.
 func (t *Task) AddTaskEvent(event TaskEvent) {
@@ -220,6 +336,46 @@ func (t *Task) AddTaskEvent(event TaskEvent) {
 		}
 	}
 	t.Unlock()
+}
+
+// SetGobackLink sets the GobackLink attribute
+func (t *Task) SetGobackLink(link string) {
+	t.GoBackLink = link
+}
+
+// GetIndex returns the index of the task
+func (t *Task) GetIndex() int {
+	return t.Index
+}
+
+// GetID returns the ID of the task
+func (t *Task) GetID() string {
+	return t.ID
+}
+
+// GetStatus returns the status of the task
+func (t *Task) GetStatus() StatusTask {
+	return t.Status
+}
+
+// SetStatus sets the status of the task
+func (t *Task) SetStatus(status StatusTask) {
+	t.Status = status
+}
+
+// GetGobackLink returns the goback link of the task
+func (t *Task) GetGobackLink() string {
+	return t.GoBackLink
+}
+
+// GetDescription returns the description of the task
+func (t *Task) GetDescription() string {
+	return t.Description
+}
+
+// GetHistory returns the history of the task
+func (t *Task) GetHistory() []*TaskEvent {
+	return t.History
 }
 
 // AddInfo adds a new task event of type info

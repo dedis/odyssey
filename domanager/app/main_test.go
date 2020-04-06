@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -10,7 +12,9 @@ import (
 	"net/http/httptest"
 	"os"
 	"regexp"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/dedis/odyssey/domanager/app/controllers"
 	"github.com/dedis/odyssey/domanager/app/models"
@@ -199,8 +203,16 @@ func Test_Dataset_POST(t *testing.T) {
 	gob.Register(xhelpers.Flash{})
 	gob.Register(models.Session{})
 
+	taskManager := newFakeTaskManager()
+	cloudClient := &fakeCloudClient{}
+
 	store := sessions.NewCookieStore([]byte("TOBECHANGEDOFCOURSE"))
-	conf := &models.Config{&models.TOMLConfig{}, xhelpers.DefaultTaskFactory{}}
+	conf := &models.Config{
+		TOMLConfig:  &models.TOMLConfig{Standalone: true},
+		TaskManager: taskManager,
+		Executor:    fakeExecutor{},
+		CloudClient: cloudClient,
+	}
 
 	mux := mux.NewRouter()
 	mux.Handle("/showtasks/{id}", controllers.ShowtasksShowHandler(store, conf))
@@ -251,9 +263,136 @@ func Test_Dataset_POST(t *testing.T) {
 	bodyBuf, err := ioutil.ReadAll(resp.Body)
 	taskCreadedMsg := regexp.MustCompile("Task to create dataset with index 0 created")
 	require.True(t, taskCreadedMsg.MatchString(string(bodyBuf)))
+
+	select {
+	case <-taskManager.called:
+	case <-time.After(time.Second):
+		t.Error("the taskmanager should have been called")
+	}
+	require.Equal(t, 1, len(taskManager.taskList))
+	task := taskManager.taskList[0]
+
+	timeout := time.Second
+	var event xhelpers.TaskEvent
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "starting the upload process", event.Message)
+	require.Equal(t, "got this POST form: map[description:[dataset description] title:[dataset title]]", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "Darc created in standalone mode", event.Message)
+	require.Equal(t, "DarcID: darc:0000000000000000000000000000000000000000000000000000000000000000", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "getting the dataset file", event.Message)
+	require.Equal(t, "retrieving the 'dataset-file' post argument", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "genering a symmetric key", event.Message)
+	require.Equal(t, "genering a 16 bytes symmetric key", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "genering an nonce", event.Message)
+	require.Equal(t, "genering a 12 bytes nonce", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "encrypting the dataset", event.Message)
+	require.Equal(t, "encrypting with AES using the Galois Counter Mode", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "uploading the encrypted dataset on the cloud", event.Message)
+	require.True(t, strings.HasSuffix(event.Details, "_dataset+title.txt.aes"))
+
+	// The cloud client should have been called
+	require.True(t, cloudClient.called)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "computing the SHA2", event.Message)
+	require.Equal(t, "using the unencrypted file to compute the SHA2", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "creating a Calypso write", event.Message)
+	require.Equal(t, "using csadmin to create the calypso write that contains the symetric key and the nonce", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "getting the write instance ID", event.Message)
+	require.Equal(t, "parsing the output of csadmin to extract the write instance ID", event.Details)
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "updating the catalog", event.Message)
+	require.True(t, strings.HasPrefix(event.Details, "using the following command: ./catadmin"))
+
+	select {
+	case event = <-task.eventChan:
+	case <-time.After(timeout):
+		t.Error("event didn't come after timeout")
+	}
+	require.Equal(t, "DO Manager", event.Source)
+	require.Equal(t, "dataset created", event.Message)
+
+	select {
+	case <-task.doneChan:
+	case <-time.After(time.Second):
+		t.Error("the task is not done after timeout")
+	}
 }
 
-// -----------------
+// -----------------------------------------------------------------------------
 // Utility functions
 
 // setSession sets the session variable that creates the session and returns the
@@ -278,4 +417,122 @@ func setSession(t *testing.T, url string) string {
 	require.Equal(t, 1, len(cookies))
 
 	return cookies[0]
+}
+
+// Task manager
+
+type fakeTaskManager struct {
+	taskList []*FakeTask
+	called   chan interface{}
+}
+
+func newFakeTaskManager() *fakeTaskManager {
+	return &fakeTaskManager{
+		taskList: make([]*FakeTask, 0),
+		called:   make(chan interface{}),
+	}
+}
+
+func (ftm *fakeTaskManager) NewTask(title string) xhelpers.TaskI {
+	task := &FakeTask{
+		eventChan: make(chan xhelpers.TaskEvent, 10),
+		doneChan:  make(chan interface{}),
+	}
+	ftm.taskList = append(ftm.taskList, task)
+	// So we can block in the test until at least one task is created
+	close(ftm.called)
+	return task
+}
+
+func (ftm *fakeTaskManager) NumTasks() int {
+	return len(ftm.taskList)
+}
+
+func (ftm *fakeTaskManager) GetTask(index int) xhelpers.TaskI {
+	return ftm.taskList[index]
+}
+
+type FakeTask struct {
+	eventChan chan xhelpers.TaskEvent
+	doneChan  chan interface{}
+}
+
+func (ft FakeTask) CloseError(source, msg, details string) {
+	ft.eventChan <- xhelpers.NewTaskEventCloseError(source, msg, details)
+	close(ft.doneChan)
+}
+
+func (ft FakeTask) AddInfo(source, msg, details string) {
+	ft.eventChan <- xhelpers.NewTaskEvent(xhelpers.TypeInfo, source, msg, details)
+}
+
+func (ft FakeTask) AddInfof(source, msg, details string, args ...interface{}) {
+	ft.eventChan <- xhelpers.NewTaskEvent(xhelpers.TypeInfo, source, msg, fmt.Sprintf(details, args...))
+}
+
+func (ft FakeTask) CloseOK(source, msg, details string) {
+	ft.eventChan <- xhelpers.NewTaskEvent(xhelpers.TypeCloseOK, source, msg, details)
+	close(ft.doneChan)
+}
+
+func (ft FakeTask) SetGobackLink(link string) {}
+
+func (ft FakeTask) GetIndex() int {
+	return 0
+}
+
+func (ft FakeTask) GetID() string {
+	return "Fake ID"
+}
+
+func (ft FakeTask) GetStatus() xhelpers.StatusTask {
+	return "status"
+}
+
+func (ft FakeTask) GetGobackLink() string {
+	return "goback link"
+}
+
+func (ft FakeTask) GetDescription() string {
+	return "description"
+}
+
+func (ft FakeTask) GetHistory() []*xhelpers.TaskEvent {
+	return []*xhelpers.TaskEvent{}
+}
+
+// Executor
+
+type fakeExecutor struct {
+}
+
+func (fe fakeExecutor) Run(args ...string) (bytes.Buffer, error) {
+	cmdString := strings.Join(args, " ")
+	// fmt.Printf("running: '%s'\n", cmdString)
+
+	outb := bytes.Buffer{}
+
+	if strings.HasPrefix(cmdString, "./bcadmin darc add") {
+		outb.WriteString("darc:0000000000000000000000000000000000000000000000000000000000000000\n[]")
+		return outb, nil
+	}
+
+	if strings.HasPrefix(cmdString, "./bcadmin -c  contract write spawn ") {
+		outb.WriteString("blabla\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+	}
+
+	return outb, nil
+}
+
+// Cloud Client
+
+type fakeCloudClient struct {
+	called bool
+}
+
+func (fcc *fakeCloudClient) PutObject(bucketName, objectName string, reader io.Reader, objectSize int64,
+	opts interface{}) (n int64, err error) {
+	fcc.called = true
+
+	return 0, nil
 }

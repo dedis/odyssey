@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -11,6 +12,40 @@ import (
 
 // minioClient is the client that can talk to our cloud endpoint
 var minioClient *minio.Client
+
+// CloudClient defines the primitives needed to use a cloud client, This
+// abstraction allows us to mock the traditional minio client.
+type CloudClient interface {
+	PutObject(bucketName, objectName string, reader io.Reader, objectSize int64,
+		opts interface{}) (n int64, err error)
+}
+
+// MinioCloudClient is the default implementation for a CloudClient
+type MinioCloudClient struct {
+	client *minio.Client
+}
+
+// NewMinioCloudClient return a new minio cloud client
+func NewMinioCloudClient() (CloudClient, error) {
+	client, err := GetMinioClient()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to get minio client: %v", err)
+	}
+
+	return MinioCloudClient{client: client}, nil
+}
+
+// PutObject puts an object on the cloud
+func (mcc MinioCloudClient) PutObject(bucketName, objectName string, reader io.Reader, objectSize int64,
+	opts interface{}) (n int64, err error) {
+
+	minioOpts, ok := opts.(minio.PutObjectOptions)
+	if !ok {
+		return 0, xerrors.Errorf("unkown opts: ", opts)
+	}
+
+	return mcc.client.PutObject(bucketName, objectName, reader, objectSize, minioOpts)
+}
 
 // GetMinioClient return a static minio client
 func GetMinioClient() (*minio.Client, error) {

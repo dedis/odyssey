@@ -99,7 +99,7 @@ type Project struct {
 type Request struct {
 	Description    string
 	Status         RequestStatus
-	Tasks          []*helpers.Task
+	Tasks          []helpers.TaskI
 	StatusNotifier *helpers.StatusNotifier
 	Index          int
 }
@@ -178,7 +178,7 @@ func (p *Project) PrepareBeforeMarshal() {
 	for _, request := range p.Requests {
 		request.StatusNotifier = nil
 		for _, task := range request.Tasks {
-			task.Subscribers = nil
+			task.SetSubscribers(nil)
 		}
 	}
 }
@@ -192,7 +192,7 @@ func (p *Project) PrepareAfterUnmarshal() {
 		request.StatusNotifier = helpers.NewStatusNotifier()
 		request.StatusNotifier.Terminated = true
 		for _, task := range request.Tasks {
-			task.Subscribers = make([]*helpers.Subscriber, 0)
+			task.SetSubscribers(make([]*helpers.Subscriber, 0))
 		}
 	}
 }
@@ -210,31 +210,30 @@ func (p *Project) GetLastestTaskMsg() (string, string) {
 		return "", ""
 	}
 	t := r.Tasks[len(r.Tasks)-1]
-	if len(t.History) == 0 {
+	if len(t.GetHistory()) == 0 {
 		return "", ""
 	}
-	return t.History[0].Message, t.History[0].Details
+	return t.GetHistory()[0].Message, t.GetHistory()[0].Details
 }
 
 // RequestCreateProjectInstance creates and runs a request that creates a new
 // instance of a project contract.
-func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config) (*Request, *helpers.Task) {
+func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config) (*Request, helpers.TaskI) {
 	p.Status = ProjectStatusPreparingEnclave
 	p.StatusNotifier.UpdateStatus(ProjectStatusPreparingEnclave)
 
-	task := helpers.NewTask("New project creation")
+	task := conf.TaskManager.NewTask("New project creation")
 	tef := helpers.NewTaskEventFactory("ds manager")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
 	client := task.Subscribe()
 
-	task.AddTaskEvent(tef.NewTaskEventInfo("task created",
-		"from the RequestCreateProjectInstance function"))
+	task.AddInfo(tef.Source, "task created", "from the RequestCreateProjectInstance function")
 
 	request := &Request{
 		Description:    "Prepare the enclave",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}
@@ -334,7 +333,7 @@ func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config
 
 // RequestBootEnclave talks to the enclave manager and asks it to boot an
 // enclave.
-func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf *Config) {
+func (p *Project) RequestBootEnclave(request *Request, task helpers.TaskI, conf *Config) {
 	tef := helpers.NewTaskEventFactory("ds manager")
 
 	// This is the case where RequestCreateProjectInstance has not been called
@@ -344,7 +343,7 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 		p.Status = ProjectStatusPreparingEnclave
 		p.StatusNotifier.UpdateStatus(ProjectStatusPreparingEnclave)
 
-		task = helpers.NewTask("New project creation")
+		task = conf.TaskManager.NewTask("New project creation")
 
 		// We use this client to listen to the events and update the project
 		// status based on what we receive.
@@ -354,7 +353,7 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 
 		request = &Request{
 			Description:    "Prepare the enclave",
-			Tasks:          []*helpers.Task{task},
+			Tasks:          []helpers.TaskI{task},
 			StatusNotifier: helpers.NewStatusNotifier(),
 			Status:         RequestStatusRunning,
 		}
@@ -500,7 +499,7 @@ func (p *Project) RequestUpdateAttributes(values url.Values, conf *Config) {
 	p.StatusNotifier.Terminated = false
 	p.StatusNotifier.UpdateStatus(ProjectStatusUpdatingAttributes)
 
-	task := helpers.NewTask("Update the attributes")
+	task := conf.TaskManager.NewTask("Update the attributes")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -510,7 +509,7 @@ func (p *Project) RequestUpdateAttributes(values url.Values, conf *Config) {
 
 	request := &Request{
 		Description:    "Update the enclave's attributes",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}
@@ -657,7 +656,7 @@ func (p *Project) RequestUnlockEnclave(conf *Config) {
 	p.StatusNotifier.Terminated = false
 	p.StatusNotifier.UpdateStatus(ProjectStatusUnlockingEnclave)
 
-	task := helpers.NewTask("Request to unlock the enclave")
+	task := conf.TaskManager.NewTask("Request to unlock the enclave")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -667,7 +666,7 @@ func (p *Project) RequestUnlockEnclave(conf *Config) {
 
 	request := &Request{
 		Description:    "Ask to unlock the enclave",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}
@@ -895,7 +894,7 @@ func (p *Project) RequestDeleteEnclave(conf *Config) {
 	p.StatusNotifier.Terminated = false
 	p.StatusNotifier.UpdateStatus(ProjectStatusDeletingEnclave)
 
-	task := helpers.NewTask("Request to delete the enclave")
+	task := conf.TaskManager.NewTask("Request to delete the enclave")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -905,7 +904,7 @@ func (p *Project) RequestDeleteEnclave(conf *Config) {
 
 	request := &Request{
 		Description:    "Ask to destroy the enclave",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}

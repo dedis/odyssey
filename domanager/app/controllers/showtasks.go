@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"sort"
 	"strconv"
 	"text/template"
 
@@ -58,7 +57,7 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 
 	type viewData struct {
 		Title    string
-		Requests []*xhelpers.Task
+		Requests []xhelpers.TaskI
 		Flash    []xhelpers.Flash
 		Session  *models.Session
 	}
@@ -68,11 +67,11 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 		fmt.Printf("Failed to get flash: %s\n", err.Error())
 	}
 
-	xhelpers.TaskListLock.Lock()
-	taskSlice := make([]*xhelpers.Task, len(xhelpers.TaskList))
-	copy(taskSlice, xhelpers.TaskList)
-	xhelpers.TaskListLock.Unlock()
-	sort.Sort(sort.Reverse(xhelpers.TaskSorter(taskSlice)))
+	// xhelpers.TaskListLock.Lock()
+	taskSlice := conf.TaskManager.GetSortedTasks()
+	// copy(taskSlice, xhelpers.TaskList)
+	// xhelpers.TaskListLock.Unlock()
+	// sort.Sort(sort.Reverse(xhelpers.TaskSorter(taskSlice)))
 
 	session, err := models.GetSession(store, r)
 	if err != nil {
@@ -97,7 +96,7 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 
 func showtasksIndexDelete(w http.ResponseWriter, r *http.Request, store sessions.Store, conf *models.Config) {
 
-	xhelpers.TaskList = make([]*xhelpers.Task, 0)
+	conf.TaskManager.DeleteAllTasks()
 
 	xhelpers.RedirectWithInfoFlash("/showtasks", "tasks deleted", w, r, store)
 }
@@ -120,7 +119,7 @@ func showtaskShowGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 
 	type viewData struct {
 		Title     string
-		Request   *xhelpers.Task
+		Task      xhelpers.TaskI
 		StatusImg string
 		Flash     []xhelpers.Flash
 		Session   *models.Session
@@ -133,13 +132,13 @@ func showtaskShowGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 		return
 	}
 
-	if index >= len(xhelpers.TaskList) || index < 0 {
+	if index >= conf.TaskManager.NumTasks() || index < 0 {
 		xhelpers.RedirectWithErrorFlash("/", fmt.Sprintf("Index out of bound: "+
-			"0 > (index) %d >= len(TaskList) %d", index, len(xhelpers.TaskList)),
+			"0 > (index) %d >= len(TaskList) %d", index, conf.TaskManager.NumTasks()),
 			w, r, store)
 		return
 	}
-	task := xhelpers.TaskList[index]
+	task := conf.TaskManager.GetTask(index)
 
 	session, err := models.GetSession(store, r)
 	if err != nil {
@@ -149,10 +148,10 @@ func showtaskShowGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 	}
 
 	p := &viewData{
-		Title:     "Request " + task.ID + " with index " + string(task.Index),
+		Title:     "Request " + task.GetID() + " with index " + string(task.GetIndex()),
 		Flash:     flashes,
-		StatusImg: xhelpers.StatusImage(task.Status),
-		Request:   task,
+		StatusImg: xhelpers.StatusImage(task.GetStatus()),
+		Task:      task,
 		Session:   session,
 	}
 

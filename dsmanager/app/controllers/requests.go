@@ -43,7 +43,7 @@ func requestsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, c
 
 	type viewData struct {
 		Title    string
-		Requests []*helpers.Task
+		Requests []helpers.TaskI
 		Flash    []helpers.Flash
 	}
 
@@ -52,14 +52,14 @@ func requestsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, c
 		fmt.Printf("Failed to get flash: %s\n", err.Error())
 	}
 
-	taskSlice := []*helpers.Task{}
-	for _, value := range helpers.TaskList {
-		taskSlice = append(taskSlice, value)
-	}
+	// taskSlice := []*helpers.Task{}
+	// for _, value := range helpers.TaskList {
+	// 	taskSlice = append(taskSlice, value)
+	// }
 	p := &viewData{
 		Title:    "List of datasets",
 		Flash:    flashes,
-		Requests: taskSlice,
+		Requests: conf.TaskManager.GetSortedTasks(),
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
@@ -87,7 +87,7 @@ func requestsSwhoGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 
 	type viewData struct {
 		Title     string
-		Request   *helpers.Task
+		Request   helpers.TaskI
 		StatusImg string
 		Flash     []helpers.Flash
 	}
@@ -99,18 +99,18 @@ func requestsSwhoGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 		return
 	}
 
-	if index >= len(helpers.TaskList) || index < 0 {
+	if index >= conf.TaskManager.NumTasks() || index < 0 {
 		helpers.RedirectWithErrorFlash("/", fmt.Sprintf("Index out of bound: "+
-			"0 > (index) %d >= len(TaskList) %d", index, len(helpers.TaskList)),
+			"0 > (index) %d >= len(TaskList) %d", index, conf.TaskManager.NumTasks()),
 			w, r, store)
 		return
 	}
-	task := helpers.TaskList[index]
+	task := conf.TaskManager.GetTask(index)
 
 	p := &viewData{
-		Title:     "Request " + task.ID + " with index " + string(task.Index),
+		Title:     "Request " + task.GetID() + " with index " + string(task.GetIndex()),
 		Flash:     flashes,
-		StatusImg: helpers.StatusImage(task.Status),
+		StatusImg: helpers.StatusImage(task.GetStatus()),
 		Request:   task,
 	}
 

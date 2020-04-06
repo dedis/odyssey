@@ -13,12 +13,10 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"sort"
 	"strings"
 	"sync/atomic"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/dedis/odyssey/domanager/app/controllers"
 	"github.com/dedis/odyssey/domanager/app/models"
 	dsmanagercontrollers "github.com/dedis/odyssey/dsmanager/app/controllers"
@@ -27,6 +25,7 @@ import (
 	"github.com/gorilla/sessions"
 	xlog "go.dedis.ch/onet/v3/log"
 	bolt "go.etcd.io/bbolt"
+	"golang.org/x/xerrors"
 )
 
 type key int
@@ -43,14 +42,6 @@ var (
 	db         *bolt.DB
 )
 
-func init() {
-	var err error
-	conf, err = parseConfig()
-	if err != nil {
-		log.Fatal("failed to load config: ", err)
-	}
-}
-
 // @title Data Scientist Manager REST API
 // @version 1.0
 // @description REST functionalities provided by the Data Scientist Manager
@@ -62,10 +53,16 @@ func main() {
 	gob.Register(xhelpers.Flash{})
 	gob.Register(models.Session{})
 
+	var err error
+	conf, err = models.NewConfig()
+	if err != nil {
+		log.Fatal("failed to load config: ", err)
+	}
+
 	xlog.LLvl1("here is the catalog id:", conf.CatalogID)
 
 	xlog.Info("loading db into memory")
-	err := loadDb()
+	err = loadDb()
 	if err != nil {
 		log.Fatal("failed to import DB: " + err.Error())
 	}
@@ -96,7 +93,7 @@ func main() {
 	router.Handle("/healthz", healthz())
 	router.Handle("/showtasks", http.HandlerFunc(controllers.ShowtasksIndexHandler(store, conf)))
 	router.Handle("/showtasks/{id}", http.HandlerFunc(controllers.ShowtasksShowHandler(store, conf)))
-	router.Handle("/tasks/{id}", http.HandlerFunc(dsmanagercontrollers.TasksShowHandler(store)))
+	router.Handle("/tasks/{id}", http.HandlerFunc(dsmanagercontrollers.TasksShowHandler(store, conf.TaskManager)))
 	router.Handle("/lifecycle", http.HandlerFunc(controllers.ShowLifecycle(store, conf)))
 
 	nextRequestID := func() string {
@@ -153,17 +150,6 @@ func main() {
 
 	<-done
 	logger.Println("Server stopped")
-}
-
-// parseConfig parses the config file and return a config struct
-func parseConfig() (*models.Config, error) {
-	tomlConf := &models.TOMLConfig{}
-	_, err := toml.DecodeFile("config.toml", tomlConf)
-	if err != nil {
-		return nil, errors.New("failed to read config: " + err.Error())
-	}
-	conf := &models.Config{tomlConf, xhelpers.DefaultTaskFactory{}}
-	return conf, nil
 }
 
 func healthz() http.Handler {
@@ -272,7 +258,7 @@ func loadDb() error {
 
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("Tasks"))
-		tempTaskList := make([]*xhelpers.Task, 0)
+		tempTaskList := make([]xhelpers.TaskI, 0)
 		b.ForEach(func(k, v []byte) error {
 			task := &xhelpers.Task{}
 			err := json.Unmarshal(v, task)
@@ -285,8 +271,8 @@ func loadDb() error {
 			tempTaskList = append(tempTaskList, task)
 			return nil
 		})
-		sort.Sort(xhelpers.TaskSorter(tempTaskList))
-		xhelpers.TaskList = tempTaskList
+		tempTaskList = conf.TaskManager.GetSortedTasks()
+		conf.TaskManager.RestoreTasks(tempTaskList)
 		return nil
 	})
 
@@ -336,13 +322,14 @@ func saveDb() error {
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-		for _, task := range xhelpers.TaskList {
-			task.PrepareBeforeMarshal()
-			taskBuf, err := json.Marshal(task)
+
+		for _, task := range conf.TaskManager.GetSortedTasks() {
+			taskBuf, err := task.Marshall()
 			if err != nil {
-				return errors.New("failed to marshal task: " + err.Error())
+				return xerrors.Errorf("failed to marshall task: %v", err)
 			}
-			err = b.Put([]byte(task.ID), taskBuf)
+
+			err = b.Put([]byte(task.GetID()), taskBuf)
 			if err != nil {
 				return errors.New("failed to save task buf: " + err.Error())
 			}
