@@ -299,7 +299,7 @@ func datasetsPost(w http.ResponseWriter, r *http.Request,
 	// creating the task
 	tef := xhelpers.NewTaskEventFactory("DO Manager")
 	task := conf.TaskManager.NewTask(fmt.Sprintf("Upload of the dataset '%s'", title))
-	task.SetGobackLink(`<p><a class="pure-button" href="/datasets/new">🔙 Back to the upload of a dataset</a></p>`)
+	task.GetData().GoBackLink = `<p><a class="pure-button" href="/datasets/new">🔙 Back to the upload of a dataset</a></p>`
 	task.AddInfof(tef.Source, "starting the upload process", "got this POST form: %v", r.PostForm)
 
 	go func() {
@@ -540,8 +540,8 @@ func datasetsPost(w http.ResponseWriter, r *http.Request,
 		task.CloseOK(tef.Source, "dataset created", outb.String())
 	}()
 
-	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetIndex()),
-		fmt.Sprintf("Task to create dataset with index %d created", task.GetIndex()), w, r, store)
+	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetData().Index),
+		fmt.Sprintf("Task to create dataset with index %d created", task.GetData().Index), w, r, store)
 }
 
 func datasetsNew(w http.ResponseWriter, r *http.Request,
@@ -856,7 +856,7 @@ func datasetsShowPut(w http.ResponseWriter, r *http.Request,
 	// creating the task
 	tef := xhelpers.NewTaskEventFactory("DO Manager")
 	task := conf.TaskManager.NewTask(fmt.Sprintf("Update infos for dataset '%s'", title))
-	task.SetGobackLink(`<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`)
+	task.GetData().GoBackLink = `<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`
 	task.AddInfof(tef.Source, "starting the update process", "got this POST form: %v", r.PostForm)
 
 	go func() {
@@ -885,8 +885,8 @@ func datasetsShowPut(w http.ResponseWriter, r *http.Request,
 
 	}()
 
-	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetIndex()),
-		fmt.Sprintf("Task to update dataset's info with index %d created", task.GetIndex()), w, r, store)
+	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetData().Index),
+		fmt.Sprintf("Task to update dataset's info with index %d created", task.GetData().Index), w, r, store)
 }
 
 // This function should not be called be the dataset owner, it is here for debug
@@ -922,7 +922,7 @@ func datasetsShowDelete(w http.ResponseWriter, r *http.Request,
 	// creating the task
 	tef := xhelpers.NewTaskEventFactory("DO Manager")
 	task := conf.TaskManager.NewTask(fmt.Sprintf("Deletion of the dataset '%s'", datasetTitle))
-	task.SetGobackLink(`<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`)
+	task.GetData().GoBackLink = `<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`
 	task.AddInfof(tef.Source, "starting the deletion process", "got this POST form: %v", r.PostForm)
 
 	go func() {
@@ -1015,8 +1015,8 @@ func datasetsShowDelete(w http.ResponseWriter, r *http.Request,
 		task.CloseOK(tef.Source, "dataset deleted", output)
 	}()
 
-	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetIndex()),
-		fmt.Sprintf("Task to delete dataset with index %d created", task.GetIndex()),
+	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetData().Index),
+		fmt.Sprintf("Task to delete dataset with index %d created", task.GetData().Index),
 		w, r, store)
 }
 
@@ -1054,7 +1054,7 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 	// creating the task
 	tef := xhelpers.NewTaskEventFactory("DO Manager")
 	task := conf.TaskManager.NewTask(fmt.Sprintf("Update attributes on dataset '%s'", datasetTitle))
-	task.SetGobackLink(`<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`)
+	task.GetData().GoBackLink = `<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`
 	task.AddInfof(tef.Source, "starting the update process", "got this POST form: %v", r.PostForm)
 
 	go func() {
@@ -1272,8 +1272,8 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 		task.CloseOK(tef.Source, "dataset's attributes updated", "the last command ran successfully")
 	}()
 
-	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetIndex()),
-		fmt.Sprintf("Task to update dataset's attributes with index %d created", task.GetIndex()), w, r, store)
+	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetData().Index),
+		fmt.Sprintf("Task to update dataset's attributes with index %d created", task.GetData().Index), w, r, store)
 }
 
 func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
@@ -1310,7 +1310,7 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 	// creating the task
 	tef := xhelpers.NewTaskEventFactory("DO Manager")
 	task := conf.TaskManager.NewTask(fmt.Sprintf("Remove access from the dataset '%s'", datasetTitle))
-	task.SetGobackLink(`<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`)
+	task.GetData().GoBackLink = `<p><a class="pure-button" href="/datasets">🔙 Back to the list of datasets</a></p>`
 	task.AddInfof(tef.Source, "starting the upload process", "got this POST form: %v", r.PostForm)
 
 	go func() {
@@ -1515,8 +1515,8 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 
 	}()
 
-	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetIndex()),
-		fmt.Sprintf("Task to set dataset in archived mode with index %d created", task.GetIndex()), w, r, store)
+	xhelpers.RedirectWithInfoFlash(fmt.Sprintf("/showtasks/%d", task.GetData().Index),
+		fmt.Sprintf("Task to set dataset in archived mode with index %d created", task.GetData().Index), w, r, store)
 }
 
 func datasetsShowAuditGet(w http.ResponseWriter, r *http.Request,

@@ -56,10 +56,10 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 	}
 
 	type viewData struct {
-		Title    string
-		Requests []xhelpers.TaskI
-		Flash    []xhelpers.Flash
-		Session  *models.Session
+		Title   string
+		Tasks   []xhelpers.TaskI
+		Flash   []xhelpers.Flash
+		Session *models.Session
 	}
 
 	flashes, err := xhelpers.ExtractFlash(w, r, store)
@@ -81,10 +81,10 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 	}
 
 	p := &viewData{
-		Title:    "List of datasets",
-		Flash:    flashes,
-		Requests: taskSlice,
-		Session:  session,
+		Title:   "List of datasets",
+		Flash:   flashes,
+		Tasks:   taskSlice,
+		Session: session,
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
@@ -118,11 +118,10 @@ func showtaskShowGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 	}
 
 	type viewData struct {
-		Title     string
-		Task      xhelpers.TaskI
-		StatusImg string
-		Flash     []xhelpers.Flash
-		Session   *models.Session
+		Title   string
+		Task    xhelpers.TaskI
+		Flash   []xhelpers.Flash
+		Session *models.Session
 	}
 
 	flashes, err := xhelpers.ExtractFlash(w, r, store)
@@ -148,11 +147,10 @@ func showtaskShowGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 	}
 
 	p := &viewData{
-		Title:     "Request " + task.GetID() + " with index " + string(task.GetIndex()),
-		Flash:     flashes,
-		StatusImg: xhelpers.StatusImage(task.GetStatus()),
-		Task:      task,
-		Session:   session,
+		Title:   "Request " + task.GetData().ID + " with index " + string(task.GetData().Index),
+		Flash:   flashes,
+		Task:    task,
+		Session: session,
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)

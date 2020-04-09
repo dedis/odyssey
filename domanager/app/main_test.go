@@ -18,6 +18,7 @@ import (
 
 	"github.com/dedis/odyssey/domanager/app/controllers"
 	"github.com/dedis/odyssey/domanager/app/models"
+	"github.com/dedis/odyssey/dsmanager/app/helpers"
 	xhelpers "github.com/dedis/odyssey/dsmanager/app/helpers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -375,7 +376,7 @@ func Test_Dataset_POST(t *testing.T) {
 	}
 	require.Equal(t, "DO Manager", event.Source)
 	require.Equal(t, "updating the catalog", event.Message)
-	require.True(t, strings.HasPrefix(event.Details, "using the following command: ./catadmin"))
+	require.True(t, strings.HasPrefix(event.Details, "using the following command: [./catadmin"), "got this instead: %s", event.Details)
 
 	select {
 	case event = <-task.eventChan:
@@ -437,6 +438,7 @@ func (ftm *fakeTaskManager) NewTask(title string) xhelpers.TaskI {
 	task := &FakeTask{
 		eventChan: make(chan xhelpers.TaskEvent, 10),
 		doneChan:  make(chan interface{}),
+		data:      &helpers.TaskData{},
 	}
 	ftm.taskList = append(ftm.taskList, task)
 	// So we can block in the test until at least one task is created
@@ -452,9 +454,20 @@ func (ftm *fakeTaskManager) GetTask(index int) xhelpers.TaskI {
 	return ftm.taskList[index]
 }
 
+func (ftm *fakeTaskManager) GetSortedTasks() []helpers.TaskI {
+	return nil
+}
+func (ftm *fakeTaskManager) DeleteAllTasks() {
+
+}
+func (ftm *fakeTaskManager) RestoreTasks(tasks []helpers.TaskI) error {
+	return nil
+}
+
 type FakeTask struct {
 	eventChan chan xhelpers.TaskEvent
 	doneChan  chan interface{}
+	data      *helpers.TaskData
 }
 
 func (ft FakeTask) CloseError(source, msg, details string) {
@@ -475,30 +488,28 @@ func (ft FakeTask) CloseOK(source, msg, details string) {
 	close(ft.doneChan)
 }
 
-func (ft FakeTask) SetGobackLink(link string) {}
+func (ft *FakeTask) AddTaskEvent(event helpers.TaskEvent) {
 
-func (ft FakeTask) GetIndex() int {
-	return 0
 }
 
-func (ft FakeTask) GetID() string {
-	return "Fake ID"
+func (ft *FakeTask) Subscribe() *helpers.Subscriber {
+	return nil
 }
 
-func (ft FakeTask) GetStatus() xhelpers.StatusTask {
-	return "status"
+func (ft *FakeTask) GetData() *helpers.TaskData {
+	return ft.data
 }
 
-func (ft FakeTask) GetGobackLink() string {
-	return "goback link"
+func (ft *FakeTask) StatusImg() string {
+	return ""
 }
 
-func (ft FakeTask) GetDescription() string {
-	return "description"
+func (ft *FakeTask) MarshalBinary() ([]byte, error) {
+	return nil, nil
 }
 
-func (ft FakeTask) GetHistory() []*xhelpers.TaskEvent {
-	return []*xhelpers.TaskEvent{}
+func (ft *FakeTask) UnmarshalBinary(data []byte) error {
+	return nil
 }
 
 // Executor
@@ -517,7 +528,7 @@ func (fe fakeExecutor) Run(args ...string) (bytes.Buffer, error) {
 		return outb, nil
 	}
 
-	if strings.HasPrefix(cmdString, "./bcadmin -c  contract write spawn ") {
+	if strings.HasPrefix(cmdString, "./csadmin -c  contract write spawn ") {
 		outb.WriteString("blabla\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 	}
 

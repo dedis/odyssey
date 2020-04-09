@@ -64,7 +64,7 @@ func tasksShowGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 	// If the task is not in a working state then there is nothing to return
 	// here.
 	var client *helpers.Subscriber
-	if task.GetStatus() == helpers.StatusWorking {
+	if task.GetData().Status == helpers.StatusWorking {
 		client = task.Subscribe()
 	} else {
 		log.LLvl1("task not in the working status, nothing to send")

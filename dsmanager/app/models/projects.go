@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/rand"
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -95,6 +96,18 @@ type Project struct {
 	PubKey         string
 }
 
+// Used for marshal/unmarshal
+type projectWrap struct {
+	Status      ProjectStatus
+	UID         string
+	Title       string
+	Description string
+	InstanceID  string
+	Requests    [][]byte
+	CreatedAt   time.Time
+	PubKey      string
+}
+
 // Request holds a request for a project
 type Request struct {
 	Description    string
@@ -102,6 +115,14 @@ type Request struct {
 	Tasks          []helpers.TaskI
 	StatusNotifier *helpers.StatusNotifier
 	Index          int
+}
+
+// Used for marshal/unmarshal
+type requestWrap struct {
+	Description string
+	Status      RequestStatus
+	Tasks       [][]byte
+	Index       int
 }
 
 // RequestSorter is used to define a sorter that sorts requests by the Index
@@ -122,6 +143,61 @@ func (p RequestSorter) Less(i, j int) bool {
 // GetCloudAttributes return the alias, bucket name and prefix
 func (r *Request) GetCloudAttributes(projectUID string) (string, string, string) {
 	return "dedis", projectUID, fmt.Sprintf("logs/%d", r.Index)
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler
+func (r *Request) MarshalBinary() ([]byte, error) {
+
+	wrap := &requestWrap{}
+	wrap.Description = r.Description
+	wrap.Status = r.Status
+	wrap.Tasks = make([][]byte, len(r.Tasks))
+	for i, task := range r.Tasks {
+		taskBuf, err := task.MarshalBinary()
+		if err != nil {
+			return nil, xerrors.Errorf("failed to marshal task: %v", err)
+		}
+		wrap.Tasks[i] = taskBuf
+	}
+	wrap.Index = r.Index
+
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(wrap)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to encode request wrap: %v", err)
+	}
+
+	return buf.Bytes(), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler
+func (r *Request) UnmarshalBinary(data []byte) error {
+
+	wrap := &requestWrap{}
+	dataReader := bytes.NewReader(data)
+	dec := gob.NewDecoder(dataReader)
+	err := dec.Decode(wrap)
+	if err != nil {
+		return xerrors.Errorf("failed to unmarshal request wrap: %v", err)
+	}
+
+	r.Description = wrap.Description
+	r.Status = wrap.Status
+	r.Tasks = make([]helpers.TaskI, len(wrap.Tasks))
+	for i, taskBuf := range wrap.Tasks {
+		task := &helpers.Task{}
+		err := task.UnmarshalBinary(taskBuf)
+		if err != nil {
+			return xerrors.Errorf("failed to unmarshal task: %v", err)
+		}
+		r.Tasks[i] = task
+	}
+	r.Index = wrap.Index
+	r.StatusNotifier = helpers.NewStatusNotifier()
+	r.StatusNotifier.Terminated = true
+
+	return nil
 }
 
 // ProjectSorter is used to define a sorter that sorts projects by the CreatedAt
@@ -171,30 +247,69 @@ func (p *Project) AddRequest(request *Request) {
 	p.Requests = append(p.Requests, request)
 }
 
-// PrepareBeforeMarshal updates the elements of the project that can not be
-// marshalled.
-func (p *Project) PrepareBeforeMarshal() {
-	p.StatusNotifier = nil
-	for _, request := range p.Requests {
-		request.StatusNotifier = nil
-		for _, task := range request.Tasks {
-			task.SetSubscribers(nil)
+// MarshalBinary implements encoding.BinaryMarshaler
+func (p *Project) MarshalBinary() ([]byte, error) {
+
+	wrap := &projectWrap{}
+
+	wrap.Status = p.Status
+	wrap.UID = p.UID
+	wrap.Title = p.Title
+	wrap.Description = p.Description
+	wrap.InstanceID = p.InstanceID
+	wrap.Requests = make([][]byte, len(p.Requests))
+	for i, request := range p.Requests {
+		requestBuf, err := request.MarshalBinary()
+		if err != nil {
+			return nil, xerrors.Errorf("failed to marshal request: %v", err)
 		}
+		wrap.Requests[i] = requestBuf
 	}
+	wrap.CreatedAt = p.CreatedAt
+	wrap.PubKey = p.PubKey
+
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(wrap)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to encode project wrap: %v", err)
+	}
+
+	return buf.Bytes(), nil
 }
 
-// PrepareAfterUnmarshal updates the elements of the project that were changed
-// before marshalling.
-func (p *Project) PrepareAfterUnmarshal() {
+// UnmarshalBinary implements encoding.BinaryUnmarshaler
+func (p *Project) UnmarshalBinary(data []byte) error {
+
+	wrap := &projectWrap{}
+	dataReader := bytes.NewReader(data)
+	dec := gob.NewDecoder(dataReader)
+	err := dec.Decode(wrap)
+	if err != nil {
+		return xerrors.Errorf("failed to unmarshal project wrap: %v", err)
+	}
+
+	p.Status = wrap.Status
+	p.UID = wrap.UID
+	p.Title = wrap.Title
+	p.Description = wrap.Description
+	p.InstanceID = wrap.InstanceID
+	p.Requests = make([]*Request, len(wrap.Requests))
+	for i, requestBuf := range wrap.Requests {
+		request := &Request{}
+		err = request.UnmarshalBinary(requestBuf)
+		if err != nil {
+			return xerrors.Errorf("failed to unmarshal request: %v", err)
+		}
+		p.Requests[i] = request
+	}
+	p.CreatedAt = wrap.CreatedAt
+	p.PubKey = wrap.PubKey
+
 	p.StatusNotifier = helpers.NewStatusNotifier()
 	p.StatusNotifier.Terminated = true
-	for _, request := range p.Requests {
-		request.StatusNotifier = helpers.NewStatusNotifier()
-		request.StatusNotifier.Terminated = true
-		for _, task := range request.Tasks {
-			task.SetSubscribers(make([]*helpers.Subscriber, 0))
-		}
-	}
+
+	return nil
 }
 
 // GetLastestTaskMsg return the latest task message, or an empty one if there
@@ -210,10 +325,10 @@ func (p *Project) GetLastestTaskMsg() (string, string) {
 		return "", ""
 	}
 	t := r.Tasks[len(r.Tasks)-1]
-	if len(t.GetHistory()) == 0 {
+	if len(t.GetData().History) == 0 {
 		return "", ""
 	}
-	return t.GetHistory()[0].Message, t.GetHistory()[0].Details
+	return t.GetData().History[0].Message, t.GetData().History[0].Details
 }
 
 // RequestCreateProjectInstance creates and runs a request that creates a new

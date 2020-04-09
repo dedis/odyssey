@@ -93,6 +93,7 @@ func main() {
 	router.Handle("/healthz", healthz())
 	router.Handle("/showtasks", http.HandlerFunc(controllers.ShowtasksIndexHandler(store, conf)))
 	router.Handle("/showtasks/{id}", http.HandlerFunc(controllers.ShowtasksShowHandler(store, conf)))
+	// This endpoint is used by the API to get the task updates with http flush.
 	router.Handle("/tasks/{id}", http.HandlerFunc(dsmanagercontrollers.TasksShowHandler(store, conf.TaskManager)))
 	router.Handle("/lifecycle", http.HandlerFunc(controllers.ShowLifecycle(store, conf)))
 
@@ -261,18 +262,21 @@ func loadDb() error {
 		tempTaskList := make([]xhelpers.TaskI, 0)
 		b.ForEach(func(k, v []byte) error {
 			task := &xhelpers.Task{}
-			err := json.Unmarshal(v, task)
+			err := task.UnmarshalBinary(v)
 			if err != nil {
-				xlog.Error("failed to unmarshal session: " + err.Error())
-				return errors.New("failed to unmarshal session: " + err.Error())
+				xlog.Error("failed to unmarshal task: " + err.Error())
+				return errors.New("failed to unmarshal task: " + err.Error())
 			}
-			task.PrepareAfterUnmarshal()
 
 			tempTaskList = append(tempTaskList, task)
 			return nil
 		})
-		tempTaskList = conf.TaskManager.GetSortedTasks()
-		conf.TaskManager.RestoreTasks(tempTaskList)
+		err = conf.TaskManager.RestoreTasks(tempTaskList)
+		if err != nil {
+			xlog.Errorf("failed to restore task: %v", err)
+			return xerrors.Errorf("failed to restore task: %v", err)
+		}
+
 		return nil
 	})
 
@@ -324,12 +328,12 @@ func saveDb() error {
 		}
 
 		for _, task := range conf.TaskManager.GetSortedTasks() {
-			taskBuf, err := task.Marshall()
+			taskBuf, err := task.MarshalBinary()
 			if err != nil {
 				return xerrors.Errorf("failed to marshall task: %v", err)
 			}
 
-			err = b.Put([]byte(task.GetID()), taskBuf)
+			err = b.Put([]byte(task.GetData().ID), taskBuf)
 			if err != nil {
 				return errors.New("failed to save task buf: " + err.Error())
 			}

@@ -42,9 +42,9 @@ func requestsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, c
 	}
 
 	type viewData struct {
-		Title    string
-		Requests []helpers.TaskI
-		Flash    []helpers.Flash
+		Title string
+		Tasks []helpers.TaskI
+		Flash []helpers.Flash
 	}
 
 	flashes, err := helpers.ExtractFlash(w, r, store)
@@ -52,14 +52,10 @@ func requestsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, c
 		fmt.Printf("Failed to get flash: %s\n", err.Error())
 	}
 
-	// taskSlice := []*helpers.Task{}
-	// for _, value := range helpers.TaskList {
-	// 	taskSlice = append(taskSlice, value)
-	// }
 	p := &viewData{
-		Title:    "List of datasets",
-		Flash:    flashes,
-		Requests: conf.TaskManager.GetSortedTasks(),
+		Title: "List of datasets",
+		Flash: flashes,
+		Tasks: conf.TaskManager.GetSortedTasks(),
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
@@ -86,10 +82,9 @@ func requestsSwhoGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 	}
 
 	type viewData struct {
-		Title     string
-		Request   helpers.TaskI
-		StatusImg string
-		Flash     []helpers.Flash
+		Title string
+		Task  helpers.TaskI
+		Flash []helpers.Flash
 	}
 
 	flashes, err := helpers.ExtractFlash(w, r, store)
@@ -108,10 +103,9 @@ func requestsSwhoGet(w http.ResponseWriter, r *http.Request, store sessions.Stor
 	task := conf.TaskManager.GetTask(index)
 
 	p := &viewData{
-		Title:     "Request " + task.GetID() + " with index " + string(task.GetIndex()),
-		Flash:     flashes,
-		StatusImg: helpers.StatusImage(task.GetStatus()),
-		Request:   task,
+		Title: "Request " + task.GetData().ID + " with index " + string(task.GetData().Index),
+		Flash: flashes,
+		Task:  task,
 	}
 
 	err = t.ExecuteTemplate(w, "layout", p)
