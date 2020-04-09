@@ -79,8 +79,9 @@ func Test_NotLogged(t *testing.T) {
 	// We should have been redirected to home (ie. "")
 	require.Equal(t, "", resp.Header.Get("Location"))
 	// We should have a message telling us to login
-	bodyBuf, err := ioutil.ReadAll(resp.Body)
 	loginMessage := regexp.MustCompile("you need to be logged in to access this page")
+	bodyBuf, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	require.True(t, loginMessage.MatchString(string(bodyBuf)))
 
 	// Checking /datasets/new
@@ -95,6 +96,7 @@ func Test_NotLogged(t *testing.T) {
 	require.Equal(t, "", resp.Header.Get("Location"))
 	// We should have a message telling us to login
 	bodyBuf, err = ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	require.True(t, loginMessage.MatchString(string(bodyBuf)))
 }
 
@@ -127,8 +129,9 @@ func Test_Login(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
 
-	bodyBuf, err := ioutil.ReadAll(resp.Body)
 	singinMessage := regexp.MustCompile("Please upload your credentials")
+	bodyBuf, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	require.True(t, singinMessage.MatchString(string(bodyBuf)))
 
 	// Creating the POST form to login
@@ -157,8 +160,9 @@ func Test_Login(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
 
-	bodyBuf, err = ioutil.ReadAll(resp.Body)
 	loggedMessage := regexp.MustCompile("Identity file uploaded and set!")
+	bodyBuf, err = ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	require.True(t, loggedMessage.MatchString(string(bodyBuf)))
 }
 
@@ -195,6 +199,7 @@ func Test_Dataset_new(t *testing.T) {
 
 	uploadMsg := regexp.MustCompile("<h1>Upload a new dataset</h1>")
 	bodyBuf, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	require.True(t, uploadMsg.MatchString(string(bodyBuf)))
 }
 
@@ -261,8 +266,10 @@ func Test_Dataset_POST(t *testing.T) {
 	resp, err := client.Do(req)
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
-	bodyBuf, err := ioutil.ReadAll(resp.Body)
+
 	taskCreadedMsg := regexp.MustCompile("Task to create dataset with index 0 created")
+	bodyBuf, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	require.True(t, taskCreadedMsg.MatchString(string(bodyBuf)))
 
 	select {

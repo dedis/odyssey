@@ -1,5 +1,3 @@
-// Performance issue: https://github.com/golang/go/issues/26019
-
 package main
 
 import (
@@ -79,7 +77,7 @@ func main() {
 		http.FileServer(http.Dir("."+"/assets/"))))
 	router.HandleFunc("/favicon.ico", faviconHandler)
 
-	router.Handle("/datasets", http.HandlerFunc(controllers.DatasetsIndexHandler(store, conf, db)))
+	router.Handle("/datasets", http.HandlerFunc(controllers.DatasetsIndexHandler(store, conf)))
 	router.Handle("/requests", http.HandlerFunc(controllers.RequestsIndexHandler(store, conf, db)))
 	router.Handle("/requests/{id}", http.HandlerFunc(controllers.RequestsShowHandler(store, conf, db)))
 

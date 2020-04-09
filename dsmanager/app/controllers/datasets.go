@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
-	"os/exec"
 	"text/template"
 
 	"github.com/dedis/odyssey/catalogc"
@@ -13,11 +11,11 @@ import (
 	"github.com/gorilla/sessions"
 	"go.dedis.ch/onet/v3/log"
 	"go.dedis.ch/protobuf"
-	bolt "go.etcd.io/bbolt"
+	"golang.org/x/xerrors"
 )
 
 // DatasetsIndexHandler ...
-func DatasetsIndexHandler(gs sessions.Store, conf *models.Config, db *bolt.DB) http.HandlerFunc {
+func DatasetsIndexHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -65,17 +63,12 @@ func datasetsGet(w http.ResponseWriter, r *http.Request, store sessions.Store, c
 }
 
 func getDatasets(conf *models.Config) ([]*catalogc.Dataset, error) {
-	cmd := exec.Command("./catadmin", "-c", conf.ConfigPath, "contract",
-		"catalog", "get", "-i", conf.CatalogID, "-bc", conf.BCPath,
+	outb, err := conf.Executor.Run("./catadmin", "-c", conf.ConfigPath,
+		"contract", "catalog", "get", "-i", conf.CatalogID, "-bc", conf.BCPath,
 		"--export")
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-	err := cmd.Run()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get the catalog with id '%s': %s - "+
-			"Output: %s - Err: %s", conf.CatalogID, err.Error(), outb.String(),
-			errb.String())
+		return nil, xerrors.Errorf("failed to get the catalog with id '%s': %v",
+			conf.CatalogID, err)
 	}
 
 	// cmdOut := outb.String()
