@@ -14,6 +14,7 @@ type Config struct {
 	TaskManager helpers.TaskManagerI
 	Executor    helpers.Executor
 	CloudClient helpers.CloudClient
+	RunHTTP     helpers.RunHTTP
 }
 
 // TOMLConfig is a struct matching the configuration parameters that are stored
@@ -44,6 +45,7 @@ func NewConfig() (*Config, error) {
 		TaskManager: helpers.NewDefaultTaskManager(),
 		Executor:    helpers.NewOSExecutor(),
 		CloudClient: cloudClient,
+		RunHTTP:     helpers.NewDefaultRunHTTP(),
 	}
 	return conf, nil
 }

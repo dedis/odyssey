@@ -338,7 +338,7 @@ func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config
 	p.StatusNotifier.UpdateStatus(ProjectStatusPreparingEnclave)
 
 	task := conf.TaskManager.NewTask("New project creation")
-	tef := helpers.NewTaskEventFactory("ds manager")
+	tef := helpers.NewTaskEventFactory("DS Manager")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -449,7 +449,7 @@ func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config
 // RequestBootEnclave talks to the enclave manager and asks it to boot an
 // enclave.
 func (p *Project) RequestBootEnclave(request *Request, task helpers.TaskI, conf *Config) {
-	tef := helpers.NewTaskEventFactory("ds manager")
+	tef := helpers.NewTaskEventFactory("DS Manager")
 
 	// This is the case where RequestCreateProjectInstance has not been called
 	// before because we are trying to re-request to boot the enclave, but the
@@ -518,7 +518,7 @@ func (p *Project) RequestBootEnclave(request *Request, task helpers.TaskI, conf 
 		"projectUID":    {p.UID},
 		"requestIndex":  {strconv.Itoa(request.Index)},
 	}
-	resp, err := http.PostForm("http://localhost:5000/vapps", formData)
+	resp, err := conf.RunHTTP.PostForm("http://localhost:5000/vapps", formData)
 	if err != nil {
 		log.Infof("Failed to send request: %s", err.Error())
 		task.CloseError(tef.Source, "Failed to send request", err.Error())
@@ -578,17 +578,11 @@ func (p *Project) RequestBootEnclave(request *Request, task helpers.TaskI, conf 
 }
 
 func createProjectInstace(idStr, pubKey string, conf *Config) (string, error) {
-
-	cmd := exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
+	outb, err := conf.Executor.Run("./pcadmin", "-c", conf.ConfigPath, "contract",
 		"project", "spawn", "-is", idStr, "-bc", conf.BCPath, "-sign",
 		conf.KeyID, "-darc", conf.DarcID, "-pubKey", pubKey)
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("failed to run the command: %s - "+
-			"Output: %s - Err: %s", err.Error(), outb.String(), errb.String())
+		return "", xerrors.Errorf("failed to run the command: %v", err.Error())
 	}
 
 	cmdOut := outb.String()
