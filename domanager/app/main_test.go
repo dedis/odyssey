@@ -24,6 +24,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/require"
 	"go.dedis.ch/cothority/v3/byzcoin/bcadmin/lib"
+	"golang.org/x/xerrors"
 )
 
 // I should be able to browse the home page without any problem
@@ -553,4 +554,21 @@ func (fcc *fakeCloudClient) PutObject(bucketName, objectName string, reader io.R
 	fcc.called = true
 
 	return 0, nil
+}
+
+// GetObject gets an object
+func (fcc *fakeCloudClient) GetObject(bucketName, objectName string,
+	opts interface{}) (xhelpers.CloudObject, error) {
+
+	return nil, xerrors.New("no implemented")
+}
+
+// BucketExists tells if a bucket exists
+func (fcc *fakeCloudClient) BucketExists(bucketName string) (bool, error) {
+	return false, xerrors.New("no implemented")
+}
+
+// MakeBucket makes a bucket
+func (fcc *fakeCloudClient) MakeBucket(bucketName string, location string) (err error) {
+	return xerrors.New("no implemented")
 }

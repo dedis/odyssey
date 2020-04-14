@@ -12,7 +12,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 	"text/template"
@@ -36,7 +35,7 @@ func VappsIndexHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			VappsIndexGet(w, r, gs)
+			VappsIndexGet(w, r, gs, conf)
 		case http.MethodPost:
 			VappsIndexPost(w, r, gs, conf)
 		}
@@ -45,19 +44,20 @@ func VappsIndexHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc 
 
 // VappsShowHandler points to:
 // GET /Vapps/{id}
-func VappsShowHandler(gs sessions.Store) http.HandlerFunc {
+func VappsShowHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			VappsShowGet(w, r, gs)
+			VappsShowGet(w, r, gs, conf)
 		}
 	}
 }
 
 // VappsIndexGet retrives the list of vApps and sends its json representation
-func VappsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
+func VappsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store,
+	conf *models.Config) {
 
-	token, err := helpers.GetToken(w)
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		helpers.SendRequestError(err, w)
 		return
@@ -113,7 +113,8 @@ func VappsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 // written its newly created public key on the cloud endpoint. If everything
 // goes well the vApp is power off.
 // TODO: if an error occurs we should ensure that the created vApp is destroyed
-func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, conf *models.Config) {
+func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store,
+	conf *models.Config) {
 	// Apparently, we must do this at the begining, after what the reader is
 	// closed and we get a "http: invalid Read on closed Body"
 	err := r.ParseForm()
@@ -132,7 +133,8 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Credentials", "false")
 
-	tef.FlushTaskEventInfo("hi from the enclave manager", "let's prpare this VM - from VappsIndexPost")
+	tef.FlushTaskEventInfo("hi from the enclave manager",
+		"let's prpare this VM - from VappsIndexPost")
 
 	var taskURL string
 	var project *models.EProject
@@ -187,23 +189,26 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 	}
 
 	tef.FlushTaskEventInfo("updating the contract status",
-		"setting 'preparing' on the project's instance status ")
+		"setting 'preparing' on the project's instance status")
 	err = models.UpdateProjectcStatus(conf, "preparing", projectInstID)
 	if err != nil {
 		handleError("failed to update the contract status", err.Error())
 		return
 	}
 
-	tef.FlushTaskEventInfo("getting argument", "now let's try to get the project UID from the POST form")
+	tef.FlushTaskEventInfo("getting argument",
+		"now let's try to get the project UID from the POST form")
 	projectUID := r.PostForm.Get("projectUID")
 	if projectUID == "" {
 		handleError("Got en empty project UID", projectUID)
 		return
 	}
-	tef.FlushTaskEventInfo("got the project UID", fmt.Sprintf("alright, we got this project UID: %s."+
-		"This UID will be used as the cloud endpoint and the enclave UID", projectUID))
+	tef.FlushTaskEventInfo("got the project UID", fmt.Sprintf(
+		"alright, we got this project UID: %s.This UID will be used as the "+
+			"cloud endpoint and the enclave UID", projectUID))
 
-	tef.FlushTaskEventInfo("getting the request index", "now let's try to get the request index from the POST form")
+	tef.FlushTaskEventInfo("getting the request index",
+		"now let's try to get the request index from the POST form")
 	requestIndex := r.PostForm.Get("requestIndex")
 	if requestIndex == "" {
 		handleError("Got en empty requestIndex", requestIndex)
@@ -211,24 +216,28 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 	}
 	tef.FlushTaskEventInfo("got the index request", fmt.Sprintf(
 		"alright, we got this request index: %s. This request index will be "+
-			"used by the enclave to send logs at /{projectUID}/logs/{requestIndex}/{timestamp}", requestIndex))
+			"used by the enclave to send logs at "+
+			"/{projectUID}/logs/{requestIndex}/{timestamp}", requestIndex))
 
-	tef.FlushTaskEventInfo("trying to authenticate", "trying to get an authentication token for vCloud")
-	token, err := helpers.GetToken(w)
+	tef.FlushTaskEventInfo("trying to authenticate",
+		"trying to get an authentication token for vCloud")
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		handleError("failed to get authentication token", err.Error())
 		return
 	}
 	tef.FlushTaskEventInfo("authentication OK", "we got the authentication token")
 
-	tef.FlushTaskEventInfo("getting minio client", "creating the minio client based on the ENV variables")
-	minioClient, err := xhelpers.GetMinioClient()
+	tef.FlushTaskEventInfo("getting minio client",
+		"creating the minio client based on the ENV variables")
+	minioClient := conf.CloudClient
 	if err != nil {
 		handleError("failed to get the minion client", err.Error())
 		return
 	}
 
-	tef.FlushTaskEventInfof("creating the bucket", "now we are creating the bucket '%s'", projectUID)
+	tef.FlushTaskEventInfof("creating the bucket",
+		"now we are creating the bucket '%s'", projectUID)
 	found, err := minioClient.BucketExists(projectUID)
 
 	if err != nil {
@@ -244,7 +253,8 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 		}
 		tef.FlushTaskEventInfo("bucket created", "successfully created the bucket!")
 	} else {
-		tef.FlushTaskEventInfo("bucket not created", "bucket not created because it is already created")
+		tef.FlushTaskEventInfo("bucket not created",
+			"bucket not created because it is already created")
 	}
 
 	// ------------------------------------------------------------------------
@@ -265,8 +275,10 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 		Source        string
 	}{
 		projectUID,
-		fmt.Sprintf("https://vcd-pod-charlie.swisscomcloud.com/api/network/%s", os.Getenv("NETWORK_ID")),
-		fmt.Sprintf("https://vcloud.example.com/api/vAppTemplate/vappTemplate-%s", os.Getenv("TEMPLATE_ID")),
+		fmt.Sprintf("https://vcd-pod-charlie.swisscomcloud.com/api/network/%s",
+			os.Getenv("NETWORK_ID")),
+		fmt.Sprintf("https://vcloud.example.com/api/vAppTemplate/vappTemplate-%s",
+			os.Getenv("TEMPLATE_ID")),
 	}
 	t, err := template.New("instantiateArg").Parse(`<?xml version="1.0" encoding="UTF-8"?> 
 	<vcloud:InstantiateVAppTemplateParams 
@@ -302,7 +314,7 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 	}
 	pr, pw := io.Pipe()
 
-	go func() {
+	go func(handleError func(msg string, details string, args ...interface{})) {
 		defer pw.Close()
 
 		err = t.Execute(pw, instantiateParams)
@@ -310,9 +322,10 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 			handleError("failed to execute template: ", err.Error())
 			return
 		}
-	}()
+	}(handleError)
 
-	url := fmt.Sprintf("https://vcd-pod-charlie.swisscomcloud.com/api/vdc/%s/action/instantiateVAppTemplate", os.Getenv("VDC_ID"))
+	url := fmt.Sprintf("https://vcd-pod-charlie.swisscomcloud.com"+
+		"/api/vdc/%s/action/instantiateVAppTemplate", os.Getenv("VDC_ID"))
 	req, err := http.NewRequest("POST", url, pr)
 	if err != nil {
 		handleError("failed to create request: ", err.Error())
@@ -324,9 +337,9 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 
 	client := &http.Client{}
 	log.Lvlf1("sending POST request: %s", url)
-	tef.FlushTaskEventInfo("sending Post request", url)
+	tef.FlushTaskEventInfo("sending POST request", url)
 
-	resp, err := client.Do(req)
+	resp, err := conf.RunHTTP.Do(client, req)
 	if err != nil {
 		handleError("failed to send request: ", err.Error())
 		return
@@ -361,12 +374,13 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 		// already been created. If not we return an error
 		project, found = models.EProjectList[projectInstID]
 		if !found || project == nil {
-			handleError("EProject not found", "EProject not found at this instanceID: "+projectInstID)
+			handleError("EProject not found",
+				"EProject not found at this instanceID: "+projectInstID)
 			return
 		}
 
 		log.Lvl1("here is the vapp Href: " + project.EnclaveHref)
-		resp, err = getVapp(project.EnclaveHref, token)
+		resp, err = getVapp(project.EnclaveHref, token, conf)
 		if err != nil {
 			handleError("failed to get vApp: ", err.Error())
 			project.Status = models.EProjectStatusSetupErrored
@@ -435,7 +449,7 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store, c
 	log.Lvlf1("waiting for the POST vapp task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the POST vapp task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.3)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.3)
 	if err != nil {
 		handleError("failed to poll the create app task: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -493,7 +507,7 @@ setproperty:
 	}
 	pr, pw = io.Pipe()
 
-	go func() {
+	go func(handleError func(msg string, details string, args ...interface{})) {
 		defer pw.Close()
 
 		err = t.Execute(pw, propertyParam)
@@ -502,7 +516,7 @@ setproperty:
 			project.Status = models.EProjectStatusSetupErrored
 			return
 		}
-	}()
+	}(handleError)
 
 	url = fmt.Sprintf("%s/productSections", vmLink)
 	req, err = http.NewRequest("PUT", url, pr)
@@ -519,7 +533,7 @@ setproperty:
 	log.LLvlf1("sending PUT request to update properties with url: %s", url)
 	tef.FlushTaskEventInfo("sending PUT request to update properties", url)
 
-	resp, err = client.Do(req)
+	resp, err = conf.RunHTTP.Do(client, req)
 	if err != nil {
 		handleError("failed to send request: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -577,7 +591,7 @@ setproperty:
 	log.Lvlf1("waiting for the PUT properties task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the PUT properties task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.2)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.2)
 	if err != nil {
 		handleError("failed to poll the set property task: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -634,7 +648,7 @@ setproperty:
 	}
 	pr, pw = io.Pipe()
 
-	go func() {
+	go func(handleError func(msg string, details string, args ...interface{})) {
 		defer pw.Close()
 
 		err = t.Execute(pw, networkParam)
@@ -643,7 +657,7 @@ setproperty:
 			project.Status = models.EProjectStatusSetupErrored
 			return
 		}
-	}()
+	}(handleError)
 
 	url = fmt.Sprintf("%s/networkConnectionSection", vmLink)
 	req, err = http.NewRequest("PUT", url, pr)
@@ -661,9 +675,9 @@ setproperty:
 	log.Lvlf1("sending the PUT request to update the adapter: %s", url)
 	tef.FlushTaskEventInfo("sending the PUT request to update the network adapter", url)
 
-	resp, err = client.Do(req)
+	resp, err = conf.RunHTTP.Do(client, req)
 	if err != nil {
-		handleError("failed to semd request: ", err.Error())
+		handleError("failed to send request: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
 		return
 	}
@@ -717,7 +731,7 @@ setproperty:
 	log.Lvlf1("waiting for the PUT networkConnectionSection task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the PUT networkConnectionSection task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.2)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.2)
 	if err != nil {
 		handleError("failed to poll the set network settings task: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -745,7 +759,7 @@ setproperty:
 	tef.FlushTaskEventInfo("sending the GET request to fetch the IP",
 		fmt.Sprintf("Request URL: %s", url))
 
-	resp, err = client.Do(req)
+	resp, err = conf.RunHTTP.Do(client, req)
 	if err != nil {
 		handleError("failed to send request: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -806,21 +820,16 @@ setproperty:
 	// ------------------------------------------------------------------------
 	// UPDATE THE PROJECT CONTRACT WITH THE ENCLAVE'S IP
 
-	cmd := exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
-		"project", "invoke", "setURL", "-bc", conf.BCPath, "-sign", conf.KeyID,
-		"-darc", conf.DarcID, "-enclaveURL", project.IPAddr.String(), "-i", project.InstanceID)
-	tef.FlushTaskEventInfof("setting the pub key of the enclave on the contract",
-		"running %s", cmd.Args)
+	args := []string{"./pcadmin", "-c", conf.ConfigPath, "contract", "project",
+		"invoke", "setURL", "-bc", conf.BCPath, "-sign", conf.KeyID, "-darc",
+		conf.DarcID, "-enclaveURL", project.IPAddr.String(), "-i", project.InstanceID}
+	tef.FlushTaskEventInfof("runing pcadmin", "setting the pub key of the "+
+		"enclave on the contract running %s", args)
 
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-
-	err = cmd.Run()
+	_, err = conf.Executor.Run(args...)
 	if err != nil {
 		handleError("failed to set the enclave IP, ",
-			"failed to run the command: %s - Output: %s - Err: %s", err.Error(),
-			outb.String(), errb.String())
+			"failed to run the command: %s", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
 		return
 	}
@@ -831,7 +840,7 @@ setproperty:
 	log.Lvl1("getting the newly created vApp")
 	tef.FlushTaskEventInfo("getting the newly created vApp", vapp.Href)
 
-	resp, err = getVapp(vapp.Href, token)
+	resp, err = getVapp(vapp.Href, token, conf)
 	if err != nil {
 		handleError("failed to get vApp: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -911,7 +920,7 @@ setproperty:
 	log.Lvlf1("sending the POST request to power on the vApp: %s", url)
 	tef.FlushTaskEventInfo("sending the POST request to power on the vApp", url)
 
-	resp, err = client.Do(req)
+	resp, err = conf.RunHTTP.Do(client, req)
 	if err != nil {
 		handleError("failed to send request: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -967,7 +976,7 @@ setproperty:
 	log.Lvlf1("waiting for the POST power on task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the POST power on task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.3)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.3)
 	if err != nil {
 		handleError("failed to poll the power on task",
 			"failed to poll the power on task. Maybe the IP adress %s is "+
@@ -1001,14 +1010,15 @@ setproperty:
 
 		retry--
 		if retry == 0 {
-			handleError("failed to find the bucket",
-				"failed to find the bucket, timeout reached %s", project.CloudEndpoint)
+			handleError("failed to find the bucket", "failed to find the "+
+				"bucket, timeout reached %s", project.CloudEndpoint)
 			project.Status = models.EProjectStatusSetupErrored
 			return
 		}
 
 		log.Lvlf1("waiting a bit, bucket not found at: %s/%s "+
-			"(remaining tries: %d)", os.Getenv("MINIO_ENDPOINT"), project.CloudEndpoint, retry)
+			"(remaining tries: %d)", os.Getenv("MINIO_ENDPOINT"),
+			project.CloudEndpoint, retry)
 		tef.FlushTaskEventInfof("waiting a bit, bucket not found",
 			"waiting a bit, bucket not found at: %s/%s (remaining tries: %d)",
 			os.Getenv("MINIO_ENDPOINT"), project.CloudEndpoint, retry)
@@ -1016,7 +1026,8 @@ setproperty:
 	}
 
 	log.LLvl1("getting and checking the content of 'pub_key.txt'")
-	tef.FlushTaskEventInfo("checking the pub key", "getting and checking the content of 'pub_key.txt'")
+	tef.FlushTaskEventInfo("checking the pub key",
+		"getting and checking the content of 'pub_key.txt'")
 
 	// Due to some latency, the file can take a bit of time to be readable, so
 	// we poll it. From what we observed, it can take sometimes up to 1m40
@@ -1024,10 +1035,11 @@ setproperty:
 	// first executed for a short time, then executed a second time (this time
 	// wihtout being interrupted) after a while.
 	retry = 20
-	var pubkeyReader *minio.Object
+	var pubkeyReader xhelpers.CloudObject
 	for retry > 0 {
 		retry--
-		pubkeyReader, err = minioClient.GetObject(project.CloudEndpoint, "pub_key.txt", minio.GetObjectOptions{})
+		pubkeyReader, err = minioClient.GetObject(project.CloudEndpoint,
+			"pub_key.txt", minio.GetObjectOptions{})
 		if err != nil {
 			handleError("failed to check if 'pub_key.txt' exists: ", err.Error())
 			project.Status = models.EProjectStatusSetupErrored
@@ -1039,18 +1051,21 @@ setproperty:
 		_, err = pubkeyReader.Stat()
 		if err == nil {
 			log.LLvl1("'pub_key.txt' found")
-			tef.FlushTaskEventInfo("'pub_key.txt' found", project.CloudEndpoint+"/pub_key.txt")
+			tef.FlushTaskEventInfo("'pub_key.txt' found",
+				project.CloudEndpoint+"/pub_key.txt")
 			break
 		}
 
 		if retry == 0 {
-			handleError("failed to find the public key", "failed to find 'pub_key.txt' in "+project.CloudEndpoint)
+			handleError("failed to find the public key",
+				"failed to find 'pub_key.txt' in "+project.CloudEndpoint)
 			project.Status = models.EProjectStatusSetupErrored
 			return
 		}
 
 		log.Lvlf1("failed to read the pub key, waiting a bit (remaining tries: %d)", retry)
-		tef.FlushTaskEventInfof("pub key not found, sleeping", "failed to read the pub key, waiting 10 seconds (remaining tries: %d)", retry)
+		tef.FlushTaskEventInfof("pub key not found, sleeping",
+			"failed to read the pub key, waiting 10 seconds (remaining tries: %d)", retry)
 		time.Sleep(time.Second * 10)
 
 	}
@@ -1081,27 +1096,22 @@ setproperty:
 	project.PubKey = result
 
 	log.LLvlf1("ok, erverything is allright (found '%s'), we can power off the enclave", result)
-	tef.FlushTaskEventImportantInfo("found the pub key", fmt.Sprintf("ok, everything is allright (found '%s'), we can power off the enclave", result))
+	tef.FlushTaskEventImportantInfo("found the pub key", fmt.Sprintf(
+		"ok, everything is allright (found '%s'), we can power off the enclave", result))
 
 	// ------------------------------------------------------------------------
 	// UPDATE THE PROJECT CONTRACT WITH THE ENCLAVE'S PUB KEY
 
-	cmd = exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
-		"project", "invoke", "setEnclavePubKey", "-bc", conf.BCPath, "-sign",
-		conf.KeyID, "-darc", conf.DarcID, "-pubKey", project.PubKey, "-i", project.InstanceID)
-	tef.FlushTaskEventInfof("setting the pub key of the enclave on the contract",
-		"running %s", cmd.Args)
+	args = []string{"./pcadmin", "-c", conf.ConfigPath, "contract", "project",
+		"invoke", "setEnclavePubKey", "-bc", conf.BCPath, "-sign", conf.KeyID,
+		"-darc", conf.DarcID, "-pubKey", project.PubKey, "-i", project.InstanceID}
+	tef.FlushTaskEventInfof("running pcadmin", "setting the pub key of the "+
+		"enclave on the contract running %s", args)
 
-	outb.Reset()
-	errb.Reset()
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-
-	err = cmd.Run()
+	_, err = conf.Executor.Run(args...)
 	if err != nil {
 		handleError("failed to set the enclave pub key, ",
-			"failed to run the command: %s - Output: %s - Err: %s", err.Error(),
-			outb.String(), errb.String())
+			"failed to run the command: %s", err)
 		project.Status = models.EProjectStatusSetupErrored
 		return
 	}
@@ -1110,7 +1120,8 @@ setproperty:
 	// SHUTDOWN THE NEWLY CREATED VAPP
 
 	log.Lvl1("shutdown (undeploy) the newly created vApp")
-	tef.FlushTaskEventInfo("shut down the emclave", "shut down (undeploy) the newly created vApp")
+	tef.FlushTaskEventInfo("shut down the emclave",
+		"shut down (undeploy) the newly created vApp")
 	// We can use the 'shutdown' command because VMware tools is installed on
 	// the VM, otherwise we must use 'powerOff', but shis may leave the enclave
 	// with an unstable state (with empty files for example).
@@ -1135,7 +1146,7 @@ setproperty:
 	log.Lvlf1("sending the POST request to shutdown (undeploy) the vApp: %s", url)
 	tef.FlushTaskEventInfo("sending the POST request to shutdown (undeploy) the vApp", url)
 
-	resp, err = client.Do(req)
+	resp, err = conf.RunHTTP.Do(client, req)
 	if err != nil {
 		handleError("failed to send request: ", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -1191,7 +1202,7 @@ setproperty:
 	log.Lvlf1("waiting for the POST shutdown task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the POST shutdown task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.2)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.2)
 	if err != nil {
 		handleError("failed to poll the shutdown task", err.Error())
 		project.Status = models.EProjectStatusSetupErrored
@@ -1216,12 +1227,15 @@ setproperty:
 		return
 	}
 
-	tef.FlushTaskEventCloseOK("enclave successfully set up", "new enclave created, configured, booted, working fine and now powered off")
+	tef.FlushTaskEventCloseOK("enclave successfully set up",
+		"new enclave created, configured, booted, working fine and now powered off")
 
 }
 
 // VappsShowGet gets a single vApp and sends its json representation
-func VappsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
+func VappsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store,
+	conf *models.Config) {
+
 	params := mux.Vars(r)
 	id := params["id"]
 	if id == "" {
@@ -1229,14 +1243,14 @@ func VappsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 		return
 	}
 
-	token, err := helpers.GetToken(w)
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		helpers.SendRequestError(err, w)
 		return
 	}
 
 	url := fmt.Sprintf("https://%s/api/vApp/%s", helpers.VcdHost, id)
-	resp, err := getVapp(url, token)
+	resp, err := getVapp(url, token, conf)
 	defer resp.Body.Close()
 	if err != nil {
 		helpers.SendRequestError(errors.New("failed to get vApp: "+err.Error()), w)
@@ -1272,7 +1286,7 @@ func VappsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 }
 
 // getVapp sends a request to get a single vApp and returns the response
-func getVapp(url string, token string) (*http.Response, error) {
+func getVapp(url string, token string, conf *models.Config) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, errors.New("failed to build request:" + err.Error())
@@ -1282,7 +1296,7 @@ func getVapp(url string, token string) (*http.Response, error) {
 
 	client := &http.Client{}
 	log.LLvlf1("sending POST request to get vApp: %s", url)
-	resp, err := client.Do(req)
+	resp, err := conf.RunHTTP.Do(client, req)
 	if err != nil {
 		return nil, errors.New("failed to send request: " + err.Error())
 	}
@@ -1293,11 +1307,12 @@ func getVapp(url string, token string) (*http.Response, error) {
 // doing so, the vCloud API returns a task that indicates the status of the
 // request. This function poll the task based on the retry, wait and exponent
 // parameters.
-func pollTask(tef *xhelpers.TaskEventFFactory, taskURL,
+func pollTask(tef *xhelpers.TaskEventFFactory, taskURL string, conf *models.Config,
 	token string, retry int, wait time.Duration, exponent float64) error {
 
 	log.Lvlf1("starting to poll the task maximum %d times: %s", retry, taskURL)
-	tef.FlushTaskEventInfof("starting to poll", "starting to poll the task maximum %d times: %s", retry, taskURL)
+	tef.FlushTaskEventInfof("starting to poll",
+		"starting to poll the task maximum %d times: %s", retry, taskURL)
 
 	var task models.Task
 	for retry > 0 {
@@ -1312,7 +1327,7 @@ func pollTask(tef *xhelpers.TaskEventFFactory, taskURL,
 		req.Header.Set("Accept", "application/*;version=31.0")
 
 		client := &http.Client{}
-		resp, err := client.Do(req)
+		resp, err := conf.RunHTTP.Do(client, req)
 		if err != nil {
 			return errors.New("failed to send request: " + err.Error())
 		}
@@ -1362,7 +1377,8 @@ func pollTask(tef *xhelpers.TaskEventFFactory, taskURL,
 			time.Sleep(wait)
 			wait = time.Duration(float64(wait.Nanoseconds()) * exponent)
 		} else {
-			return fmt.Errorf("the task got an unexpected status: %s - %s - %s", task.Status, task.Details, task.Error.Message)
+			return fmt.Errorf("the task got an unexpected status: %s - %s - %s",
+				task.Status, task.Details, task.Error.Message)
 		}
 	}
 	return nil

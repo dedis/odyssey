@@ -24,8 +24,8 @@ Rating:
 | Cryptutil | 🌕🌕🌕 3 | |
 | DOManager | 🌕🌗🌑 1.5 | can be used as a base for the test in DSManager |
 | DSManager | 🌕 1 | |
+| Enclavem | 🌕 1 | |
 | Enclave | 0 | |
-| Enclavem | 0 | |
 | Projectc | 0 | |
 
 You can launch all the tests with:
@@ -44,3 +44,16 @@ The following illustration shows the different interfaces required to mock the
 components:
 
 ![](assets/components_uml_tests.png)
+
+Note that our system does not yet use all the interfaces it should. For example
+there is still a lot of direct calls with `os/exec` instead of
+`conf.Executor.Run`. This should be eventually done with the implementations of
+new tests.
+
+## Where to continue
+
+One good start is `domanager/app/main_test.go`. One would want to extend the
+tests adding more cases (with the update of a dataset for example), and then
+break `main_test.go` where each test is close to its location: for example
+moving the tests releated to the datasets controller in a new
+`controllers/datasets_test.go` file.

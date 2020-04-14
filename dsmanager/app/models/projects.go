@@ -518,7 +518,15 @@ func (p *Project) RequestBootEnclave(request *Request, task helpers.TaskI, conf 
 		"projectUID":    {p.UID},
 		"requestIndex":  {strconv.Itoa(request.Index)},
 	}
-	resp, err := conf.RunHTTP.PostForm("http://localhost:5000/vapps", formData)
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/vapps", strings.NewReader(formData.Encode()))
+	if err != nil {
+		log.Infof("Failed to create request: %s", err.Error())
+		task.CloseError(tef.Source, "Failed to create request", err.Error())
+		return
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := conf.RunHTTP.Do(&http.Client{}, req)
 	if err != nil {
 		log.Infof("Failed to send request: %s", err.Error())
 		task.CloseError(tef.Source, "Failed to send request", err.Error())

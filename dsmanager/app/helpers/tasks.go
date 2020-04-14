@@ -658,7 +658,7 @@ func (t TaskEventFFactory) XFlushTaskEventCloseError(err2 error, msg, details st
 			"Something went wrong while handling the error: %s</span>",
 			details, err2.Error())
 	}
-	log.Error(msg)
+	log.Error(msg, details)
 	fmt.Fprint(t.w, NewTaskEventCloseError(t.Source, msg, details).JSONStream())
 	t.flusher.Flush()
 }

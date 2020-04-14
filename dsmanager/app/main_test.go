@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -325,19 +324,6 @@ func (fe fakeExecutor) Run(args ...string) (bytes.Buffer, error) {
 	return outb, nil
 }
 
-// Cloud Client
-
-type fakeCloudClient struct {
-	called bool
-}
-
-func (fcc *fakeCloudClient) PutObject(bucketName, objectName string, reader io.Reader, objectSize int64,
-	opts interface{}) (n int64, err error) {
-	fcc.called = true
-
-	return 0, nil
-}
-
 // RunHTTP
 
 type fakeRunHTTP struct {
@@ -345,7 +331,7 @@ type fakeRunHTTP struct {
 	called chan interface{}
 }
 
-func (f *fakeRunHTTP) PostForm(url string, data url.Values) (resp *http.Response, err error) {
+func (f *fakeRunHTTP) Do(client *http.Client, req *http.Request) (resp *http.Response, err error) {
 	close(f.called)
 	return &http.Response{
 		Body: ioutil.NopCloser(bytes.NewBuffer([]byte{})),

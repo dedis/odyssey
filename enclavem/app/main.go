@@ -45,20 +45,18 @@ type Flash struct {
 	Msg string
 }
 
-func init() {
-	var err error
-	conf, err = parseConfig()
-	if err != nil {
-		log.Fatal("failed to load config", err)
-	}
-}
-
 func main() {
 	// Register the struct so encoding/gob knows about it
 	gob.Register(helpers.Flash{})
 
+	var err error
+	conf, err = models.NewConfig()
+	if err != nil {
+		log.Fatal("failed to load config", err)
+	}
+
 	xlog.Info("loading db into memory")
-	err := loadDb()
+	err = loadDb()
 	if err != nil {
 		log.Fatal("failed to import DB: " + err.Error())
 	}
@@ -77,11 +75,11 @@ func main() {
 
 	router.Handle("/", http.HandlerFunc(controllers.HomeHandler(store, conf)))
 	router.Handle("/healthz", healthz())
-	router.Handle("/orgs", http.HandlerFunc(controllers.OrgsIndexHandler(store)))
-	router.Handle("/orgs/{id}", http.HandlerFunc(controllers.OrgsShowHandler(store)))
+	router.Handle("/orgs", http.HandlerFunc(controllers.OrgsIndexHandler(store, conf)))
+	router.Handle("/orgs/{id}", http.HandlerFunc(controllers.OrgsShowHandler(store, conf)))
 	router.Handle("/vapps", http.HandlerFunc(controllers.VappsIndexHandler(store, conf)))
-	router.Handle("/vapps/{id}", http.HandlerFunc(controllers.VappsShowHandler(store)))
-	router.Handle("/eprojects", http.HandlerFunc(controllers.EProjectsIndexHandler(store)))
+	router.Handle("/vapps/{id}", http.HandlerFunc(controllers.VappsShowHandler(store, conf)))
+	router.Handle("/eprojects", http.HandlerFunc(controllers.EProjectsIndexHandler(store, conf)))
 	router.Handle("/eprojects/{instID}/unlock", http.HandlerFunc(controllers.EProjectsShowUnlockHandler(store, conf)))
 	router.Handle("/eprojects/{instID}", http.HandlerFunc(controllers.EProjectsShowHandler(store, conf)))
 	router.Handle("/darcs", http.HandlerFunc(controllers.DarcIndexHandler(store, conf)))

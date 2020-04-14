@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/dedis/odyssey/enclavem/app/helpers"
+	"github.com/dedis/odyssey/enclavem/app/models"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"go.dedis.ch/onet/v3/log"
@@ -16,30 +17,31 @@ import (
 
 // OrgsIndexHandler points to:
 // GET /Orgs
-func OrgsIndexHandler(gs sessions.Store) http.HandlerFunc {
+func OrgsIndexHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			OrgsIndexGet(w, r, gs)
+			OrgsIndexGet(w, r, gs, conf)
 		}
 	}
 }
 
 // OrgsShowHandler points to:
 // GET /Orgs/{id}
-func OrgsShowHandler(gs sessions.Store) http.HandlerFunc {
+func OrgsShowHandler(gs sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			OrgsShowGet(w, r, gs)
+			OrgsShowGet(w, r, gs, conf)
 		}
 	}
 }
 
 // OrgsIndexGet return a json representation of a list of orgs
-func OrgsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
+func OrgsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store,
+	conf *models.Config) {
 
-	token, err := helpers.GetToken(w)
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		helpers.SendRequestError(err, w)
 		return
@@ -113,7 +115,9 @@ func OrgsIndexGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 }
 
 // OrgsShowGet gets a single org and sends a json representation of it
-func OrgsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
+func OrgsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store,
+	conf *models.Config) {
+
 	params := mux.Vars(r)
 	id := params["id"]
 	if id == "" {
@@ -121,7 +125,7 @@ func OrgsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store) {
 		return
 	}
 
-	token, err := helpers.GetToken(w)
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		helpers.SendRequestError(err, w)
 		return

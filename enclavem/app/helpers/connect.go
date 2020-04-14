@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/dedis/odyssey/enclavem/app/models"
 )
 
 /*
@@ -28,13 +30,13 @@ var (
 // token is already sets, it checks if the token is still valid by sending a GET
 // to '/org/'. If the request doesn't work, a new token is requested.
 // It then finally return a working token.
-func GetToken(w http.ResponseWriter) (string, error) {
-	return getToken(w, true)
+func GetToken(w http.ResponseWriter, conf *models.Config) (string, error) {
+	return getToken(w, conf, true)
 }
 
-func getToken(w http.ResponseWriter, retry bool) (string, error) {
+func getToken(w http.ResponseWriter, conf *models.Config, retry bool) (string, error) {
 	if authToken == "" {
-		err := connect(w)
+		err := connect(w, conf)
 		if err != nil {
 			return "", NewInternalError("failed to connect: " + err.Error())
 		}
@@ -48,7 +50,7 @@ func getToken(w http.ResponseWriter, retry bool) (string, error) {
 	req.Header.Set("Accept", "application/*;version=31.0")
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := conf.RunHTTP.Do(client, req)
 	if err != nil {
 		return "", NewInternalError(fmt.Sprintf("failed to get %s: %s", url, err.Error()))
 	}
@@ -58,7 +60,7 @@ func getToken(w http.ResponseWriter, retry bool) (string, error) {
 		if retry {
 			// The token might be expired, so we should try to get a new one
 			authToken = ""
-			return getToken(w, false)
+			return getToken(w, conf, false)
 		}
 		return "", fmt.Errorf("failed to check the token at %s, expected 200 status code but got %s", url, resp.Status)
 	}
@@ -67,7 +69,7 @@ func getToken(w http.ResponseWriter, retry bool) (string, error) {
 }
 
 // connect gets and sets a new access token from vCloud
-func connect(w http.ResponseWriter) error {
+func connect(w http.ResponseWriter, conf *models.Config) error {
 	url := fmt.Sprintf("https://%s/api/sessions", VcdHost)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -77,7 +79,7 @@ func connect(w http.ResponseWriter) error {
 	req.Header.Set("Accept", "application/*;version=31.0")
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := conf.RunHTTP.Do(client, req)
 	if err != nil {
 		return errors.New("failed to send request: " + err.Error())
 	}

@@ -24,7 +24,7 @@ import (
 )
 
 // EProjectsIndexHandler ...
-func EProjectsIndexHandler(store sessions.Store) http.HandlerFunc {
+func EProjectsIndexHandler(store sessions.Store, conf *models.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -37,7 +37,7 @@ func EProjectsIndexHandler(store sessions.Store) http.HandlerFunc {
 			}
 			switch r.PostFormValue("_method") {
 			case "delete":
-				eProjectsIndexDelete(w, r, store)
+				eProjectsIndexDelete(w, r, store, conf)
 			default:
 				xhelpers.RedirectWithErrorFlash("/", "only DELETE allowed", w, r, store)
 			}
@@ -125,10 +125,10 @@ func eProjectsIndexGet(w http.ResponseWriter, r *http.Request,
 }
 
 func eProjectsIndexDelete(w http.ResponseWriter, r *http.Request,
-	store sessions.Store) {
+	store sessions.Store, conf *models.Config) {
 
 	for k, eproject := range models.EProjectList {
-		token, err := helpers.GetToken(w)
+		token, err := helpers.GetToken(w, conf)
 		if err != nil {
 			xhelpers.RedirectWithErrorFlash("/eprojects", "failed to get authentication token: "+err.Error(), w, r, store)
 			return
@@ -281,7 +281,7 @@ func eProjectsShowDelete(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	token, err := helpers.GetToken(w)
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		handleError("failed to get authentication token", err.Error())
 		return
@@ -291,7 +291,7 @@ func eProjectsShowDelete(w http.ResponseWriter, r *http.Request,
 	// GET THE VAPP
 
 	url := eproject.EnclaveHref
-	resp, err := getVapp(url, token)
+	resp, err := getVapp(url, token, conf)
 	defer resp.Body.Close()
 	if err != nil {
 		handleError("failed to get vApp", err.Error())
@@ -430,7 +430,7 @@ func eProjectsShowDelete(w http.ResponseWriter, r *http.Request,
 	log.Lvlf1("waiting for the POST shutdown task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the POST shutdown task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.2)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.2)
 	if err != nil {
 		handleError("failed to poll the shutdown task", err.Error())
 		return
@@ -500,7 +500,7 @@ removeVapp:
 	log.Lvlf1("waiting for the delete task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the delete task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.2)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.2)
 	if err != nil {
 		handleError("failed to poll the delete task", err.Error())
 		return
@@ -677,7 +677,7 @@ func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
 	// ------------------------------------------------------------------------
 	// GET THE VAPP
 
-	token, err := helpers.GetToken(w)
+	token, err := helpers.GetToken(w, conf)
 	if err != nil {
 		handleError("failed to get token", err.Error())
 		eproject.Status = models.EProjectStatusUnlockingEnclaveErrored
@@ -685,7 +685,7 @@ func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
 	}
 
 	url := eproject.EnclaveHref
-	resp, err := getVapp(url, token)
+	resp, err := getVapp(url, token, conf)
 	defer resp.Body.Close()
 	if err != nil {
 		handleError("failed to get vApp", err.Error())
@@ -876,7 +876,7 @@ func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
 	log.Lvlf1("waiting for the PUT properties task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the PUT properties task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.2)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.2)
 	if err != nil {
 		handleError("failed to poll the set property task", err.Error())
 		eproject.Status = models.EProjectStatusUnlockingEnclaveErrored
@@ -961,7 +961,7 @@ func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
 	log.Lvlf1("waiting for the POST power on task to succeed: %s", taskURL)
 	tef.FlushTaskEventInfo("waiting for the POST power on task to succeed", taskURL)
 
-	err = pollTask(tef, taskURL, token, 10, time.Duration(time.Second*5), 1.3)
+	err = pollTask(tef, taskURL, conf, token, 10, time.Duration(time.Second*5), 1.3)
 	if err != nil {
 		handleError("failed to poll the power on task. "+
 			"Maybe the IP adress %s is already used?\nError: %s",
