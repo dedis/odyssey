@@ -2,6 +2,8 @@
 [https://dedis.github.io/odyssey/](https://dedis.github.io/odyssey/), or
 directly in [/docs](/docs)**
 
+[![Build Status](https://travis-ci.com/dedis/odyssey.svg?branch=master)](https://travis-ci.com/dedis/odyssey)
+
 # odyssey
 
 Auditable Sharing and Management of Sensitive Data Across Jurisdictions.
