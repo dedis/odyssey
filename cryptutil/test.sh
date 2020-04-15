@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 test_folder="/tmp/cryptutil"
 cryptutil=$test_folder/cryptutil
