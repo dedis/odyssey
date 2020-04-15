@@ -26,7 +26,7 @@ Rating:
 | DSManager | 🌕 1 | |
 | Enclavem | 🌕 1 | |
 | Enclave | 0 | |
-| Projectc | 0 | |
+| Projectc | 🌕🌕🌗 2.5  | pcadmin not tested |
 
 You can launch all the tests with:
 

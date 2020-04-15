@@ -35,3 +35,4 @@ test:
 	@echo "🔎 testing catalogc..." && cd catalogc && go test ./... > /dev/null && echo "...✔️ test OK"
 	@echo "🔎 testing domanager..." && cd domanager/app && go test ./... > /dev/null && echo "...✔️ test OK"
 	@echo "🔎 testing dsmanager..." && cd dsmanager/app && go test ./... > /dev/null && echo "...✔️ test OK"
+	@echo "🔎 testing projectc..." && cd projectc && go test ./... > /dev/null && echo "...✔️ test OK"
