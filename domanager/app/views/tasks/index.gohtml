@@ -37,7 +37,7 @@
                         <script>
                             (function () {
                                 var url = new URL(window.location.href);
-                                const evtSource = new EventSource("/tasks/"+"{{.Index}}", {withCredentials: false });
+                                const evtSource = new EventSource("/tasks/"+"{{.GetData.Index}}", {withCredentials: false });
 
                                 evtSource.onmessage = function(event) {
                                     var newLog = document.createElement("div");

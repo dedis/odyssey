@@ -67,11 +67,7 @@ func showtasksGet(w http.ResponseWriter, r *http.Request, store sessions.Store, 
 		fmt.Printf("Failed to get flash: %s\n", err.Error())
 	}
 
-	// xhelpers.TaskListLock.Lock()
 	taskSlice := conf.TaskManager.GetSortedTasks()
-	// copy(taskSlice, xhelpers.TaskList)
-	// xhelpers.TaskListLock.Unlock()
-	// sort.Sort(sort.Reverse(xhelpers.TaskSorter(taskSlice)))
 
 	session, err := models.GetSession(store, r)
 	if err != nil {

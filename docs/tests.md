@@ -5,12 +5,12 @@ have been invested in preparing the ground for testing. Therefore, the DOManager
 has a first batch of tests that demonstrates how to mock the http server, the
 commands performed with os.exec, the external cloud provider and the task
 manager. It is a good start to develop more tests across the system. Some other
-elements like the catalog smart contract have been well tested. This shows the
-way for testing the project smart contract.
+elements like the catalog smart contract have been well tested.
 
 A first batch of tests have been added in the DSManager. It uses the same
 mocking interfaces as the DOManager and adds a new one to mock the calls to the
-Enclave Manager.
+Enclave Manager. The Enclave manager has also a first batch of testing that
+demonstrates how to mock all its external components.
 
 Rating:  
 0 = Not tested  
