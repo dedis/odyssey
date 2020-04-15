@@ -4,6 +4,6 @@
 
 <p style="text-align:center"><img width="100px" src="assets/odyssey.png"/></p>
 
-<p style="text-align:center; border:none; background:none;">
-    <a href="https://travis-ci.com/dedis/odyssey"><img src="https://travis-ci.com/dedis/odyssey.svg?branch=master"></a>
+<p style="text-align:center;">
+    <a style="border:none; background:none;" href="https://travis-ci.com/dedis/odyssey"><img src="https://travis-ci.com/dedis/odyssey.svg?branch=master"></a>
 </p>
