@@ -71,11 +71,11 @@ func getDatasets(conf *models.Config) ([]*catalogc.Dataset, error) {
 			conf.CatalogID, err)
 	}
 
-	// cmdOut := outb.String()
-	// log.LLvl1("here is the output of the value contract:", cmdOut)
-
 	catalog := catalogc.CatalogData{}
 	err = protobuf.Decode(outb.Bytes(), &catalog)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to decode dataset buffer: %v", err)
+	}
 
 	datasets := []*catalogc.Dataset{}
 

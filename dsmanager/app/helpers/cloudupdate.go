@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"regexp"
 	"sort"
 	"sync"
 	"time"
@@ -15,19 +14,6 @@ import (
 	"go.dedis.ch/onet/v3/log"
 	"golang.org/x/xerrors"
 )
-
-var cloudURLPattern *regexp.Regexp
-
-func init() {
-	var err error
-
-	// We capture this form: "{alias}/{bucket}/logs/{request index}"
-	// +? => prefer fewer (non-greedy)
-	cloudURLPattern, err = regexp.Compile("^.+?/.+?/logs/[0-9]+$")
-	if err != nil {
-		log.ErrFatal(err, "failed to create cloud url regex")
-	}
-}
 
 // CloudNotifier notify subscribers about the update of a project or request
 // status

@@ -270,7 +270,6 @@ func eProjectsShowDelete(w http.ResponseWriter, r *http.Request,
 		} else {
 			tef.XFlushTaskEventCloseErrorf(err2, msg, details, args...)
 		}
-		return
 	}
 
 	tef.FlushTaskEventInfo("updating the contract status",
@@ -292,12 +291,12 @@ func eProjectsShowDelete(w http.ResponseWriter, r *http.Request,
 
 	url := eproject.EnclaveHref
 	resp, err := getVapp(url, token, conf)
-	defer resp.Body.Close()
 	if err != nil {
 		handleError("failed to get vApp", err.Error())
 		eproject.Status = models.EProjectStatusUnlockingEnclaveErrored
 		return
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		bodyBuf, err := ioutil.ReadAll(resp.Body)
@@ -568,7 +567,6 @@ func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
 		} else {
 			tef.XFlushTaskEventCloseErrorf(err2, msg, details, args...)
 		}
-		return
 	}
 
 	tef.FlushTaskEventInfo("updating the contract status",
@@ -686,12 +684,12 @@ func eProjectsShowUnlockPost(w http.ResponseWriter, r *http.Request,
 
 	url := eproject.EnclaveHref
 	resp, err := getVapp(url, token, conf)
-	defer resp.Body.Close()
 	if err != nil {
 		handleError("failed to get vApp", err.Error())
 		eproject.Status = models.EProjectStatusUnlockingEnclaveErrored
 		return
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		bodyBuf, err := ioutil.ReadAll(resp.Body)

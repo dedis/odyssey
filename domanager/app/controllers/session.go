@@ -168,6 +168,11 @@ func sessionDelete(w http.ResponseWriter, r *http.Request,
 	}
 
 	err = session.Destroy(store, r, w)
+	if err != nil {
+		xhelpers.RedirectWithErrorFlash("/", "failed to delete session: "+
+			err.Error(), w, r, store)
+		return
+	}
 
 	xhelpers.RedirectWithInfoFlash("/", "Session deleted", w, r, store)
 }

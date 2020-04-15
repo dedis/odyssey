@@ -30,13 +30,13 @@ func TestCatalogScenario(t *testing.T) {
 			"invoke:odysseycatalog.updateMetadata",
 			"invoke:odysseycatalog.deleteDataset",
 			"invoke:odysseycatalog.archiveDataset"}, signer.Identity())
-	require.Nil(t, err)
+	require.NoError(t, err)
 	gDarc := &genesisMsg.GenesisDarc
 
 	genesisMsg.BlockInterval = time.Second
 
 	cl, _, err := byzcoin.NewLedger(genesisMsg, false)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// ------------------------------------------------------------------------
 	// Spawn
@@ -56,13 +56,13 @@ func TestCatalogScenario(t *testing.T) {
 	instIDBuf := instID.Slice()
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	pr, err := cl.WaitProof(instID, 2*genesisMsg.BlockInterval, nil)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.True(t, pr.InclusionProof.Match(instIDBuf))
 	_, _, _, err = pr.Get(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -70,12 +70,12 @@ func TestCatalogScenario(t *testing.T) {
 	// Get
 
 	prResp, err := cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof := prResp.Proof
 
 	exist, err := proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match := proof.InclusionProof.Match(instIDBuf)
@@ -83,7 +83,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	var catalogData CatalogData
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Nil(t, catalogData.Owners)
 
@@ -120,13 +120,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -155,10 +155,10 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
 	require.Error(t, err)
@@ -169,12 +169,12 @@ func TestCatalogScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -182,7 +182,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners := []*Owner{
 		&Owner{
@@ -238,13 +238,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -282,10 +282,10 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
 	require.Error(t, err)
@@ -296,12 +296,12 @@ func TestCatalogScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -309,7 +309,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -346,7 +346,7 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	datasetBuf, err := protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -369,13 +369,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -393,7 +393,7 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -417,10 +417,10 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
 	require.Error(t, err)
@@ -442,12 +442,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -455,7 +455,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -505,7 +505,7 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -528,13 +528,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -549,9 +549,6 @@ func TestCatalogScenario(t *testing.T) {
 		CloudURL:    "example.com/2",
 		SHA2:        "abcdef",
 	}
-
-	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -572,13 +569,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -596,7 +593,7 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -620,10 +617,10 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
 	require.Error(t, err)
@@ -647,12 +644,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -660,7 +657,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -713,7 +710,7 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -736,13 +733,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -761,12 +758,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -774,7 +771,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -823,9 +820,8 @@ func TestCatalogScenario(t *testing.T) {
 		SHA2:        "other hash",
 	}
 
-	datasetBuf = []byte{}
 	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -849,13 +845,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -882,12 +878,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -895,7 +891,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -956,9 +952,8 @@ func TestCatalogScenario(t *testing.T) {
 		SHA2:        "other hash",
 	}
 
-	datasetBuf = []byte{}
 	datasetBuf, err = protobuf.Encode(&dataset)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	invoke = byzcoin.Invoke{
 		ContractID: ContractCatalogID,
@@ -982,10 +977,10 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
 	require.Error(t, err)
@@ -1020,13 +1015,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -1053,12 +1048,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -1066,7 +1061,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -1150,13 +1145,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -1182,12 +1177,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -1195,7 +1190,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -1279,13 +1274,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -1303,12 +1298,12 @@ func TestCatalogScenario(t *testing.T) {
 	}
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -1316,7 +1311,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -1385,13 +1380,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -1399,12 +1394,12 @@ func TestCatalogScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -1412,7 +1407,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{
@@ -1513,13 +1508,13 @@ func TestCatalogScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -1527,12 +1522,12 @@ func TestCatalogScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
@@ -1540,7 +1535,7 @@ func TestCatalogScenario(t *testing.T) {
 
 	catalogData = CatalogData{}
 	err = proof.VerifyAndDecode(cothority.Suite, ContractCatalogID, &catalogData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	owners = []*Owner{
 		&Owner{

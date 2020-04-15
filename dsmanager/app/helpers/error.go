@@ -125,7 +125,7 @@ func RedirectWithErrorFlash(path, message string, w http.ResponseWriter, r *http
 // there is an error during this process, raises a json error. One must return
 // after calling this function.
 func RedirectWithWarningFlash(path, message string, w http.ResponseWriter, r *http.Request, store sessions.Store) {
-	err := AddFlash(w, r, fmt.Sprintf("%s", message), store, Warning)
+	err := AddFlash(w, r, message, store, Warning)
 	if err != nil {
 		SendRequestError(xerrors.Errorf("failed to add warning flash: %v", err), w)
 		return
@@ -137,7 +137,7 @@ func RedirectWithWarningFlash(path, message string, w http.ResponseWriter, r *ht
 // there is an error during this process, raises a json error. One must return
 // after calling this function.
 func RedirectWithInfoFlash(path, message string, w http.ResponseWriter, r *http.Request, store sessions.Store) {
-	err := AddFlash(w, r, fmt.Sprintf("%s", message), store, Info)
+	err := AddFlash(w, r, message, store, Info)
 	if err != nil {
 		SendRequestError(xerrors.Errorf("failed to add info flash: %v", err), w)
 		return

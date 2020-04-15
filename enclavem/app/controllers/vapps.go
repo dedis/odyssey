@@ -185,7 +185,6 @@ func VappsIndexPost(w http.ResponseWriter, r *http.Request, gs sessions.Store,
 		} else {
 			tef.XFlushTaskEventCloseErrorf(err2, msg, details, args...)
 		}
-		return
 	}
 
 	tef.FlushTaskEventInfo("updating the contract status",
@@ -1251,11 +1250,11 @@ func VappsShowGet(w http.ResponseWriter, r *http.Request, gs sessions.Store,
 
 	url := fmt.Sprintf("https://%s/api/vApp/%s", helpers.VcdHost, id)
 	resp, err := getVapp(url, token, conf)
-	defer resp.Body.Close()
 	if err != nil {
 		helpers.SendRequestError(errors.New("failed to get vApp: "+err.Error()), w)
 		return
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		helpers.SendRequestError(helpers.NewNotOkError(resp), w)

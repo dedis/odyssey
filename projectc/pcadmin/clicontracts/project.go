@@ -73,6 +73,9 @@ func ProjectSpawn(c *cli.Context) error {
 	pubKey := c.String("pubKey")
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	ctx := byzcoin.NewClientTransaction(byzcoin.CurrentVersion, byzcoin.Instruction{
 		InstanceID: byzcoin.NewInstanceID(d.GetBaseID()),
@@ -214,6 +217,9 @@ func ProjectdInvokeUpdate(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: projectc.ContractProjectID,
@@ -295,6 +301,9 @@ func ProjectdInvokeUpdateStatus(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: projectc.ContractProjectID,
@@ -371,6 +380,9 @@ func ProjectInvokeUpdateMetadata(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: projectc.ContractProjectID,
@@ -446,6 +458,9 @@ func ProjectdInvokeSetURL(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: projectc.ContractProjectID,
@@ -522,6 +537,9 @@ func ProjectdInvokeSetAccessPubKey(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: projectc.ContractProjectID,
@@ -598,6 +616,9 @@ func ProjectdInvokeSetEnclavePubKey(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: projectc.ContractProjectID,

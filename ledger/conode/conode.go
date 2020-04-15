@@ -26,9 +26,7 @@ import (
 	"time"
 
 	"github.com/dedis/odyssey/catalogc"
-	_ "github.com/dedis/odyssey/catalogc"
 	"github.com/dedis/odyssey/projectc"
-	_ "github.com/dedis/odyssey/projectc"
 	cli "github.com/urfave/cli"
 	"go.dedis.ch/cothority/v3"
 	_ "go.dedis.ch/cothority/v3/authprox"

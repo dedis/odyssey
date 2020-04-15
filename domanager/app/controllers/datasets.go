@@ -236,7 +236,6 @@ func datasetsGet(w http.ResponseWriter, r *http.Request,
 }
 
 var darcR = regexp.MustCompile("^darc:[0-9a-f]{64}$")
-var baseMatch = regexp.MustCompile(`BaseID: (darc:[0-9a-f]{64})`)
 var datasetR = regexp.MustCompile("^[0-9a-f]{64}$")
 var darcMatch = regexp.MustCompile(`DarcID: ([0-9a-f]{64})`)
 var readAttrRule = regexp.MustCompile(
@@ -387,10 +386,6 @@ func datasetsPost(w http.ResponseWriter, r *http.Request,
 			if err != nil {
 				task.CloseError(tef.Source, "failed to read body response", err.Error())
 				return
-			}
-
-			type Response struct {
-				DarcID string `json:"darcID"`
 			}
 
 			darcPostResponse := &enclavemodels.DarcPostResponse{}
@@ -666,7 +661,6 @@ func datasetsShow(w http.ResponseWriter, r *http.Request,
 	// show"
 
 	log.Info("getting the darc ID")
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./bcadmin", "instance", "get", "-i",
 		dataset.CalypsoWriteID, "--bc", session.BcPath)
 
@@ -699,7 +693,6 @@ func datasetsShow(w http.ResponseWriter, r *http.Request,
 	usesStr := ""
 
 	log.Info("getting the darc info")
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./bcadmin", "darc", "show", "--darc", darcID, "--bc",
 		session.BcPath)
 
@@ -993,7 +986,6 @@ func datasetsShowDelete(w http.ResponseWriter, r *http.Request,
 
 		// Delete dataset from the catalog
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./catadmin", "-c", conf.ConfigPath, "contract",
 			"catalog", "invoke", "deleteDataset", "--bc", session.BcPath,
 			"--instid", conf.CatalogID, "--identityStr", identityStr,
@@ -1132,7 +1124,6 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 		}
 		metadataJSONStr := string(metadataJSONBuf)
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./catadmin", "-c", conf.ConfigPath, "contract",
 			"catalog", "invoke", "updateDataset", "--bc", session.BcPath,
 			"--instid", conf.CatalogID, "--metadataJSON", metadataJSONStr,
@@ -1156,7 +1147,7 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 		// show"
 
 		log.Info("getting the darc ID")
-		cmd = new(exec.Cmd)
+
 		cmd = exec.Command("./bcadmin", "instance", "get", "-i", id, "--bc",
 			session.BcPath)
 		task.AddInfof(tef.Source, "getting the associated DARC ID", "using this command: %v", cmd.Args)
@@ -1187,7 +1178,6 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 
 		log.Info("getting the darc info")
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./bcadmin", "darc", "show", "--darc", darcID, "--bc",
 			session.BcPath)
 		task.AddInfof(tef.Source, "getting the darc info", "using this command: %v", cmd.Args)
@@ -1249,7 +1239,6 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 		// Waiting 10 seconds in order to prevent bad counter, because we run an
 		// a bcadmin command before.
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./bcadmin", "-c", conf.ConfigPath, "darc", "rule",
 			"--rule", "spawn:calypsoRead", "--darc", darcID, "--bc", session.BcPath,
 			"-id", rule, "-replace", "-restricted")
@@ -1267,7 +1256,6 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 				outb.String(), errb.String()))
 			return
 		}
-		output = outb.String()
 
 		task.CloseOK(tef.Source, "dataset's attributes updated", "the last command ran successfully")
 	}()
@@ -1379,7 +1367,6 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 
 		// Update the catalog with the "archived" flag and reset the metadata
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./catadmin", "-c", conf.ConfigPath, "contract",
 			"catalog", "invoke", "archiveDataset", "-i", conf.CatalogID, "-bc",
 			session.BcPath, "-identityStr", identityStr, "--calypsoWriteID", id)
@@ -1404,7 +1391,7 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 		// show"
 
 		log.Info("getting the darc ID")
-		cmd = new(exec.Cmd)
+
 		cmd = exec.Command("./bcadmin", "instance", "get", "-i", id, "--bc",
 			session.BcPath)
 		task.AddInfof(tef.Source, "getting the associated DARC ID", "using this command: %v", cmd.Args)
@@ -1434,7 +1421,6 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 
 		log.Info("getting the darc info")
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./bcadmin", "darc", "show", "--darc", darcID, "--bc",
 			session.BcPath)
 		task.AddInfof(tef.Source, "getting the DARC info", "using this command: %v", cmd.Args)
@@ -1491,7 +1477,6 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 		// Waiting 10 seconds in order to prevent bad counter, because we run an
 		// a bcadmin command before.
 
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./bcadmin", "-c", conf.ConfigPath, "darc", "rule",
 			"--rule", "spawn:calypsoRead", "--darc", darcID, "--bc", session.BcPath,
 			"-id", rule, "-replace", "-restricted")

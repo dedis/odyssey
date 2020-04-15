@@ -101,7 +101,6 @@ func darcIndexPost(w http.ResponseWriter, r *http.Request,
 	}
 
 	// spawn:calypsoWrite
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./bcadmin", "-c", conf.ConfigPath, "darc", "rule",
 		"--rule", "spawn:calypsoWrite", "-id", darcID, "-bc", conf.BCPath, "--sign",
 		conf.KeyID, "--darc", newDarcID)
@@ -117,8 +116,8 @@ func darcIndexPost(w http.ResponseWriter, r *http.Request,
 			err.Error(), outb.String(), errb.String()), w)
 		return
 	}
+
 	// spawn:calypsoRead
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./bcadmin", "-c", conf.ConfigPath, "darc", "rule",
 		"--rule", "spawn:calypsoRead", "-id", darcID+" | ( attr:allowed: & attr:must_have: )",
 		"-bc", conf.BCPath, "--sign", conf.KeyID, "--darc", newDarcID)
@@ -134,8 +133,8 @@ func darcIndexPost(w http.ResponseWriter, r *http.Request,
 			err.Error(), outb.String(), errb.String()), w)
 		return
 	}
+
 	// invoke:darc.evolve
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./bcadmin", "-c", conf.ConfigPath, "darc", "rule",
 		"--rule", "invoke:darc.evolve", "-id", conf.KeyID+" | "+darcID,
 		"-bc", conf.BCPath, "--sign", conf.KeyID, "--darc", newDarcID, "--replace")
@@ -153,7 +152,7 @@ func darcIndexPost(w http.ResponseWriter, r *http.Request,
 	}
 
 	resp := &models.DarcPostResponse{
-		newDarcID,
+		DarcID: newDarcID,
 	}
 
 	js, err := json.MarshalIndent(resp, "", "  ")

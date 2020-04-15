@@ -14,7 +14,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/dedis/odyssey/dsmanager/app/controllers"
 	"github.com/dedis/odyssey/dsmanager/app/helpers"
 	"github.com/dedis/odyssey/dsmanager/app/models"
@@ -152,17 +151,6 @@ func main() {
 
 	<-done
 	logger.Println("Server stopped")
-}
-
-// parseConfig parses the config file and return a config struct
-func parseConfig() (*models.Config, error) {
-	conf := &models.Config{}
-	_, err := toml.DecodeFile("config.toml", conf)
-	if err != nil {
-		return nil, errors.New("failed to read config: " + err.Error())
-	}
-
-	return conf, nil
 }
 
 func loadDb() error {

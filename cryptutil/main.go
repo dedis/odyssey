@@ -103,7 +103,6 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to run app: " + err.Error())
 	}
-	return
 }
 
 func encrypt(c *cli.Context) error {

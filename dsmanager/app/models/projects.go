@@ -740,7 +740,6 @@ func (p *Project) RequestUpdateAttributes(values url.Values, conf *Config) {
 		return
 	}
 
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
 		"project", "invoke", "updateMetadata", "-i", p.InstanceID, "-bc", conf.BCPath,
 		"-sign", conf.KeyID, "-metadataJSON", string(metadataJSON))
@@ -821,10 +820,11 @@ func (p *Project) RequestUnlockEnclave(conf *Config) {
 					request.StatusNotifier.UpdateStatusAndClose(
 						RequestStatusErrored)
 
-				} else if taskEl.Type == helpers.TypeCloseOK {
-					// nothing to do because there is still the cloud logs that
-					// must be closed OK
 				}
+				// else if taskEl.Type == helpers.TypeCloseOK {
+				//   nothing to do because there is still the cloud logs that
+				//   must be closed OK
+				// }
 			default:
 				select {
 				case <-client.Done:
@@ -985,7 +985,6 @@ func (p *Project) updateFailedReasons(failedReasons *catalogc.FailedReasons,
 	if err != nil {
 		return xerrors.Errorf("failed to marshal metadata into JSON: %v", err)
 	}
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
 		"project", "invoke", "updateMetadata", "-bc", conf.BCPath, "-sign",
 		conf.KeyID, "-metadataJSON", string(jsonMetadata), "-i", p.InstanceID)

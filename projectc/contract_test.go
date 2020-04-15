@@ -30,13 +30,13 @@ func TestProjectScenario(t *testing.T) {
 			"invoke:odysseyproject.setURL",
 			"invoke:odysseyproject.setAccessPubKey",
 			"invoke:odysseyproject.setEnclavePubKey"}, signer.Identity())
-	require.Nil(t, err)
+	require.NoError(t, err)
 	gDarc := &genesisMsg.GenesisDarc
 
 	genesisMsg.BlockInterval = time.Second
 
 	cl, _, err := byzcoin.NewLedger(genesisMsg, false)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// ------------------------------------------------------------------------
 	// Spawn
@@ -63,13 +63,13 @@ func TestProjectScenario(t *testing.T) {
 	instIDBuf := instID.Slice()
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	pr, err := cl.WaitProof(instID, 2*genesisMsg.BlockInterval, nil)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.True(t, pr.InclusionProof.Match(instIDBuf))
 	_, _, _, err = pr.Get(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -77,12 +77,12 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err := cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof := prResp.Proof
 
 	exist, err := proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match := proof.InclusionProof.Match(instIDBuf)
@@ -90,7 +90,7 @@ func TestProjectScenario(t *testing.T) {
 
 	var projectData ProjectData
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())
@@ -122,13 +122,13 @@ func TestProjectScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -136,19 +136,19 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
 	require.True(t, match)
 
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())
@@ -177,13 +177,13 @@ func TestProjectScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -191,19 +191,19 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
 	require.True(t, match)
 
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())
@@ -237,13 +237,13 @@ func TestProjectScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -251,19 +251,19 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
 	require.True(t, match)
 
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())
@@ -294,13 +294,13 @@ func TestProjectScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -308,19 +308,19 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
 	require.True(t, match)
 
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())
@@ -352,13 +352,13 @@ func TestProjectScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -366,19 +366,19 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
 	require.True(t, match)
 
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())
@@ -410,13 +410,13 @@ func TestProjectScenario(t *testing.T) {
 		Invoke:        &invoke,
 		SignerCounter: []uint64{counter},
 	})
-	require.Nil(t, nil)
+	require.NoError(t, err)
 
 	err = ctx.FillSignersAndSignWith(signer)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = cl.AddTransactionAndWait(ctx, 10)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	local.WaitDone(genesisMsg.BlockInterval)
 
@@ -424,19 +424,19 @@ func TestProjectScenario(t *testing.T) {
 	// Get
 
 	prResp, err = cl.GetProofFromLatest(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	proof = prResp.Proof
 
 	exist, err = proof.InclusionProof.Exists(instIDBuf)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	match = proof.InclusionProof.Match(instIDBuf)
 	require.True(t, match)
 
 	err = proof.VerifyAndDecode(cothority.Suite, ContractProjectID, &projectData)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, 2, len(projectData.Datasets))
 	require.Equal(t, instID1, projectData.Datasets[0].String())

@@ -67,7 +67,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return
 }
 
 // auditDataset prints all the access performed on the dataset

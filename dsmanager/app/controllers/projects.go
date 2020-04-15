@@ -278,12 +278,6 @@ func ProjectsRequestsTasksShowStatusHandler(gs sessions.Store,
 func projectsPost(w http.ResponseWriter, r *http.Request,
 	store sessions.Store, conf *models.Config) {
 
-	type viewData struct {
-		Title    string
-		Datasets []models.Dataset
-		Flash    []helpers.Flash
-	}
-
 	// Call ParseForm() to parse the raw query and update r.PostForm and r.Form.
 	err := r.ParseForm()
 	if err != nil {
@@ -316,7 +310,6 @@ func projectsPost(w http.ResponseWriter, r *http.Request,
 		fmt.Sprintf("A new project with uniq id '%s' and title '%s' has been "+
 			"created and the request to set up an enclave submitted",
 			project.UID, project.Title), w, r, store)
-	return
 }
 
 // @Summary Gets the list of projects
@@ -486,11 +479,11 @@ func projectsShowGet(w http.ResponseWriter, r *http.Request,
 		log.Info("latest message: ", latestMsg, "latest details: ", latestDetails)
 		lastI := strings.LastIndex(latestDetails, "attr:allowed verification failed")
 		if lastI != -1 {
-			failedReason = latestDetails[lastI:len(latestDetails)]
+			failedReason = latestDetails[lastI:]
 		} else {
 			lastI = strings.LastIndex(latestDetails, "attr:must_have verification failed")
 			if lastI != -1 {
-				failedReason = latestDetails[lastI:len(latestDetails)]
+				failedReason = latestDetails[lastI:]
 			}
 		}
 	}
@@ -635,7 +628,6 @@ func projectsShowPut(w http.ResponseWriter, r *http.Request,
 
 	helpers.RedirectWithInfoFlash("/projects/"+project.UID, "New request to "+
 		"prepare the enclave has been submitted", w, r, store)
-	return
 }
 
 func projectsShowDelete(w http.ResponseWriter, r *http.Request,
@@ -659,7 +651,6 @@ func projectsShowDelete(w http.ResponseWriter, r *http.Request,
 
 	helpers.RedirectWithInfoFlash("/projects", "Project '"+id+
 		"' deleted", w, r, store)
-	return
 }
 
 func projectsShowAttributesGet(w http.ResponseWriter, r *http.Request,
@@ -720,7 +711,6 @@ func projectsShowAttributesGet(w http.ResponseWriter, r *http.Request,
 	// catalog.
 	datasetList := []*catalogc.Dataset{}
 	for _, calypsoWriteID := range projectContractData.Datasets {
-		cmd = new(exec.Cmd)
 		cmd = exec.Command("./catadmin", "contract", "catalog",
 			"getSingleDataset", "-i", conf.CatalogID, "--calypsoWriteID",
 			calypsoWriteID.String(), "--bc", conf.BCPath, "--export")
@@ -732,6 +722,12 @@ func projectsShowAttributesGet(w http.ResponseWriter, r *http.Request,
 		cmd.Stderr = &errb
 
 		err = cmd.Run()
+		if err != nil {
+			helpers.RedirectWithErrorFlash("/projects", fmt.Sprintf("failed to "+
+				"get the dataset '%s': %s - Output: %s - Err: %s", calypsoWriteID,
+				err.Error(), outb.String(), errb.String()), w, r, store)
+			return
+		}
 
 		dataset := &catalogc.Dataset{}
 		err := protobuf.Decode(outb.Bytes(), dataset)
@@ -746,7 +742,6 @@ func projectsShowAttributesGet(w http.ResponseWriter, r *http.Request,
 
 	// Get the catalog
 
-	cmd = new(exec.Cmd)
 	cmd = exec.Command("./catadmin", "-c", conf.ConfigPath, "contract",
 		"catalog", "getMetadata", "-i", conf.CatalogID, "-bc", conf.BCPath,
 		"--export")
@@ -827,7 +822,6 @@ func projectsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 
 	helpers.RedirectWithInfoFlash("/projects/"+project.UID, "Request to "+
 		"update the attributes submitted", w, r, store)
-	return
 }
 
 func projectsShowEnclaveGet(w http.ResponseWriter, r *http.Request,
@@ -925,7 +919,6 @@ func projectsShowEnclaveDelete(w http.ResponseWriter, r *http.Request,
 
 	helpers.RedirectWithInfoFlash("/projects/"+project.UID, "Request to "+
 		"delete the enclave submitted", w, r, store)
-	return
 }
 
 func projectsShowUnlockPut(w http.ResponseWriter, r *http.Request,
@@ -953,7 +946,6 @@ func projectsShowUnlockPut(w http.ResponseWriter, r *http.Request,
 
 	helpers.RedirectWithInfoFlash("/projects/"+project.UID, "Request to "+
 		"unlock the enclave submitted", w, r, store)
-	return
 }
 
 func projectShowDebugGet(w http.ResponseWriter, r *http.Request,
@@ -1264,7 +1256,7 @@ func projectsRequestShowCloudstreamGet(w http.ResponseWriter, r *http.Request,
 	for {
 		select {
 		case taskEvent := <-cloudNotif.TaskEventCh:
-			fmt.Fprintf(w, taskEvent.JSONStream())
+			fmt.Fprint(w, taskEvent.JSONStream())
 			flusher.Flush()
 		default:
 			select {

@@ -55,6 +55,9 @@ func CatalogSpawn(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	ctx, err := cl.CreateTransaction(byzcoin.Instruction{
 		InstanceID: byzcoin.NewInstanceID(d.GetBaseID()),
@@ -151,6 +154,9 @@ func CatalogInvokeAddOwner(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -236,6 +242,9 @@ func CatalogInvokeUpdateOwner(c *cli.Context) error {
 	newIdentityStr := c.String("newIdentityStr")
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -320,6 +329,9 @@ func CatalogInvokeDeleteOwner(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -432,6 +444,9 @@ func CatalogInvokeAddDataset(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -610,6 +625,9 @@ func CatalogInvokeUpdateDataset(c *cli.Context) error {
 	newCalypsoWriteID := c.String("newCalypsoWriteID")
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -742,6 +760,9 @@ func CatalogInvokeArchiveDataset(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -868,6 +889,9 @@ func CatalogInvokeDeleteDataset(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,
@@ -946,6 +970,9 @@ func CatalogInvokeUpdateMetadata(c *cli.Context) error {
 	}
 
 	counters, err := cl.GetSignerCounters(signer.Identity().String())
+	if err != nil {
+		return xerrors.Errorf("failed to get counters: %v", err)
+	}
 
 	invoke := byzcoin.Invoke{
 		ContractID: catalogc.ContractCatalogID,

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"net/url"
@@ -39,7 +38,6 @@ var (
 	healthy    int32
 	store      = sessions.NewCookieStore([]byte("TOBECHANGEDOFCOURSE"))
 	conf       *models.Config
-	db         *bolt.DB
 )
 
 // @title Data Scientist Manager REST API
@@ -165,16 +163,6 @@ func healthz() http.Handler {
 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/images/favicon.ico")
-}
-
-func testHandler(w http.ResponseWriter, r *http.Request) {
-	value := 12
-	p := &struct{ Value int }{value}
-
-	// cl := calypso.NewClient(nil)
-
-	t, _ := template.ParseFiles("test.html")
-	t.Execute(w, p)
 }
 
 func logging(logger *log.Logger) func(http.Handler) http.Handler {

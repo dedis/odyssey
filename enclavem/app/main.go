@@ -14,7 +14,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/gorilla/mux"
 
 	"github.com/dedis/odyssey/dsmanager/app/helpers"
@@ -38,12 +37,6 @@ var (
 	store      = sessions.NewCookieStore([]byte("TOBECHANGEDOFCOURSE"))
 	conf       *models.Config
 )
-
-// Flash ...
-type Flash struct {
-	i   interface{}
-	Msg string
-}
 
 func main() {
 	// Register the struct so encoding/gob knows about it
@@ -172,17 +165,6 @@ func tracing(nextRequestID func() string) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
-}
-
-// parseConfig parses the config file and return a config struct
-func parseConfig() (*models.Config, error) {
-	conf := &models.Config{}
-	_, err := toml.DecodeFile("config.toml", conf)
-	if err != nil {
-		return nil, errors.New("failed to read config: " + err.Error())
-	}
-
-	return conf, nil
 }
 
 func loadDb() error {

@@ -18,7 +18,6 @@ import (
 
 	"github.com/dedis/odyssey/domanager/app/controllers"
 	"github.com/dedis/odyssey/domanager/app/models"
-	"github.com/dedis/odyssey/dsmanager/app/helpers"
 	xhelpers "github.com/dedis/odyssey/dsmanager/app/helpers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -412,6 +411,7 @@ func setSession(t *testing.T, url string) string {
 
 	w := httptest.NewRecorder()
 	session, err := store.Get(req, "signin-session")
+	require.NoError(t, err)
 	randKey := lib.RandString(12)
 	session.Values["key"] = randKey
 	bcPath := "test/bc-test.cfg"
@@ -446,7 +446,7 @@ func (ftm *fakeTaskManager) NewTask(title string) xhelpers.TaskI {
 	task := &FakeTask{
 		eventChan: make(chan xhelpers.TaskEvent, 10),
 		doneChan:  make(chan interface{}),
-		data:      &helpers.TaskData{},
+		data:      &xhelpers.TaskData{},
 	}
 	ftm.taskList = append(ftm.taskList, task)
 	// So we can block in the test until at least one task is created
@@ -462,20 +462,20 @@ func (ftm *fakeTaskManager) GetTask(index int) xhelpers.TaskI {
 	return ftm.taskList[index]
 }
 
-func (ftm *fakeTaskManager) GetSortedTasks() []helpers.TaskI {
+func (ftm *fakeTaskManager) GetSortedTasks() []xhelpers.TaskI {
 	return nil
 }
 func (ftm *fakeTaskManager) DeleteAllTasks() {
 
 }
-func (ftm *fakeTaskManager) RestoreTasks(tasks []helpers.TaskI) error {
+func (ftm *fakeTaskManager) RestoreTasks(tasks []xhelpers.TaskI) error {
 	return nil
 }
 
 type FakeTask struct {
 	eventChan chan xhelpers.TaskEvent
 	doneChan  chan interface{}
-	data      *helpers.TaskData
+	data      *xhelpers.TaskData
 }
 
 func (ft FakeTask) CloseError(source, msg, details string) {
@@ -496,15 +496,15 @@ func (ft FakeTask) CloseOK(source, msg, details string) {
 	close(ft.doneChan)
 }
 
-func (ft *FakeTask) AddTaskEvent(event helpers.TaskEvent) {
+func (ft *FakeTask) AddTaskEvent(event xhelpers.TaskEvent) {
 
 }
 
-func (ft *FakeTask) Subscribe() *helpers.Subscriber {
+func (ft *FakeTask) Subscribe() *xhelpers.Subscriber {
 	return nil
 }
 
-func (ft *FakeTask) GetData() *helpers.TaskData {
+func (ft *FakeTask) GetData() *xhelpers.TaskData {
 	return ft.data
 }
 
