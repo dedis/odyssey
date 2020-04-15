@@ -7,7 +7,7 @@ jobs:
   include:
     - stage: "Lint"
       script:
-        - go mod tidy && echo "$(git diff)" && [ -z "$(git status -s)" ]
+        - go mod tidy && ( [ -z "$(git status -s)" ] || echo "$(git diff)" && false )
         - make lint
         
     - stage: "Test"
