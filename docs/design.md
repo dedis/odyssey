@@ -37,6 +37,42 @@ organisation by collecting evidence of wrongdoing.
 **UML component diagram**
 <center><img src="assets/components_uml.png"/></center>
 
+# About the code structure
+
+## Global organization
+
+Each component has its own folder at the root of the project. 
+
+- `catalogc/` the catalog smart contract
+- `cryptutil/` utility tool to encrypt/descript data
+- `domanager/` the data owner manager
+- `dsmanager/` the data scientist manager
+- `enclave/` scipts that run on each new enclave
+- `enclavem/` the enclave manager
+- `ledger/` the code taken from [cothority](https://github.com/dedis/cothority) to run a blockchain
+- `projectc/` the project smart contract
+
+## Http servers
+
+`domanager/`, `dsmanager/`, and `enclavem/` are all http servers that use the
+native net/http library, coupled with some
+[gorilla](http://www.gorillatoolkit.org) packages. All our http components
+follow a standard organization borrowed from the [ruby on
+rails](https://guides.rubyonrails.org/getting_started.html) framework:
+
+- `main.go` the entrypoint of the server that defines the routes and their corresponding handlers
+- `assets/` images, fonts, stylesheets and all other asset elements needed
+- `controllers/` contains the handlers that are mapped from the routes
+- `helpers/` common utilities needed mostly in the controllers
+- `models/` codes that support the different data model structures needed
+- `views/` html representations that are rendered from the controllers
+
+It came out that some elements of the helpers were common to all our http
+servers. Instead of duplicating the codes accross the different helpers, we
+decided that the helpers of the data scientist manager (`dsmanager/app/helpers`)
+would contain the common helpers. This is for example the case of the "Task"
+helper, which is used by all the 3 http servers.
+
 # About the DARCs
 
 In order to later display the content of each DARC, the following table sets the
