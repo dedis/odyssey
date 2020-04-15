@@ -3,6 +3,7 @@
 directly in [/docs](/docs)**
 
 [![Build Status](https://travis-ci.com/dedis/odyssey.svg?branch=master)](https://travis-ci.com/dedis/odyssey)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dedis/odyssey)](https://goreportcard.com/report/github.com/dedis/odyssey)
 
 # odyssey
 
