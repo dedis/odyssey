@@ -7,8 +7,8 @@ lifecycle of vritual machine that we call "enclaves".
 
 We used the [Swisscom Dynamic Compution
 servive](https://www.swisscom.ch/en/business/enterprise/offer/cloud-data-center/dynamic-computing-services.html)
-the the virtualization service. This server offesr vMware vCloud, which allows
-one to manager virtual machines on the cloud.
+the the virtualization service. This server offers vMware vCloud, which allows
+one to manage virtual machines on the cloud.
 
 From https://extranet.swisscom.ch, select “Dynamic Computing”:
 
