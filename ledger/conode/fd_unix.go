@@ -25,6 +25,9 @@ func init() {
 		}
 
 		err = syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+		if err != nil {
+			log.Warn("Error Getting limit:", err)
+		}
 		log.Info("File descriptor limit is:", rLimit.Cur)
 	}
 }
