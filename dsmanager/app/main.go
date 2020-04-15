@@ -1,11 +1,8 @@
-// Performance issue: https://github.com/golang/go/issues/26019
-
 package main
 
 import (
 	"context"
 	"encoding/gob"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -44,14 +41,6 @@ var (
 	db         *bolt.DB
 )
 
-func init() {
-	var err error
-	conf, err = parseConfig()
-	if err != nil {
-		log.Fatal("failed to load config", err)
-	}
-}
-
 // @title Data Scientist Manager REST API
 // @version 1.0
 // @description REST functionalities provided by the Data Scientist Manager
@@ -62,10 +51,16 @@ func main() {
 	// Register the struct so encoding/gob knows about it
 	gob.Register(helpers.Flash{})
 
+	var err error
+	conf, err = models.NewConfig()
+	if err != nil {
+		log.Fatal("failed to load config", err)
+	}
+
 	xlog.LLvl1("here is the catalog id:", conf.CatalogID)
 
 	xlog.Info("loading db into memory")
-	err := loadDb()
+	err = loadDb()
 	if err != nil {
 		log.Fatal("failed to import DB: " + err.Error())
 	}
@@ -82,7 +77,7 @@ func main() {
 		http.FileServer(http.Dir("."+"/assets/"))))
 	router.HandleFunc("/favicon.ico", faviconHandler)
 
-	router.Handle("/datasets", http.HandlerFunc(controllers.DatasetsIndexHandler(store, conf, db)))
+	router.Handle("/datasets", http.HandlerFunc(controllers.DatasetsIndexHandler(store, conf)))
 	router.Handle("/requests", http.HandlerFunc(controllers.RequestsIndexHandler(store, conf, db)))
 	router.Handle("/requests/{id}", http.HandlerFunc(controllers.RequestsShowHandler(store, conf, db)))
 
@@ -101,7 +96,7 @@ func main() {
 	router.Handle("/projects/{pid}/requests/{rid}/tasks/{tid}/debug", http.HandlerFunc(controllers.ProjectsRequestsTasksShowDebugHandler(store, conf)))
 	router.Handle("/projects/{pid}/requests/{rid}/tasks/{tid}/status", http.HandlerFunc(controllers.ProjectsRequestsTasksShowStatusHandler(store, conf)))
 
-	router.Handle("/tasks/{id}", http.HandlerFunc(controllers.TasksShowHandler(store)))
+	router.Handle("/tasks/{id}", http.HandlerFunc(controllers.TasksShowHandler(store, conf.TaskManager)))
 	router.Handle("/", http.HandlerFunc(controllers.HomeHandler(store, conf)))
 	router.Handle("/healthz", healthz())
 	router.Handle("/test", http.HandlerFunc(testHandler))
@@ -189,32 +184,14 @@ func loadDb() error {
 
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("Projects"))
-		tempTaskList := make([]*helpers.Task, 0)
 		b.ForEach(func(k, v []byte) error {
 			project := &models.Project{}
-			err := json.Unmarshal(v, project)
+			err := project.UnmarshalBinary(v)
 			if err != nil {
 				xlog.Error("failed to unmarshal project: " + err.Error())
 				return errors.New("failed to unmarshal project: " + err.Error())
 			}
-			project.PrepareAfterUnmarshal()
 			models.ProjectList[string(k)] = project
-			for _, r := range project.Requests {
-				for _, t := range r.Tasks {
-					tempTaskList = append(tempTaskList, t)
-				}
-			}
-			// Here we assume that each new task were appended to the TaskList
-			// with an incrementing Index attribute corresponding to its
-			// position in the TaskList
-			helpers.TaskList = make([]*helpers.Task, len(tempTaskList))
-			for _, t := range tempTaskList {
-				if t.Index >= len(tempTaskList) || t.Index < 0 {
-					return fmt.Errorf("found anormal index on task: 0 > "+
-						"(index) %d >= len(TaskList) %d", t.Index, len(tempTaskList))
-				}
-				helpers.TaskList[t.Index] = t
-			}
 			return nil
 		})
 		return nil
@@ -239,8 +216,7 @@ func saveDb() error {
 			return fmt.Errorf("create bucket: %s", err)
 		}
 		for k, project := range models.ProjectList {
-			project.PrepareBeforeMarshal()
-			projectBuf, err := json.Marshal(project)
+			projectBuf, err := project.MarshalBinary()
 			if err != nil {
 				return errors.New("failed to marshal project: " + err.Error())
 			}

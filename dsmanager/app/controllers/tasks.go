@@ -13,18 +13,18 @@ import (
 )
 
 // TasksShowHandler ...
-func TasksShowHandler(gs sessions.Store) http.HandlerFunc {
+func TasksShowHandler(gs sessions.Store, tm helpers.TaskManagerI) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			tasksShowGet(w, r, gs)
+			tasksShowGet(w, r, gs, tm)
 		default:
 			log.Error("Only GET is supported for /tasks/{id}")
 		}
 	}
 }
 
-func tasksShowGet(w http.ResponseWriter, r *http.Request, store sessions.Store) {
+func tasksShowGet(w http.ResponseWriter, r *http.Request, store sessions.Store, tm helpers.TaskManagerI) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		helpers.RedirectWithErrorFlash("/", "the response writer does not "+
@@ -53,18 +53,18 @@ func tasksShowGet(w http.ResponseWriter, r *http.Request, store sessions.Store) 
 		return
 	}
 
-	if index >= len(helpers.TaskList) || index < 0 {
+	if index >= tm.NumTasks() || index < 0 {
 		tef.FlushTaskEventCloseErrorf("index out of bound", "Index out of "+
 			"bound: 0 > (index) %d >= len(TaskList) %d", index,
-			len(helpers.TaskList))
+			tm.NumTasks())
 		return
 	}
-	task := helpers.TaskList[index]
+	task := tm.GetTask(index)
 
 	// If the task is not in a working state then there is nothing to return
 	// here.
 	var client *helpers.Subscriber
-	if task.Status == helpers.StatusWorking {
+	if task.GetData().Status == helpers.StatusWorking {
 		client = task.Subscribe()
 	} else {
 		log.LLvl1("task not in the working status, nothing to send")

@@ -105,13 +105,13 @@
 
     {{ range $i, $task := .Request.Tasks }}
         <h3>Task</h3>
-        <p><b>Description</b>: {{.Description}}</p>
-        <p><b>Started at</b>: {{.StartD}}</p>
-        <p><b>Ended at</b>: {{.EndD}}</p>
+        <p><b>Description</b>: {{.GetData.Description}}</p>
+        <p><b>Started at</b>: {{.GetData.StartD}}</p>
+        <p><b>Ended at</b>: {{.GetData.EndD}}</p>
         
-        <p class="status"><b>Status</b>: <img src="/assets/images/status/{{.Status}}.gif"/> {{.Status}}</p>
+        <p class="status"><b>Status</b>: <img src="/assets/images/status/{{.GetData.Status}}.gif"/> {{.GetData.Status}}</p>
 
-        <p><b>TaskEvents</b> (<span id="task-n">{{ len .History }}</span>)</p>
+        <p><b>TaskEvents</b> (<span id="task-n">{{ len .GetData.History }}</span>)</p>
 
         <div class="nice-scroll" style="overflow-x:scroll">
             <table id="tasks-main-container" class="pure-table pure-table-horizontal tasks">
@@ -125,7 +125,7 @@
                 </thead>
 
                 <tbody id="task-holder">
-                    {{ range $i, $d := .History }}
+                    {{ range $i, $d := .GetData.History }}
                         <tr>
                             <td>{{.Type}}</td>
                             <td>{{.Time}}</td>

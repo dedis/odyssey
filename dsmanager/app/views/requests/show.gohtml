@@ -5,15 +5,15 @@
     <div class="pure-u-1 pure-u-sm-1-4"><p></p></div>
     <div class="pure-u-1 pure-u-sm-1-2">
 
-        <h1>Request {{.Request.ID}} ({{ .Request.Index }})</h1>
+        <h1>Task {{.Task.GetData.ID}} ({{ .Task.GetData.Index }})</h1>
 
         <p><a class="pure-button" href="/requests">🔙 Back to the list</a></p>
 
-        <p><b>Description</b>: {{.Request.Description}}</p>
-        <p><b>Started at</b>: {{.Request.StartD}}</p>
-        <p><b>Ended at</b>: {{.Request.EndD}}</p>
+        <p><b>Description</b>: {{.Task.GetData.Description}}</p>
+        <p><b>Started at</b>: {{.Task.GetData.StartD}}</p>
+        <p><b>Ended at</b>: {{.Task.GetData.EndD}}</p>
         
-        <p><b>Status</b>: <span id="status-holder">{{.StatusImg}}</p>
+        <p><b>Status</b>: <span id="status-holder">{{.Task.GetData.StatusImg}}</p>
 
         <h3>TaskEvents</h3>
         <table id="tasks-main-container" class="pure-table pure-table-horizontal tasks">
@@ -27,7 +27,7 @@
             </thead>
 
             <tbody id="task-holder">
-            {{ range $i, $d := .Request.History }}
+            {{ range $i, $d := .Task.GetData.History }}
                 <tr>
                     <td>{{.Type}}</td>
                     <td>{{.Time}}</td>
@@ -50,7 +50,7 @@
 
 <script>
 var url = new URL(window.location.href);
-const evtSource = new EventSource("/tasks/"+"{{.Request.Index}}", {withCredentials: false });
+const evtSource = new EventSource("/tasks/"+"{{.Task.GetData.Index}}", {withCredentials: false });
 
 evtSource.onmessage = function(event) {
 

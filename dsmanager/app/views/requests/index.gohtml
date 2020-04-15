@@ -22,14 +22,14 @@
                 </tr>
             </thead>
             <tbody>
-            {{ range $i, $d := .Requests }}
+            {{ range $i, $d := .Tasks }}
                 <tr>
                     <td><a class="pure-button pure-button-primary" href="/requests/{{.Index}}">See</a></td>
-                    <td>{{.Status}}</td>
-                    <td>{{.Description}}</td>
-                    <td>{{.ID}}</td>
-                    <td>{{.Index}}</td>
-                    <td>{{.StartD}}</td>
+                    <td>{{.GetData.Status}}</td>
+                    <td>{{.GetData.Description}}</td>
+                    <td>{{.GetData.ID}}</td>
+                    <td>{{.GetData.Index}}</td>
+                    <td>{{.GetData.StartD}}</td>
                 </tr>
             {{ end }}
             </tbody>

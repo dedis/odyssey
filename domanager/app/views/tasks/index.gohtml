@@ -24,20 +24,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                {{ range $i, $d := .Requests }}
+                {{ range $i, $d := .Tasks }}
                     <tr>
-                        <td><a class="pure-button pure-button-primary" href="/showtasks/{{.Index}}">See</a></td>
+                        <td><a class="pure-button pure-button-primary" href="/showtasks/{{.GetData.Index}}">See</a></td>
                         <td><p class="status">{{.StatusImg}}</p></td>
-                        <td>{{.Description}}</td>
-                        <td>{{.ID}}</td>
-                        <td>{{.Index}}</td>
-                        <td>{{.StartD}}</td>
+                        <td>{{.GetData.Description}}</td>
+                        <td>{{.GetData.ID}}</td>
+                        <td>{{.GetData.Index}}</td>
+                        <td>{{.GetData.StartD}}</td>
                     </tr>
-                    {{ if eq $d.Status "working" }}
+                    {{ if eq $d.GetData.Status "working" }}
                         <script>
                             (function () {
                                 var url = new URL(window.location.href);
-                                const evtSource = new EventSource("/tasks/"+"{{.Index}}", {withCredentials: false });
+                                const evtSource = new EventSource("/tasks/"+"{{.GetData.Index}}", {withCredentials: false });
 
                                 evtSource.onmessage = function(event) {
                                     var newLog = document.createElement("div");

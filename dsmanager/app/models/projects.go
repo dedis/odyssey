@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/rand"
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -95,13 +96,33 @@ type Project struct {
 	PubKey         string
 }
 
+// Used for marshal/unmarshal
+type projectWrap struct {
+	Status      ProjectStatus
+	UID         string
+	Title       string
+	Description string
+	InstanceID  string
+	Requests    [][]byte
+	CreatedAt   time.Time
+	PubKey      string
+}
+
 // Request holds a request for a project
 type Request struct {
 	Description    string
 	Status         RequestStatus
-	Tasks          []*helpers.Task
+	Tasks          []helpers.TaskI
 	StatusNotifier *helpers.StatusNotifier
 	Index          int
+}
+
+// Used for marshal/unmarshal
+type requestWrap struct {
+	Description string
+	Status      RequestStatus
+	Tasks       [][]byte
+	Index       int
 }
 
 // RequestSorter is used to define a sorter that sorts requests by the Index
@@ -122,6 +143,61 @@ func (p RequestSorter) Less(i, j int) bool {
 // GetCloudAttributes return the alias, bucket name and prefix
 func (r *Request) GetCloudAttributes(projectUID string) (string, string, string) {
 	return "dedis", projectUID, fmt.Sprintf("logs/%d", r.Index)
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler
+func (r *Request) MarshalBinary() ([]byte, error) {
+
+	wrap := &requestWrap{}
+	wrap.Description = r.Description
+	wrap.Status = r.Status
+	wrap.Tasks = make([][]byte, len(r.Tasks))
+	for i, task := range r.Tasks {
+		taskBuf, err := task.MarshalBinary()
+		if err != nil {
+			return nil, xerrors.Errorf("failed to marshal task: %v", err)
+		}
+		wrap.Tasks[i] = taskBuf
+	}
+	wrap.Index = r.Index
+
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(wrap)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to encode request wrap: %v", err)
+	}
+
+	return buf.Bytes(), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler
+func (r *Request) UnmarshalBinary(data []byte) error {
+
+	wrap := &requestWrap{}
+	dataReader := bytes.NewReader(data)
+	dec := gob.NewDecoder(dataReader)
+	err := dec.Decode(wrap)
+	if err != nil {
+		return xerrors.Errorf("failed to unmarshal request wrap: %v", err)
+	}
+
+	r.Description = wrap.Description
+	r.Status = wrap.Status
+	r.Tasks = make([]helpers.TaskI, len(wrap.Tasks))
+	for i, taskBuf := range wrap.Tasks {
+		task := &helpers.Task{}
+		err := task.UnmarshalBinary(taskBuf)
+		if err != nil {
+			return xerrors.Errorf("failed to unmarshal task: %v", err)
+		}
+		r.Tasks[i] = task
+	}
+	r.Index = wrap.Index
+	r.StatusNotifier = helpers.NewStatusNotifier()
+	r.StatusNotifier.Terminated = true
+
+	return nil
 }
 
 // ProjectSorter is used to define a sorter that sorts projects by the CreatedAt
@@ -171,30 +247,69 @@ func (p *Project) AddRequest(request *Request) {
 	p.Requests = append(p.Requests, request)
 }
 
-// PrepareBeforeMarshal updates the elements of the project that can not be
-// marshalled.
-func (p *Project) PrepareBeforeMarshal() {
-	p.StatusNotifier = nil
-	for _, request := range p.Requests {
-		request.StatusNotifier = nil
-		for _, task := range request.Tasks {
-			task.Subscribers = nil
+// MarshalBinary implements encoding.BinaryMarshaler
+func (p *Project) MarshalBinary() ([]byte, error) {
+
+	wrap := &projectWrap{}
+
+	wrap.Status = p.Status
+	wrap.UID = p.UID
+	wrap.Title = p.Title
+	wrap.Description = p.Description
+	wrap.InstanceID = p.InstanceID
+	wrap.Requests = make([][]byte, len(p.Requests))
+	for i, request := range p.Requests {
+		requestBuf, err := request.MarshalBinary()
+		if err != nil {
+			return nil, xerrors.Errorf("failed to marshal request: %v", err)
 		}
+		wrap.Requests[i] = requestBuf
 	}
+	wrap.CreatedAt = p.CreatedAt
+	wrap.PubKey = p.PubKey
+
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(wrap)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to encode project wrap: %v", err)
+	}
+
+	return buf.Bytes(), nil
 }
 
-// PrepareAfterUnmarshal updates the elements of the project that were changed
-// before marshalling.
-func (p *Project) PrepareAfterUnmarshal() {
+// UnmarshalBinary implements encoding.BinaryUnmarshaler
+func (p *Project) UnmarshalBinary(data []byte) error {
+
+	wrap := &projectWrap{}
+	dataReader := bytes.NewReader(data)
+	dec := gob.NewDecoder(dataReader)
+	err := dec.Decode(wrap)
+	if err != nil {
+		return xerrors.Errorf("failed to unmarshal project wrap: %v", err)
+	}
+
+	p.Status = wrap.Status
+	p.UID = wrap.UID
+	p.Title = wrap.Title
+	p.Description = wrap.Description
+	p.InstanceID = wrap.InstanceID
+	p.Requests = make([]*Request, len(wrap.Requests))
+	for i, requestBuf := range wrap.Requests {
+		request := &Request{}
+		err = request.UnmarshalBinary(requestBuf)
+		if err != nil {
+			return xerrors.Errorf("failed to unmarshal request: %v", err)
+		}
+		p.Requests[i] = request
+	}
+	p.CreatedAt = wrap.CreatedAt
+	p.PubKey = wrap.PubKey
+
 	p.StatusNotifier = helpers.NewStatusNotifier()
 	p.StatusNotifier.Terminated = true
-	for _, request := range p.Requests {
-		request.StatusNotifier = helpers.NewStatusNotifier()
-		request.StatusNotifier.Terminated = true
-		for _, task := range request.Tasks {
-			task.Subscribers = make([]*helpers.Subscriber, 0)
-		}
-	}
+
+	return nil
 }
 
 // GetLastestTaskMsg return the latest task message, or an empty one if there
@@ -210,31 +325,30 @@ func (p *Project) GetLastestTaskMsg() (string, string) {
 		return "", ""
 	}
 	t := r.Tasks[len(r.Tasks)-1]
-	if len(t.History) == 0 {
+	if len(t.GetData().History) == 0 {
 		return "", ""
 	}
-	return t.History[0].Message, t.History[0].Details
+	return t.GetData().History[0].Message, t.GetData().History[0].Details
 }
 
 // RequestCreateProjectInstance creates and runs a request that creates a new
 // instance of a project contract.
-func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config) (*Request, *helpers.Task) {
+func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config) (*Request, helpers.TaskI) {
 	p.Status = ProjectStatusPreparingEnclave
 	p.StatusNotifier.UpdateStatus(ProjectStatusPreparingEnclave)
 
-	task := helpers.NewTask("New project creation")
-	tef := helpers.NewTaskEventFactory("ds manager")
+	task := conf.TaskManager.NewTask("New project creation")
+	tef := helpers.NewTaskEventFactory("DS Manager")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
 	client := task.Subscribe()
 
-	task.AddTaskEvent(tef.NewTaskEventInfo("task created",
-		"from the RequestCreateProjectInstance function"))
+	task.AddInfo(tef.Source, "task created", "from the RequestCreateProjectInstance function")
 
 	request := &Request{
 		Description:    "Prepare the enclave",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}
@@ -334,8 +448,8 @@ func (p *Project) RequestCreateProjectInstance(datasetIDs []string, conf *Config
 
 // RequestBootEnclave talks to the enclave manager and asks it to boot an
 // enclave.
-func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf *Config) {
-	tef := helpers.NewTaskEventFactory("ds manager")
+func (p *Project) RequestBootEnclave(request *Request, task helpers.TaskI, conf *Config) {
+	tef := helpers.NewTaskEventFactory("DS Manager")
 
 	// This is the case where RequestCreateProjectInstance has not been called
 	// before because we are trying to re-request to boot the enclave, but the
@@ -344,7 +458,7 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 		p.Status = ProjectStatusPreparingEnclave
 		p.StatusNotifier.UpdateStatus(ProjectStatusPreparingEnclave)
 
-		task = helpers.NewTask("New project creation")
+		task = conf.TaskManager.NewTask("New project creation")
 
 		// We use this client to listen to the events and update the project
 		// status based on what we receive.
@@ -354,7 +468,7 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 
 		request = &Request{
 			Description:    "Prepare the enclave",
-			Tasks:          []*helpers.Task{task},
+			Tasks:          []helpers.TaskI{task},
 			StatusNotifier: helpers.NewStatusNotifier(),
 			Status:         RequestStatusRunning,
 		}
@@ -404,7 +518,15 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 		"projectUID":    {p.UID},
 		"requestIndex":  {strconv.Itoa(request.Index)},
 	}
-	resp, err := http.PostForm("http://localhost:5000/vapps", formData)
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/vapps", strings.NewReader(formData.Encode()))
+	if err != nil {
+		log.Infof("Failed to create request: %s", err.Error())
+		task.CloseError(tef.Source, "Failed to create request", err.Error())
+		return
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := conf.RunHTTP.Do(&http.Client{}, req)
 	if err != nil {
 		log.Infof("Failed to send request: %s", err.Error())
 		task.CloseError(tef.Source, "Failed to send request", err.Error())
@@ -464,17 +586,11 @@ func (p *Project) RequestBootEnclave(request *Request, task *helpers.Task, conf 
 }
 
 func createProjectInstace(idStr, pubKey string, conf *Config) (string, error) {
-
-	cmd := exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
+	outb, err := conf.Executor.Run("./pcadmin", "-c", conf.ConfigPath, "contract",
 		"project", "spawn", "-is", idStr, "-bc", conf.BCPath, "-sign",
 		conf.KeyID, "-darc", conf.DarcID, "-pubKey", pubKey)
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("failed to run the command: %s - "+
-			"Output: %s - Err: %s", err.Error(), outb.String(), errb.String())
+		return "", xerrors.Errorf("failed to run the command: %v", err.Error())
 	}
 
 	cmdOut := outb.String()
@@ -500,7 +616,7 @@ func (p *Project) RequestUpdateAttributes(values url.Values, conf *Config) {
 	p.StatusNotifier.Terminated = false
 	p.StatusNotifier.UpdateStatus(ProjectStatusUpdatingAttributes)
 
-	task := helpers.NewTask("Update the attributes")
+	task := conf.TaskManager.NewTask("Update the attributes")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -510,7 +626,7 @@ func (p *Project) RequestUpdateAttributes(values url.Values, conf *Config) {
 
 	request := &Request{
 		Description:    "Update the enclave's attributes",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}
@@ -657,7 +773,7 @@ func (p *Project) RequestUnlockEnclave(conf *Config) {
 	p.StatusNotifier.Terminated = false
 	p.StatusNotifier.UpdateStatus(ProjectStatusUnlockingEnclave)
 
-	task := helpers.NewTask("Request to unlock the enclave")
+	task := conf.TaskManager.NewTask("Request to unlock the enclave")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -667,7 +783,7 @@ func (p *Project) RequestUnlockEnclave(conf *Config) {
 
 	request := &Request{
 		Description:    "Ask to unlock the enclave",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}
@@ -895,7 +1011,7 @@ func (p *Project) RequestDeleteEnclave(conf *Config) {
 	p.StatusNotifier.Terminated = false
 	p.StatusNotifier.UpdateStatus(ProjectStatusDeletingEnclave)
 
-	task := helpers.NewTask("Request to delete the enclave")
+	task := conf.TaskManager.NewTask("Request to delete the enclave")
 
 	// We use this client to listen to the events and update the project
 	// status based on what we receive.
@@ -905,7 +1021,7 @@ func (p *Project) RequestDeleteEnclave(conf *Config) {
 
 	request := &Request{
 		Description:    "Ask to destroy the enclave",
-		Tasks:          []*helpers.Task{task},
+		Tasks:          []helpers.TaskI{task},
 		StatusNotifier: helpers.NewStatusNotifier(),
 		Status:         RequestStatusRunning,
 	}

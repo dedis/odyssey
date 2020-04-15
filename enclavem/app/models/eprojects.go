@@ -1,14 +1,13 @@
 package models
 
 import (
-	"bytes"
 	"fmt"
 	"net"
-	"os/exec"
 	"strings"
 	"time"
 
 	"go.dedis.ch/onet/v3/log"
+	"golang.org/x/xerrors"
 )
 
 // EProjectList holds all the projects
@@ -65,17 +64,14 @@ func (e EProject) ParseKey() (string, error) {
 // dependence cycle.
 func UpdateProjectcStatus(conf *Config, status string, instanceID string) error {
 
-	cmd := exec.Command("./pcadmin", "-c", conf.ConfigPath, "contract",
+	args := []string{"./pcadmin", "-c", conf.ConfigPath, "contract",
 		"project", "invoke", "updateStatus", "-bc", conf.BCPath, "-sign",
-		conf.KeyID, "-status", status, "-i", instanceID)
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
+		conf.KeyID, "-status", status, "-i", instanceID}
+	_, err := conf.Executor.Run(args...)
 
-	var err error
 	retry := 4
 	for retry > 0 {
-		err = cmd.Run()
+		_, err = conf.Executor.Run(args...)
 		if err == nil {
 			break
 		}
@@ -85,9 +81,8 @@ func UpdateProjectcStatus(conf *Config, status string, instanceID string) error 
 		time.Sleep(7 * time.Second)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to update the project instance status after 4 try, "+
-			"failed to run the command: %s - "+
-			"Output: %s - Err: %s", err.Error(), outb.String(), errb.String())
+		return xerrors.Errorf("failed to update the project instance status "+
+			"after 4 tries, failed to run the command: %v", err)
 	}
 
 	return nil

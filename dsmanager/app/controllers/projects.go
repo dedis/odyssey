@@ -1246,6 +1246,13 @@ func projectsRequestShowCloudstreamGet(w http.ResponseWriter, r *http.Request,
 	}
 
 	request := project.Requests[rid]
+
+	// If the request is done then we don't expect more cloud logs. Nothing to
+	// do then
+	if request.Status != models.RequestStatusRunning {
+		return
+	}
+
 	aliasName, bucket, prefix := request.GetCloudAttributes(project.UID)
 	cloudNotif, err := helpers.NewCloudNotifier(aliasName, bucket, prefix)
 	if err != nil {
@@ -1455,7 +1462,7 @@ func projectsRequestTasksShowStream(w http.ResponseWriter, r *http.Request,
 	// If the task is not in a working state then there is nothing to return
 	// here.
 	var client *helpers.Subscriber
-	if task.Status == helpers.StatusWorking {
+	if task.GetData().Status == helpers.StatusWorking {
 		client = task.Subscribe()
 	} else {
 		w.WriteHeader(http.StatusNoContent)
@@ -1560,7 +1567,7 @@ func projectsRequestTasksShowDebugGet(w http.ResponseWriter, r *http.Request,
 		Title   string
 		Project *models.Project
 		Request *models.Request
-		Task    *helpers.Task
+		Task    helpers.TaskI
 		Flash   []helpers.Flash
 		Tid     int
 	}
@@ -1655,7 +1662,7 @@ func projectsRequestTasksShowStatusPut(w http.ResponseWriter, r *http.Request,
 	// associated request status accordingly. Warning: this can be dangerous as
 	// the request could be closed twice, will would then close the subscribers
 	// channels that are already closed.
-	if task.Status == helpers.StatusWorking {
+	if task.GetData().Status == helpers.StatusWorking {
 		switch status {
 		case helpers.StatusFinished:
 			task.CloseOK("ds manager (debug)", "manual update of the status", "")
@@ -1669,7 +1676,7 @@ func projectsRequestTasksShowStatusPut(w http.ResponseWriter, r *http.Request,
 				models.RequestStatusErrored)
 		}
 	} else {
-		task.Status = helpers.StatusTask(status)
+		task.GetData().Status = helpers.StatusTask(status)
 	}
 
 	helpers.RedirectWithInfoFlash("/projects/"+project.UID+"/requests/"+ridStr, fmt.Sprintf(
