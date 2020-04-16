@@ -9,9 +9,9 @@ directly in [/docs](/docs)**
 
 Auditable Sharing and Management of Sensitive Data Across Jurisdictions.
 
-<center>
+<div align="center">
 <img src="docs/assets/odyssey-components.png">
-</center>
+</div>
 
 Odyssey is a set of applications and tools that enables the sharing sensitive
 data between multiple distrustfull parties. This project uses state-of-the-art
