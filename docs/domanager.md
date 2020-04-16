@@ -14,7 +14,8 @@ The following executables are needed at the root of `domanager/app`:
 - csadmin
 
 If you followed the [setup instructions](setup.md#generate-the-executables)
-those executables should already be on your gopath. Put them there with:
+those executables should already be on your gopath. Put them at the root of this
+module with:
 
 ```
 cd domanager/app
@@ -23,8 +24,8 @@ cp `go env GOPATH`/bin/{bcadmin,catadmin,csadmin} .
 
 ## Configuration
 
-You must have the MINO_* variables from `variables.sh` loaded in your shell.
-(See section "Setup, Cloud configuration".)
+You must have the MINO_* variables from `variables.sh` loaded in your shell (see
+section "Setup, Cloud configuration").
 
 Then rename `app/config.toml.template` to `app/config.toml` and fill it
 with the appropriate settings, following the instructions below to find
@@ -32,9 +33,10 @@ each of them.
 
 ## Catalog
 
-To create a new catalog, ensure that your Darc has the spawn:catalog rule on it,
-and then use `catadmin`. You will need the `BC` variable set, which should be
-set in your `variables.sh` file.
+To create a new catalog (ie. an instance of the catalog smart contract), ensure
+that your Darc has the spawn:catalog rule on it, and then use `catadmin`. You
+will need the `BC` variable set, which should be set in your `variables.sh`
+file.
 
 ```bash
 source ../../variables.sh
@@ -47,8 +49,9 @@ to the catalog before being able to upload a dataset. The following commads add
 the current identity set in the BC config file to the catalog:
 
 ```bash
-# Spot your identity, something like "ed25519:aef123..."
+# Spot your identity with the following, something like "ed25519:aef123..."
 bcadmin info
+# Add your identity to the catalog
 catadmin contract catalog invoke addOwner -i CATALOG_INSTANCE_ID --firstname John --lastname Doe --identityStr IDENTITY
 # If you print the catalog, you can notice the change
 catadmin contract catalog get -i CATALOG_INSTANCE_ID
@@ -83,11 +86,12 @@ You can exit the server with <kbd>ctrl</kbd>+<kbd>c</kbd>.
 
 ## Login
 
-To login you need to provide a credential file. This file is made with
-`bcadmin`. For this step you need the `roster.toml` file which contains the
-definition of the ledger and the ByzcoinID. Given that you are in the same
-folder that contains your private key, you can create this credential file with
-this command:
+When you are able to open the DOManager, you then have to log in to manage your
+datasets (the link is top right). To login you need to provide a credential
+file. This file is made with `bcadmin`. For this step you need the `roster.toml`
+file which contains the definition of the ledger and the ByzcoinID. Given that
+you are in the same folder that contains your private key, you can create this
+credential file with this command:
 
 ```bash
 bcadmin -c . link ../roster.toml BYZCOIN_ID --darc DARC_ID --id DARC_KEY

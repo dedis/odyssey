@@ -5,10 +5,13 @@ the cloud provider or the executables that each component need.
 
 ## Cloud configuration
 
+The system needs a cloud storage to store the encrypted datasets and the logs of
+the enclaves (we store the logs for usability and debug reasons).
+
 Make sure you have an available S3-compatible cloud endpoint.
 
 If you are using a remote cloud storage system, skip to
-"CloudStorage Setup" below.
+[CloudStorage Setup](#cloud-storage-setup) below.
 
 ### Local Minio install
 
@@ -64,12 +67,13 @@ mc mb dedis/datasets
 
 ## Generate the executables
 
-We heavily make use of direct calls to executables as a means to interface
-with Cothority. As such, you will need to build them and make sure they
-are in the PATH.
+We heavily make use of direct calls to executables as a means to interface with
+[Cothority](https://github.com/dedis/cothority). As such, you will need to build
+them and make sure they are in the PATH.
 
-Here is a summary
-of the executables needed by each component:
+The next table is a summary of the executables needed by each component. Note
+that if you are curious about where those executables come from, you can have a
+look in the Makefile.
 
 |               |catadmin|cryptutil|pcadmin|bcadmin|csadmin|
 |---------------|--------|---------|-------|-------|-------|
@@ -88,7 +92,8 @@ make
 
 Note that this target compile "bcadmin" and "csadmin" with the v3.4.4 of
 cothority, which could erase a more recent version that is already in your
-$GOPATH. If you do not want that you can manually select the needed executables:
+$GOPATH. If you do not want that you can manually select the needed executables
+and ignore bcadmin and csadmin:
 
 ```make
 make catadmin cryptutil pcadmin
@@ -102,6 +107,8 @@ in their associated documentation (chapter "Components").
 ### Using a local ledger
 
 If you are not using a public ledger, you will need to run your own local one.
+Our system is based on the [Cothority](https://github.com/dedis/cothority)
+ledger.
 
 #### Run the nodes
 
@@ -124,7 +131,7 @@ Now that the conodes are runing, we must initialize the ledger. The following
 steps use `bcadmin`. If you followed the steps in "Generate the executables",
 then the `bcadmin` command line utility should already be in your path.
 
-Make sure to run `varialbes.sh` if you set a custom `BC_CONFIG` variables. If
+Make sure to run `variables.sh` if you set a custom `BC_CONFIG` variables. If
 set, this variable tells `bcadmin` where to store and get the configuration
 files.
 
@@ -142,8 +149,8 @@ It is also a good idea to save the `export BC=...` command in the
 `variables.sh`.
 
 Upon creation, bcadmin created for you the admin identity and DARC, which are
-described by the config file saved in the BC variable. You can display the
-content of this configuration file with the following command:
+pointed by the config file saved in the BC variable. You can display the content
+of this configuration file with the following command:
 
 ```bash
 bcadmin info
@@ -152,8 +159,8 @@ bcadmin info
 #### Initialize Calypso
 
 In the following steps we will set up Calypso. Calypso is the technology that
-allows secrets sharing on the blockchain. In our case, we use it to store the
-symmetric keys of the encrypted datasets. The steps are performed with the
+allows secrets sharing on our blockchain ledger. In our case, we use it to store
+the symmetric keys of the encrypted datasets. The steps are performed with the
 `csadmin` command line utility. If you followed the steps in "Generate the
 executables", then the `csadmin` command line utility should already be in your
 path.
@@ -201,7 +208,7 @@ bcadmin info
 # Save the identity into a variable
 id=IDENTITY
 # Note: do not run those commands into one single batch in order to let the 
-# signer counter to be refreshed.
+# signer counter be refreshed.
 bcadmin darc rule -rule "spawn:calypsoWrite" -id $id
 bcadmin darc rule -rule "spawn:calypsoRead" -id $id
 bcadmin darc rule -rule "spawn:odysseyproject" -id $id
@@ -234,30 +241,38 @@ You can generate the REST documentation with
 swag init
 ```
 
-then you can launch the data scientist manager and navigate to `docs/`.
+then you can launch the data scientist manager and navigate to `docs/`. Note
+that this REST documentation is at an early stage and far from being complete.
 
 ## Skipchain Explorer
 
+There is a custom version of the Skipchain Explorer that support some of our
+custom smart contract. The Skipchain Exmplorer allows one to browse the
+blockchain and check its status.
+
 Ensure you have `yarn` installed
 
-```
+```bash
+# on mac
 brew install yarn
 ```
 
-Begin by cloning skipchain explorer and switching to the odyssey branch
+Begin by cloning the Skipchain Explorer and switching to the odyssey branch
 
-```
+```bash
 git clone https://github.com/gnarula/student_18_explorer.git
 git checkout odyssey
 ```
 
 Run the development server
 
-```
+```bash
 make build
 yarn run serve
 ```
 
-Click on Roster on the top right corner. Add the contents of your `roster.toml` in the dialog and click save.
+Click on Roster on the top right corner. Add the contents of your
+`ledger/conode/cothority_data/public.toml` in the dialog and click save.
 
-Select the skipchain from the dropdown menu. Use the `Status` tab to see the list of conodes and the `Graph` tab to see a visualisation of the blocks.
+Select the skipchain from the dropdown menu. Use the `Status` tab to see the
+list of conodes and the `Graph` tab to see a visualisation of the blocks.

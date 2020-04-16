@@ -1,11 +1,12 @@
 # Attributes
 
 Attributes are what control access to datasets. A data owner sets attributes on
-its datasets and a data scientist set the attributes on a project that requires
-to use the datasets. The attributes of the project must comply with the
-attributes of the selected datasets. For example, there might be an attribute of
-type "use" that defines the authorized use of a dataset. Let's say a data owner
-uploads a dataset and sets the following authorized uses:
+its datasets and a data scientist sets attributes on a project that requires the
+use of some datasets (a project is an instance of the project smart contract).
+The attributes of the project must comply with the attributes of the selected
+datasets. For example, there might be an attribute of type "use" that defines
+the authorized use of a dataset. Let's say a data owner uploads a dataset and
+sets the following authorized uses:
 
 Authorized uses for dataset X:
 - [ ] authorized for use A
@@ -20,19 +21,21 @@ Uses attributes on project Y:
 - [x] need authorized use B
 - [x] need authorized use C
 
-The project wont be validated because it requests dataset X that doesn't allow
-the "use C".
+The project wont be validated because the requested dataset X doesn't allow the
+"use C".
 
 The attributes can be described in json syntax, which is convenient to update
-the catalog. The attributes are split into two categories: "must_have" and
-"allowed". A "must_have" attribute is an attribute that must be selected by the
-data scientist to be accepted. In our previous example, the "use" attribute is
-of type "allowed": if "use C" is allowed on a dataset that doesn't mean that a
-data scientist must select "use C" to be accepted. An example of a "must_have"
+the catalog (the catalog is an instance of the catalog smart contract). The
+attributes are split into two categories: "must_have" and "allowed". A
+"must_have" attribute is an attribute that must be selected by the data
+scientist to be accepted. In our previous example, the "use" attribute is of
+type "allowed": if "use C" is allowed on a dataset that doesn't mean that a data
+scientist must select "use C" to be accepted. An example of a "must_have"
 attribute is an attribute that defines the accreditation needed to use a
-dataset. If a dataset sets a required accreditation attribute "confidential"
-then a data scientist must have this accreditation and set it in the project for
-the project to be accepted.
+dataset. If a dataset D has a "must_have" accreditation attribute
+"confidential", then a data scientist that creates a project requesting dataset
+D must have this accreditation and set it on the project's attributes for the
+project to be accepted.
 
 An attribute can have a "delegated_enforcement", which is necessary for
 attributes that can not be automatically validated because there is a textual
@@ -47,9 +50,9 @@ and so on. This gives us a flexible way to define complex attributes structures.
 ## Definition
 
 We used the following attributes definition in our demo. This definition is
-applied on the instance of a "catalog contract". See the [catalog
-section](https://dedis.github.io/odyssey/#/domanager?id=catalog) of the Data
-Owner Manager in order to set it on the catalog.
+applied on the catalog (ie. an instance of the catalog smart contract). See the
+[catalog section](https://dedis.github.io/odyssey/#/domanager?id=catalog) of the
+Data Owner Manager in order to set it on the catalog.
 
 ```json
 {
@@ -255,14 +258,21 @@ Owner Manager in order to set it on the catalog.
 }
 ```
 
+We then use this attributes definition to create an HTML form, which renders as
+follow:
+
+<div align="center">
+	<img src="assets/attr_form.png">
+</div>
+
 ## DARC
 
 The Data Owner Manager automatically translates the attributes set on the
 catalog to DARC definition on the "spawn:calypsoread" action of the
-corresponding dataset. Note: The Data Owner Manager adapts the HTML form
-displayed to update the attribute of datasets from the definition stored on the
-catalog. Here is the corresponding DARC definition of the attributes described in the
-previous section:
+corresponding dataset. The Data Owner Manager uses the HTML form to update the
+attributes of the corrseponding dataset and its DARC representation. Here is the
+corresponding DARC definition of the attributes described in the previous
+section:
 
 ```
 Darc(data owner)
@@ -295,7 +305,7 @@ Darc(data owner)
 ## Textual representation
 
 For the record, here is the textual representation of an instance of those
-attribures print by the "catalog contract":
+attribures prints by the catalog:
 
 ```
 - Metadata:

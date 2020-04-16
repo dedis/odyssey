@@ -1,30 +1,29 @@
 # Set up the cloud virtualization service
 
-The Odyssey project used VMware cloud in order to spin of and manage the
-lifecycle of vritual machine that we call "enclaves".
+The Odyssey project uses VMware vCloud in order to spin-off and manage the
+lifecycle of virtual machines that we call "enclaves".
 
 ## Setup the Swisscom cloud with its first vApp
 
-We used the [Swisscom Dynamic Compution
-servive](https://www.swisscom.ch/en/business/enterprise/offer/cloud-data-center/dynamic-computing-services.html)
-the the virtualization service. This server offers vMware vCloud, which allows
-one to manage virtual machines on the cloud.
+We use the [Swisscom Dynamic Computing
+service](https://www.swisscom.ch/en/business/enterprise/offer/cloud-data-center/dynamic-computing-services.html)
+as the virtualization service. This service offers vMware vCloud with a REST
+API, which allows us to manage our "enclaves" (ie. virtual machines) on the cloud.
 
-From https://extranet.swisscom.ch, select “Dynamic Computing”:
+The following is a set of instructions that documents how we set up our vCloud
+infrastructure:
+
+From https://extranet.swisscom.ch, select “Dynamic Computing” (**Note**: It doesn’t work on Safari):
 
 ![](assets/vcloud/1.png)
-
-**Note**: It doesn’t work on Safari.
 
 Select “Dynamic Data Center”:
 
 ![](assets/vcloud/2.png)
 
-Create an Internet Access:
+Create an Internet Access (**Note**: Do not select “Edge Gateway”):
 
 ![](assets/vcloud/3.png)
-
-**Note**: Do not select “Edge Gateway”.
 
 Then select “vCloud Director”:
 
@@ -52,18 +51,23 @@ On the same page, on “Guest OS Customization” uncheck “Auto generate passw
 
 ![](assets/vcloud/9.png)
 
-Then we are ready to start the VM, go to “Virtual Machines” > “Actions” > “Power on and Force Recustomization” (in this case it is already powered on):
+Then we are ready to start the VM, go to “Virtual Machines” > “Actions” > “Power
+on and Force Recustomization” (in this case it is already powered on). You
+should then be able to access your VM using the root user and custom password we
+previously set:
 
 ![](assets/vcloud/10.png)
 
 ## Create a template
+
+The template is the base VM image that will be copied to create new enclaves.
 
 You first need to create a catalog that will contain your new template. This is
 done by selecting "Librairies > Catalog > New":
 
 ![](assets/vcloud/23.png)
 
-Then **be sure** that the vApp you want to use as a template doesn't any **any
+Then **be sure** that the vApp you want to use as a template doesn't have **any
 network** attached to it. You can check it by selecting your vApp and checking
 the "Network" section. This section MUST be empty:
 
@@ -73,7 +77,7 @@ If the vApp template has already the network configured it will create some
 conflicts and it will be impossible to instantiate a new vApp from the vApp
 template. This is why the vApp template must not have any network configured.
 Then, when a new vApp is instantiated from the vApp template, we can attach the
-network to is and set “ip pool - manual” with one of the available ip.
+network to it and set “ip pool - manual” with one of the available ip.
 
 For the record this is one of the weird error we got until we understood that
 the network conflict was the problem:
@@ -92,12 +96,14 @@ Catalog":
 You can spawn a new vApp from the template and edit it using either the web
 console, or you can ssh to it (in this case you need to attache a network to the
 vApp). Once the changes are done, you must remove the network from the vApp and
-overwrite the template with the new vApp:
+overwrite the template with the new vApp. Like before, select "Add to Catalog"
+but then tick "Overwrite catalog item":
 
 ![](assets/vcloud/21.png)
 
-Also do not forget to restore the state of the vApp as is has never been used,
-by calling the script in `enclave/clean.sh` for example.
+Also before updating the template with a new vApp, do not forget to restore the
+state of this new vApp as if it has never been used before, by calling the
+script in `enclave/clean.sh` for example.
 
 Finally, since the template id has changed, you must save those changes in the
 `secrect.sh` script. Take only the id part:
@@ -106,8 +112,8 @@ Finally, since the template id has changed, you must save those changes in the
 
 ## Initial installation of the template
 
-You can follow the next series of command to setup the enclave template. The
-enclave template is a base ubuntu image that we copy when we initialize a new
+You can follow the next series of commands to setup the enclave template. The
+enclave template is a base ubuntu image that we copy when we create a new
 enclave:
 
 ### Basic installation

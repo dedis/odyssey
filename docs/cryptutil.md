@@ -2,10 +2,8 @@
 
 ## Purpose
 
-Command line utility based on the golang crypto library that offers AES-GCM
-symetric encryption / decryption of data.
-
-Based on https://gist.github.com/kkirsche/e28da6754c39d5e7ea10
+Cryptutil is a command line utility based on the golang crypto library that
+offers AES-GCM symetric encryption / decryption of data.
 
 ## Set up
 
@@ -52,6 +50,8 @@ cryptutil decrypt --keyAndInitVal aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbb
 ```
 
 ## Tests
+
+You can run the tests with the following:
 
 ```bash
 cd cryptutil

@@ -16,7 +16,7 @@ authenticating them via a Single Sign-On system, and authorising access
 to apps via some kind of access control list.  The IT department is also
 capable of and responsible for operating a hypervisor which will be used
 to spawn, run, and destroy enclaves. In our system, this hypervisor is
-the enclave manager.
+the enclave manager that uses the VMware vCloud REST API.
 
 ### Authorised users
 
@@ -44,7 +44,7 @@ organisation by collecting evidence of wrongdoing.
 Each component has its own folder at the root of the project. 
 
 - `catalogc/` the catalog smart contract
-- `cryptutil/` utility tool to encrypt/descript data
+- `cryptutil/` utility tool to encrypt/decrypt data
 - `domanager/` the data owner manager
 - `dsmanager/` the data scientist manager
 - `enclave/` scipts that run on each new enclave
@@ -52,7 +52,7 @@ Each component has its own folder at the root of the project.
 - `ledger/` the code taken from [cothority](https://github.com/dedis/cothority) to run a blockchain
 - `projectc/` the project smart contract
 
-## Http servers
+## HTTP servers
 
 `domanager/`, `dsmanager/`, and `enclavem/` are all http servers that use the
 native net/http library, coupled with some
@@ -65,7 +65,7 @@ rails](https://guides.rubyonrails.org/getting_started.html) framework:
 - `controllers/` contains the handlers that are mapped from the routes
 - `helpers/` common utilities needed mostly in the controllers
 - `models/` codes that support the different data model structures needed
-- `views/` html representations that are rendered from the controllers
+- `views/` html representations (go templates) that are rendered from the controllers
 
 It came out that some elements of the helpers were common to all our http
 servers. Instead of duplicating the codes accross the different helpers, we
@@ -74,6 +74,9 @@ would contain the common helpers. This is for example the case of the "Task"
 helper, which is used by all the 3 http servers.
 
 # About the DARCs
+
+DARCs are the elements protecting the resources on the blockchain. See the [DARC
+repo](https://github.com/dedis/cothority/tree/master/darc) for more infos.
 
 In order to later display the content of each DARC, the following table sets the
 vocabulary of each identites and DARCs:
@@ -96,7 +99,7 @@ control over the DARC and can set the URL and public key of the enclave.
 | ------ | ---- |
 | `invoke:darc.evolve` | `id(🐙)` |
 | `spawn:odysseyproject` | `id(🔬)` |
-| `invoke:odysseyproject.update` | `id(🔬)` |
+| `invoke:odysseyproject.updateMetadata` | `id(🔬)` |
 | `invoke:odysseyproject.updateStatus` | `id(🔬) \| id(🐙)` |
 | `invoke:odysseyproject.setURL` | `id(🐙)` |
 | `invoke:odysseyproject.setEnclavePubKey` | `id(🐙)` | 
@@ -104,9 +107,9 @@ control over the DARC and can set the URL and public key of the enclave.
 ## darc(🐙) - Enclave manager
 
 Rationale: The enclave manager doesn't need a DARC with a lot of rules on it
-because it creates itself the other DARCs and can then ensure it has the correct
-rights on them. For example, it creates the DARC for each dataset and ensure it
-can create a read request.
+because it creates itself the other DARCs and can then ensure they have the
+correct rights on them. For example, it creates the DARC for each dataset and
+ensure those DARCs can create a read request.
 
 | Action | Rule | 
 | ------ | ---- |

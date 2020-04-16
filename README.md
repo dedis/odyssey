@@ -13,7 +13,7 @@ Auditable Sharing and Management of Sensitive Data Across Jurisdictions.
 <img src="docs/assets/odyssey-components.png">
 </div>
 
-Odyssey is a set of applications and tools that enables the sharing sensitive
+Odyssey is a set of applications and tools that enables sharing of sensitive
 data between multiple distrustfull parties. This project uses state-of-the-art
 secret management service [1] on the blockchain [2] coupled with an enclave
 delivery mechanism. This uniq combination provides auditable access on shared
@@ -31,7 +31,7 @@ leakage.
 [1] [Calypso - Auditable Sharing of Private Data over Blockchains](https://eprint.iacr.org/2018/209)  
 [2] [OmniLedger: A Secure, Scale-Out, Decentralized Ledger via Sharding](https://eprint.iacr.org/2017/406)
 
-This repo holds all the components necessary to run the Odyssey projects. You
+This repo holds all the components necessary to run the Odyssey project. You
 will find 3 components:
 
 - **Data Scientist Manager**, user application that delivers requested datasets

@@ -4,7 +4,7 @@
 <img src="assets/odyssey-components.png">
 </center>
 
-Odyssey is a set of applications and tools that enables the sharing sensitive
+Odyssey is a set of applications and tools that enables sharing of sensitive
 data between multiple distrustfull parties. This project uses state-of-the-art
 secret management service [1] on the blockchain [2] coupled with an enclave
 delivery mechanism. This uniq combination provides auditable access on shared
@@ -22,7 +22,7 @@ leakage.
 [1] [Calypso - Auditable Sharing of Private Data over Blockchains](https://eprint.iacr.org/2018/209)  
 [2] [OmniLedger: A Secure, Scale-Out, Decentralized Ledger via Sharding](https://eprint.iacr.org/2017/406)
 
-This repo holds all the components necessary to run the Odyssey projects. You
+This repo holds all the components necessary to run the Odyssey project. You
 will find 3 components:
 
 - **Data Scientist Manager**, user application that delivers requested datasets
@@ -46,14 +46,18 @@ Additionally, some tools were needed to support the system:
 
 ## Demo
 
-Here is a 15 minutes video that walks throught the whole process from uploading
-a dataset to its use via a secure enclave.
+Here is a 15 minutes video that shows the DOManager and the DSManager in action.
+It walks throught the whole process from uploading a dataset to its use via a
+secure enclave.
 
 <div align="center">
 <a href="https://drive.google.com/file/d/1QBvqjBjUS3q0Z9CShm4pR7lBC6wbj6cw/view"><img src="assets/video.png"></a>
 </div>
 
 ## Screenshots
+
+Here are some screenshots of the DOManager and DSManager for a quick peek view
+of the UI.
 
 ### Data Owner Manager (upload and management of datasets)
 

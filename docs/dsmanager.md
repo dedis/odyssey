@@ -4,14 +4,15 @@
 
 This component allows a data scientist to request and use datasets based on the
 attributes of a project. The system only releases datasets if the attributes of
-the project comply with the access control rules set on each dataset by their
-respective data owners.
+the project comply with the access control rules (attributes converted to a DARC
+definition) set on each dataset by their respective data owners.
 
 The datasets are never directly delivered to the data scientist, but only via an
 encalve that controls the lifecycle of the data. Once the data are no longer
 needed by the data scientist, the enclave is entirely destroyed and no trace of
-the data can be recovered. The lifecycle of the data is witnessed by the nodes
-of the blokchain.
+the data can be recovered. The lifecycle of the data (ie. the status evolution
+of the enclave) is recorded on the blockchain and witnessed by the nodes
+supporting the blokchain.
 
 ## Executables
 
@@ -23,7 +24,8 @@ The following executables are needed at the root of `dsmanager/app` :
 - csadmin
 
 If you followed the [setup instructions](setup.md#generate-the-executables)
-those executables should already be on your gopath. Put them there with:
+those executables should already be on your gopath. Put them at the root of this
+module with:
 
 ```
 cd dsmanager/app
@@ -42,8 +44,8 @@ each of them.
 ## SSH keypair
 
 The enclave grants access via a ssh keypair that it find at the `PubKeyPath`
-variable that you must set in the configuration file. Put your public key there
-or generate a new keypair:
+variable that you must set in the configuration file. Put your current public
+key path there. You can also generate a new keypair with:
 
 ```bash
 # dsmanager/app
