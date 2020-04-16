@@ -83,4 +83,6 @@ it.
 ## Run
 
 From `dsmanager/app` run `go run main.go`. The app is reachable from:
-http://localhost:5001/
+http://localhost:5001/.
+
+You can exit the server with <kbd>ctrl</kbd>+<kbd>c</kbd>.

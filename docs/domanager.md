@@ -77,7 +77,9 @@ to set `Standalone = true`.
 
 ## Run
 
-From `domanager/app` run `go run main.go`. The app is reachable from: http://localhost:5002/
+From `domanager/app` run `go run main.go`. The app is reachable from: http://localhost:5002/.
+
+You can exit the server with <kbd>ctrl</kbd>+<kbd>c</kbd>.
 
 ## Login
 
