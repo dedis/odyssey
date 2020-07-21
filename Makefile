@@ -2,17 +2,19 @@
 
 all: cothority catadmin cryptutil pcadmin
 
+CO_VER=v3.4.5
+
 cothority:
 	@cd /tmp && \
 	rm -rf /tmp/cothority && \
 	echo "cloning cothority into /tmp..." && \
 	git clone https://github.com/dedis/cothority && \
 	cd cothority && \
-	git checkout tags/v3.4.4 && \
+	git checkout $(CO_VER) && \
 	go install ./byzcoin/bcadmin && \
-	echo "📌 bcadmin v3.4.4 installed globally" && \
+	echo "📌 bcadmin $(CO_VER) installed globally" && \
 	go install ./calypso/csadmin && \
-	echo "📌 csadmin v3.4.4 install globally" && \
+	echo "📌 csadmin $(CO_VER) install globally" && \
 	rm -rf /tmp/cothority
 
 catadmin:
