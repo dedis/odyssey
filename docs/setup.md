@@ -139,7 +139,7 @@ Create a new skipchain:
 
 ```bash
 # This file was created by the run_nodes.sh script
-bcadmin create ledger/conode/cothority_data/public.toml 
+bcadmin create --interval 1s ledger/conode/cothority_data/public.toml 
 # The output of the command offers you to export the BC variable. Copy/past the
 # last line into to your terminal
 export BC="path/to/folder/bc-BYZCOIN_ID.cfg"
@@ -179,6 +179,13 @@ csadmin authorize ledger/conode/cothority_data/co2/private.toml BYZCOIN_ID
 csadmin authorize ledger/conode/cothority_data/co3/private.toml BYZCOIN_ID
 ```
 
+In the next step, you will get some information that `domanager` will
+need, so prepare to record it:
+
+```bash
+cp domanager/app/config.toml.template domanager/app/config.toml
+```
+
 The next step is to setup a long term secret and then launch a distributed key
 generation protocol. Do those two steps with the following command. You will
 need the output of the first command to launch the second one:
@@ -190,9 +197,10 @@ csadmin contract lts spawn
 csadmin dkg start -i INSTANCE_ID
 ```
 
-The instance id that outputs the first command correponds to the needed `LtsID`
-configuration entry in `domanager/app/config.toml`, while the "X" that is
-displayed by the second command corresponds to the `LtsKey` entry.
+Take the instance id printed by the first command, and put it into
+`domanager/app/config.toml` in the key called `LtsId`. Take the
+result from the second command called `X`, and put it into
+the key called `LtsKey`.
 
 #### Add rules to the DARC
 
@@ -257,11 +265,10 @@ Ensure you have `yarn` installed
 brew install yarn
 ```
 
-Begin by cloning the Skipchain Explorer and switching to the odyssey branch
+Begin by cloning the Skipchain Explorer:
 
 ```bash
-git clone https://github.com/gnarula/student_18_explorer.git
-git checkout odyssey
+git clone https://github.com/dedis/student_18_explorer.git
 ```
 
 Run the development server
