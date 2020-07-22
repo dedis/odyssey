@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/sessions v1.2.0
-	github.com/mattn/goveralls v0.0.6 // indirect
 	github.com/minio/minio-go/v6 v6.0.53
 	github.com/stretchr/testify v1.5.1
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
