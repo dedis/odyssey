@@ -49,7 +49,7 @@ func lifecycleGet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}

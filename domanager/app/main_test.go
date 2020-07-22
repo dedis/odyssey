@@ -79,7 +79,7 @@ func Test_NotLogged(t *testing.T) {
 	// We should have been redirected to home (ie. "")
 	require.Equal(t, "", resp.Header.Get("Location"))
 	// We should have a message telling us to login
-	loginMessage := regexp.MustCompile("you need to be logged in to access this page")
+	loginMessage := regexp.MustCompile("You need to be logged in to access this page")
 	bodyBuf, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
 	require.True(t, loginMessage.MatchString(string(bodyBuf)))
