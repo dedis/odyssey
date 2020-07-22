@@ -17,6 +17,5 @@ require (
 	go.dedis.ch/protobuf v1.0.11
 	go.etcd.io/bbolt v1.3.4
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4
-	golang.org/x/tools v0.0.0-20200415034506-5d8e1897c761 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 )
