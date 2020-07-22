@@ -1,8 +1,2 @@
-co*/
-*.db
-log/
-public.toml
-running
-tmp/
+cothority_data
 conode
-cothority_data/
