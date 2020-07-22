@@ -34,7 +34,7 @@ cp `go env GOPATH`/bin/{bcadmin,catadmin,csadmin,pcadmin} .
 
 ## Configuration
 
-You must have the MINO_* variables from `variables.sh` loaded in your shell.
+You must have the MINIO_* variables from `variables.sh` loaded in your shell.
 (See section "Setup, Cloud configuration".)
 
 Then rename `app/config.toml.template` to `app/config.toml` and fill it
