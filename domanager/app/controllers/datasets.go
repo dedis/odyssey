@@ -173,7 +173,7 @@ func datasetsGet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -268,7 +268,7 @@ func datasetsPost(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -555,7 +555,7 @@ func datasetsNew(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -608,7 +608,7 @@ func datasetsShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -819,7 +819,7 @@ func datasetsShowPut(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -902,7 +902,7 @@ func datasetsShowDelete(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -1036,7 +1036,7 @@ func datasetsShowAttributesPut(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -1283,7 +1283,7 @@ func datasetsShowArchivePut(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -1522,7 +1522,7 @@ func datasetsShowAuditGet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
@@ -1601,7 +1601,7 @@ func datasetsShowDebugGet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "you need to be logged in to "+
+		xhelpers.RedirectWithWarningFlash("/", "You need to be logged in to "+
 			"access this page", w, r, store)
 		return
 	}
