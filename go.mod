@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/sessions v1.2.0
+	github.com/mattn/goveralls v0.0.6 // indirect
 	github.com/minio/minio-go/v6 v6.0.53
 	github.com/stretchr/testify v1.5.1
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
@@ -17,6 +18,5 @@ require (
 	go.dedis.ch/protobuf v1.0.11
 	go.etcd.io/bbolt v1.3.4
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4
-	golang.org/x/tools v0.0.0-20200415034506-5d8e1897c761 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 )
