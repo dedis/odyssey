@@ -28,7 +28,7 @@
         </div>
         <div class="right">
           {{ if .Session.IsLogged }}
-            <p>You are logged as <a href="/profile">{{ .Session.GetShortIdentity }}</a>
+            <p>You are logged in as <a href="/profile">{{ .Session.GetShortIdentity }}</a>
           {{ else }}
             <a href="/signin">Sign in</a>
           {{ end }}

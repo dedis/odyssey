@@ -157,13 +157,13 @@ func sessionDelete(w http.ResponseWriter, r *http.Request,
 
 	session, err := models.GetSession(store, r)
 	if err != nil {
-		xhelpers.RedirectWithErrorFlash("/", "failed to get session: "+
+		xhelpers.RedirectWithErrorFlash("/", "Failed to get session: "+
 			err.Error(), w, r, store)
 		return
 	}
 
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "your are not logged", w, r, store)
+		xhelpers.RedirectWithWarningFlash("/", "You are not logged in.", w, r, store)
 		return
 	}
 
@@ -194,7 +194,7 @@ func profileGet(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !session.IsLogged() {
-		xhelpers.RedirectWithWarningFlash("/", "your are not logged", w, r, store)
+		xhelpers.RedirectWithWarningFlash("/", "You are not logged in.", w, r, store)
 		return
 	}
 
