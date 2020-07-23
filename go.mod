@@ -13,7 +13,7 @@ require (
 	github.com/urfave/cli v1.22.4
 	go.dedis.ch/cothority/v3 v3.4.4
 	go.dedis.ch/kyber/v3 v3.0.12
-	go.dedis.ch/onet/v3 v3.2.1
+	go.dedis.ch/onet/v3 v3.2.4
 	go.dedis.ch/protobuf v1.0.11
 	go.etcd.io/bbolt v1.3.4
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4

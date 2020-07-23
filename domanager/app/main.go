@@ -57,7 +57,7 @@ func main() {
 		log.Fatal("failed to load config: ", err)
 	}
 
-	xlog.LLvl1("here is the catalog id:", conf.CatalogID)
+	xlog.Info("catalog id:", conf.CatalogID)
 
 	xlog.Info("loading db into memory")
 	err = loadDb()
