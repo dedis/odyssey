@@ -19,3 +19,5 @@ require (
 	golang.org/x/sys v0.0.0-20200523222454-059865788121
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 )
+
+replace go.dedis.ch/cothority/v3 => ../cothority
