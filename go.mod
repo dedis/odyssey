@@ -16,6 +16,6 @@ require (
 	go.dedis.ch/onet/v3 v3.2.4
 	go.dedis.ch/protobuf v1.0.11
 	go.etcd.io/bbolt v1.3.4
-	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4
+	golang.org/x/sys v0.0.0-20200523222454-059865788121
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 )
