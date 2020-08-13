@@ -197,7 +197,7 @@ func Test_Dataset_new(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 200, resp.StatusCode)
 
-	uploadMsg := regexp.MustCompile("<h1>Upload a new dataset</h1>")
+	uploadMsg := regexp.MustCompile("<h1>Upload ")
 	bodyBuf, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
 	require.True(t, uploadMsg.MatchString(string(bodyBuf)))
@@ -316,8 +316,8 @@ func Test_Dataset_POST(t *testing.T) {
 		t.Error("event didn't come after timeout")
 	}
 	require.Equal(t, "DO Manager", event.Source)
-	require.Equal(t, "genering a symmetric key", event.Message)
-	require.Equal(t, "genering a 16 bytes symmetric key", event.Details)
+	require.Equal(t, "generating a symmetric key", event.Message)
+	require.Equal(t, "generating a 16 byte symmetric key", event.Details)
 
 	select {
 	case event = <-task.eventChan:
@@ -325,8 +325,8 @@ func Test_Dataset_POST(t *testing.T) {
 		t.Error("event didn't come after timeout")
 	}
 	require.Equal(t, "DO Manager", event.Source)
-	require.Equal(t, "genering an nonce", event.Message)
-	require.Equal(t, "genering a 12 bytes nonce", event.Details)
+	require.Equal(t, "generating an nonce", event.Message)
+	require.Equal(t, "generating a 12 byte nonce", event.Details)
 
 	select {
 	case event = <-task.eventChan:

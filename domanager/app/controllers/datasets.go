@@ -409,15 +409,15 @@ func datasetsPost(w http.ResponseWriter, r *http.Request,
 
 		// Generating the symetric key and the initialization value. We need 16
 		// bytes for the key and 12 bytes for the initialization value
-		task.AddInfo(tef.Source, "genering a symmetric key",
-			"genering a 16 bytes symmetric key")
+		task.AddInfo(tef.Source, "generating a symmetric key",
+			"generating a 16 byte symmetric key")
 		key := make([]byte, 16)
 		_, err = rand.Read(key)
 		if err != nil {
 			task.CloseError(tef.Source, "failed to generate key", err.Error())
 			return
 		}
-		task.AddInfo(tef.Source, "genering an nonce", "genering a 12 bytes nonce")
+		task.AddInfo(tef.Source, "generating an nonce", "generating a 12 byte nonce")
 		iv := make([]byte, 12)
 		_, err = rand.Read(iv)
 		if err != nil {
